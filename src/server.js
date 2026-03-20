@@ -1410,7 +1410,7 @@ app.get("/mc/api/dashboard", requireSetupAuth, (_req, res) => {
 if (fs.existsSync(DASHBOARD_DIR)) {
   app.use("/mc", express.static(DASHBOARD_DIR));
   // SPA catch-all: serve index.html for any /mc/* route not matched above
-  app.get("/mc/*", (req, res) => {
+  app.get("/mc/{*splat}", (req, res) => {
     // Don't catch API routes
     if (req.path.startsWith("/mc/api/")) return res.status(404).json({ error: "Not found" });
     const indexPath = path.join(DASHBOARD_DIR, "index.html");
