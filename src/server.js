@@ -1359,6 +1359,75 @@ app.get("/mc/api/files", requireSetupAuth, (req, res) => {
   return res.json({ type: "file", content });
 });
 
+// File API: write files to the OpenClaw state directory.
+app.post("/mc/api/files", requireSetupAuth, (req, res) => {
+  const filePath = req.query.path;
+  if (!filePath || typeof filePath !== "string") {
+    return res.status(400).json({ error: "Missing ?path= parameter" });
+  }
+  const normalized = path.normalize(filePath);
+  if (normalized.includes("..") || path.isAbsolute(normalized)) {
+    return res.status(403).json({ error: "Path traversal not allowed" });
+  }
+  if (!PROJECTS_ALLOWED_PREFIXES.some((p) => normalized.startsWith(p))) {
+    return res.status(403).json({ error: "Path not in allowed scope" });
+  }
+  const { content } = req.body;
+  if (content === undefined || content === null) {
+    return res.status(400).json({ error: "Missing content in request body" });
+  }
+  const fullPath = path.join(STATE_DIR, normalized);
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, typeof content === "string" ? content : JSON.stringify(content, null, 2), "utf8");
+  return res.json({ ok: true, path: normalized });
+});
+
+// File API: delete files from the OpenClaw state directory.
+app.delete("/mc/api/files", requireSetupAuth, (req, res) => {
+  const filePath = req.query.path;
+  if (!filePath || typeof filePath !== "string") {
+    return res.status(400).json({ error: "Missing ?path= parameter" });
+  }
+  const normalized = path.normalize(filePath);
+  if (normalized.includes("..") || path.isAbsolute(normalized)) {
+    return res.status(403).json({ error: "Path traversal not allowed" });
+  }
+  if (!PROJECTS_ALLOWED_PREFIXES.some((p) => normalized.startsWith(p))) {
+    return res.status(403).json({ error: "Path not in allowed scope" });
+  }
+  const fullPath = path.join(STATE_DIR, normalized);
+  if (!fs.existsSync(fullPath)) {
+    return res.status(404).json({ error: "File not found" });
+  }
+  fs.unlinkSync(fullPath);
+  return res.json({ ok: true, deleted: normalized });
+});
+
+// List pending approvals across all projects
+app.get("/mc/api/approvals", requireSetupAuth, (_req, res) => {
+  const projectsDir = path.join(STATE_DIR, "shared", "projects");
+  if (!fs.existsSync(projectsDir)) {
+    return res.json({ approvals: [] });
+  }
+  const approvals = [];
+  const projects = fs.readdirSync(projectsDir, { withFileTypes: true }).filter((e) => e.isDirectory());
+  for (const proj of projects) {
+    const pendingDir = path.join(projectsDir, proj.name, "approvals", "pending");
+    if (!fs.existsSync(pendingDir)) continue;
+    const files = fs.readdirSync(pendingDir).filter((f) => f.endsWith(".json"));
+    for (const file of files) {
+      try {
+        const raw = fs.readFileSync(path.join(pendingDir, file), "utf8");
+        const data = JSON.parse(raw);
+        if (data.status === "resolved") continue; // skip tombstones
+        approvals.push({ ...data, _project: proj.name, _file: file });
+      } catch { /* skip malformed files */ }
+    }
+  }
+  approvals.sort((a, b) => (b.created || "").localeCompare(a.created || ""));
+  return res.json({ approvals });
+});
+
 // List all projects
 app.get("/mc/api/projects", requireSetupAuth, (_req, res) => {
   const projectsDir = path.join(STATE_DIR, "shared", "projects");
