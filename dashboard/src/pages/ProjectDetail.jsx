@@ -5,6 +5,12 @@ import {
   User, Wallet, Target, ShieldCheck, Bot,
 } from "lucide-react";
 import Markdown from "../components/Markdown.jsx";
+import { Skeleton } from "../components/ui/Skeleton.jsx";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/Tabs.jsx";
+import { StatusBadge } from "../components/StatusBadge.jsx";
+import { MetricCard } from "../components/MetricCard.jsx";
+import { EmptyState } from "../components/EmptyState.jsx";
+import { ActivityRow } from "../components/ActivityRow.jsx";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: FileText },
@@ -12,12 +18,6 @@ const TABS = [
   { id: "costs", label: "Costs", icon: DollarSign },
   { id: "activity", label: "Activity", icon: Clock },
 ];
-
-const STATUS_BADGE = {
-  active: "bg-green-900/50 text-green-300",
-  paused: "bg-orange-900/50 text-orange-300",
-  completed: "bg-blue-900/50 text-blue-300",
-};
 
 function parseProjectMd(raw) {
   if (!raw) return {};
@@ -88,9 +88,9 @@ export default function ProjectDetail({ projectId, navigate }) {
   if (loading) {
     return (
       <div className="space-y-4 p-4">
-        <div className="bg-accent/75 h-6 w-48" />
-        <div className="bg-accent/75 h-4 w-32" />
-        <div className="bg-accent/75 h-32 w-full" />
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }
@@ -117,13 +117,7 @@ export default function ProjectDetail({ projectId, navigate }) {
           <h2 className="text-xl font-semibold text-foreground">
             {project.title || projectId}
           </h2>
-          <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              STATUS_BADGE[project.status] || "bg-muted text-muted-foreground"
-            }`}
-          >
-            {project.status}
-          </span>
+          <StatusBadge status={project.status} />
         </div>
         <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
@@ -149,95 +143,87 @@ export default function ProjectDetail({ projectId, navigate }) {
         </div>
       </div>
 
-      {/* Tabs — line variant */}
-      <div className="flex gap-0 border-b border-border">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={`relative flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium transition-colors ${
-              tab === id
-                ? "text-foreground after:absolute after:inset-x-0 after:bottom-[-1px] after:h-0.5 after:bg-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Icon size={14} strokeWidth={1.8} />
-            {label}
-          </button>
-        ))}
-      </div>
+      {/* Tabs */}
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList>
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <TabsTrigger key={id} value={id}>
+              <Icon size={14} strokeWidth={1.8} />
+              {label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {/* Overview tab */}
-      {tab === "overview" && (
-        <div className="space-y-4">
-          {project.mission && (
-            <div className="border border-border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Target size={14} className="text-muted-foreground/50" />
-                <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                  Mission
+        {/* Overview tab */}
+        <TabsContent value="overview">
+          <div className="space-y-4">
+            {project.mission && (
+              <div className="border border-border p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Target size={14} className="text-muted-foreground/50" />
+                  <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                    Mission
+                  </h3>
+                </div>
+                <p className="text-sm text-foreground/80 leading-relaxed">{project.mission}</p>
+              </div>
+            )}
+
+            {milestones && (
+              <div className="border border-border p-4">
+                <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+                  Milestones
                 </h3>
+                <Markdown content={milestones} />
               </div>
-              <p className="text-sm text-foreground/80 leading-relaxed">{project.mission}</p>
-            </div>
-          )}
+            )}
 
-          {milestones && (
-            <div className="border border-border p-4">
-              <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
-                Milestones
-              </h3>
-              <Markdown content={milestones} />
-            </div>
-          )}
-
-          {project.gates && (
-            <div className="border border-border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <ShieldCheck size={14} className="text-muted-foreground/50" />
-                <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                  Approval Gates
-                </h3>
+            {project.gates && (
+              <div className="border border-border p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <ShieldCheck size={14} className="text-muted-foreground/50" />
+                  <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                    Approval Gates
+                  </h3>
+                </div>
+                <div className="divide-y divide-border">
+                  {project.gates
+                    .split("\n")
+                    .filter(Boolean)
+                    .map((gate, i) => {
+                      const text = gate.replace(/^-\s*/, "");
+                      const [name, requires] = text.split(":").map((s) => s.trim());
+                      return (
+                        <div key={i} className="flex items-center justify-between py-2 text-sm">
+                          <span className="text-foreground/80">{name}</span>
+                          {requires && (
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {requires}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
-              <div className="divide-y divide-border">
-                {project.gates
-                  .split("\n")
-                  .filter(Boolean)
-                  .map((gate, i) => {
-                    const text = gate.replace(/^-\s*/, "");
-                    const [name, requires] = text.split(":").map((s) => s.trim());
-                    return (
-                      <div key={i} className="flex items-center justify-between py-2 text-sm">
-                        <span className="text-foreground/80">{name}</span>
-                        {requires && (
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {requires}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
+            )}
 
-          {project.subagents && !project.subagents.includes("(none") && (
-            <div className="border border-border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Bot size={14} className="text-muted-foreground/50" />
-                <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                  Sub-agents
-                </h3>
+            {project.subagents && !project.subagents.includes("(none") && (
+              <div className="border border-border p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bot size={14} className="text-muted-foreground/50" />
+                  <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                    Sub-agents
+                  </h3>
+                </div>
+                <Markdown content={project.subagents} />
               </div>
-              <Markdown content={project.subagents} />
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        </TabsContent>
 
-      {/* Standups tab */}
-      {tab === "standups" && (
-        <div>
+        {/* Standups tab */}
+        <TabsContent value="standups">
           {standups.length === 0 ? (
             <EmptyState icon={Activity} text="No standups yet" sub="The lead will post daily updates here." />
           ) : (
@@ -252,109 +238,80 @@ export default function ProjectDetail({ projectId, navigate }) {
               ))}
             </div>
           )}
-        </div>
-      )}
+        </TabsContent>
 
-      {/* Costs tab */}
-      {tab === "costs" && (
-        <div className="space-y-4">
-          {costs.length === 0 ? (
-            <EmptyState icon={DollarSign} text="No cost data yet" sub="Agents will log their token usage here." />
-          ) : (
-            <>
-              {/* Summary metrics */}
-              <div className="grid grid-cols-2 gap-1">
-                <div className="border border-border p-4">
-                  <div className="text-2xl font-semibold tabular-nums font-mono">
-                    ${totalCost.toFixed(2)}
-                  </div>
-                  <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mt-1">
-                    Total Spend
-                  </div>
+        {/* Costs tab */}
+        <TabsContent value="costs">
+          <div className="space-y-4">
+            {costs.length === 0 ? (
+              <EmptyState icon={DollarSign} text="No cost data yet" sub="Agents will log their token usage here." />
+            ) : (
+              <>
+                {/* Summary metrics */}
+                <div className="grid grid-cols-2 gap-1">
+                  <MetricCard
+                    label="Total Spend"
+                    value={`$${totalCost.toFixed(2)}`}
+                    mono
+                  />
+                  <MetricCard
+                    label="Entries"
+                    value={costs.reduce((sum, c) => sum + (c.entries?.length || 0), 0)}
+                  />
                 </div>
-                <div className="border border-border p-4">
-                  <div className="text-2xl font-semibold tabular-nums">
-                    {costs.reduce((sum, c) => sum + (c.entries?.length || 0), 0)}
-                  </div>
-                  <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mt-1">
-                    Entries
-                  </div>
-                </div>
-              </div>
 
-              {/* Per-agent breakdown */}
-              <div className="border border-border divide-y divide-border">
-                {costs.map((c) => (
-                  <div key={c.agent} className="px-4 py-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-foreground">{c.agent}</span>
-                      <span className="text-sm font-mono tabular-nums text-foreground">
-                        ${c.total_usd?.toFixed(2) || "0.00"}
-                      </span>
-                    </div>
-                    {c.entries && c.entries.length > 0 && (
-                      <div className="space-y-1">
-                        {c.entries.slice(-5).map((e, i) => (
-                          <div key={i} className="flex justify-between text-xs text-muted-foreground">
-                            <span className="truncate mr-4">{e.task}</span>
-                            <span className="font-mono tabular-nums shrink-0">
-                              {e.type === "claude-code" ? (
-                                <span className="text-cyan-400">CC</span>
-                              ) : (
-                                `$${e.cost_usd?.toFixed(2)}`
-                              )}
-                            </span>
-                          </div>
-                        ))}
+                {/* Per-agent breakdown */}
+                <div className="border border-border divide-y divide-border">
+                  {costs.map((c) => (
+                    <div key={c.agent} className="px-4 py-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium text-foreground">{c.agent}</span>
+                        <span className="text-sm font-mono tabular-nums text-foreground">
+                          ${c.total_usd?.toFixed(2) || "0.00"}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      )}
+                      {c.entries && c.entries.length > 0 && (
+                        <div className="space-y-1">
+                          {c.entries.slice(-5).map((e, i) => (
+                            <div key={i} className="flex justify-between text-xs text-muted-foreground">
+                              <span className="truncate mr-4">{e.task}</span>
+                              <span className="font-mono tabular-nums shrink-0">
+                                {e.type === "claude-code" ? (
+                                  <span className="text-cyan-400">CC</span>
+                                ) : (
+                                  `$${e.cost_usd?.toFixed(2)}`
+                                )}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </TabsContent>
 
-      {/* Activity tab */}
-      {tab === "activity" && (
-        <div>
+        {/* Activity tab */}
+        <TabsContent value="activity">
           {activities.length === 0 ? (
             <EmptyState icon={Clock} text="No activity yet" sub="Events will appear as the project progresses." />
           ) : (
             <div className="border border-border divide-y divide-border">
               {activities.map((a, i) => (
-                <div
+                <ActivityRow
                   key={i}
-                  className="flex items-start gap-3 px-4 py-2.5 text-sm"
-                >
-                  <span className="shrink-0 text-xs text-muted-foreground font-mono tabular-nums pt-0.5 w-28">
-                    {a.time}
-                  </span>
-                  <span className="shrink-0">
-                    <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-accent text-accent-foreground">
-                      {a.agent}
-                    </span>
-                  </span>
-                  <span className="text-foreground/80">{a.event}</span>
-                </div>
+                  time={a.time}
+                  agent={a.agent}
+                  event={a.event}
+                />
               ))}
             </div>
           )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EmptyState({ icon: Icon, text, sub }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-center border border-border">
-      <div className="bg-muted/50 p-4 mb-4">
-        <Icon className="h-10 w-10 text-muted-foreground/50" />
-      </div>
-      <p className="text-sm text-muted-foreground">{text}</p>
-      {sub && <p className="text-xs text-muted-foreground/60 mt-1">{sub}</p>}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

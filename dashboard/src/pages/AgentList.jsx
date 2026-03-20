@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { getFile } from "../api.js";
+import { MetricCard } from "../components/MetricCard.jsx";
+import { Badge } from "../components/ui/Badge.jsx";
 
 const AGENTS = [
   { name: "Sam", workspace: "workspace", role: "Cross-project coordinator", canLead: false },
@@ -36,24 +38,9 @@ export default function AgentList() {
 
       {/* Metric row */}
       <div className="grid grid-cols-3 gap-1">
-        <div className="border border-border p-4">
-          <div className="text-2xl font-semibold tabular-nums">{AGENTS.length}</div>
-          <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mt-1">
-            Total
-          </div>
-        </div>
-        <div className="border border-border p-4">
-          <div className="text-2xl font-semibold tabular-nums">{leads.length}</div>
-          <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mt-1">
-            Can Lead
-          </div>
-        </div>
-        <div className="border border-border p-4">
-          <div className="text-2xl font-semibold tabular-nums">{specialists.length}</div>
-          <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mt-1">
-            Specialists
-          </div>
-        </div>
+        <MetricCard label="Total" value={AGENTS.length} />
+        <MetricCard label="Can Lead" value={leads.length} />
+        <MetricCard label="Specialists" value={specialists.length} />
       </div>
 
       {/* Project leads */}
@@ -105,14 +92,14 @@ function AgentRow({ agent, tasks }) {
 
         {/* Lead badge */}
         {agent.canLead && (
-          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-secondary text-secondary-foreground shrink-0">
+          <Badge variant="secondary" className="shrink-0">
             lead
-          </span>
+          </Badge>
         )}
 
         {/* Expand indicator */}
         <span className="text-muted-foreground/50 text-xs shrink-0">
-          {tasks !== undefined ? (expanded ? "▾" : "▸") : ""}
+          {tasks !== undefined ? (expanded ? "\u25BE" : "\u25B8") : ""}
         </span>
       </button>
 
