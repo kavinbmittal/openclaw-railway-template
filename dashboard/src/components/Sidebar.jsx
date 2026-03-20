@@ -10,19 +10,6 @@ import {
 } from "lucide-react";
 import { getApprovals, getProjects } from "../api.js";
 
-/* ── Agent roster (static — matches OpenClaw TEAM.md) ─────────────── */
-const AGENTS = [
-  { id: "sam", name: "Sam", role: "Coordinator", lead: false },
-  { id: "binny", name: "Binny", role: "Lia PM", lead: true },
-  { id: "ej", name: "EJ", role: "Engineering", lead: false },
-  { id: "kiko", name: "Kiko", role: "Celestial PM", lead: true },
-  { id: "leslie", name: "Leslie", role: "Growth", lead: true },
-  { id: "zara", name: "Zara", role: "Design, UX", lead: true },
-  { id: "ritam", name: "Ritam", role: "Researcher", lead: true },
-  { id: "jon", name: "Jon", role: "Apps Research", lead: false },
-  { id: "midas", name: "Midas", role: "Crypto", lead: true },
-];
-
 /* ── Predefined project colors (cycled) ────────────────────────────── */
 const PROJECT_COLORS = [
   "#ec4899", // pink
@@ -226,31 +213,14 @@ export default function Sidebar({ page, navigate }) {
           )}
         </SidebarSection>
 
-        {/* ── Agents section ───────────────────────────────────── */}
-        <SidebarSection
-          label="Agents"
-          collapsible
-          action={null}
-        >
-          {AGENTS.map((agent) => (
-            <button
-              key={agent.id}
-              onClick={() => navigate("agents")}
-              className={`flex items-center gap-2.5 px-3 py-1.5 text-[13px] font-medium transition-colors w-full text-left ${
-                page === "agents"
-                  ? "text-foreground/80 hover:bg-accent/50 hover:text-foreground"
-                  : "text-foreground/80 hover:bg-accent/50 hover:text-foreground"
-              }`}
-            >
-              <Bot className="shrink-0 h-3.5 w-3.5 text-muted-foreground" />
-              <span className="flex-1 truncate">{agent.name}</span>
-              {agent.lead && (
-                <span className="ml-auto shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-none font-medium bg-blue-500/15 text-blue-400 border border-blue-500/20">
-                  lead
-                </span>
-              )}
-            </button>
-          ))}
+        {/* ── Work section ────────────────────────────────────── */}
+        <SidebarSection label="Work">
+          <SidebarNavItem
+            active={page === "agents"}
+            onClick={() => navigate("agents")}
+            icon={Bot}
+            label="Agents"
+          />
         </SidebarSection>
       </nav>
 
