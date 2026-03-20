@@ -91,7 +91,7 @@ function SidebarNavItem({ active, onClick, icon: Icon, label, badge, badgeTone =
 }
 
 /* ── Main sidebar ──────────────────────────────────────────────────── */
-export default function Sidebar({ page, navigate }) {
+export default function Sidebar({ page, navigate, refreshKey }) {
   const [approvalCount, setApprovalCount] = useState(0);
   const [projects, setProjects] = useState([]);
 
@@ -106,7 +106,7 @@ export default function Sidebar({ page, navigate }) {
     return () => clearInterval(interval);
   }, []);
 
-  /* Load projects */
+  /* Load projects (re-fetch on navigation) */
   useEffect(() => {
     const load = () =>
       getProjects()
@@ -115,7 +115,7 @@ export default function Sidebar({ page, navigate }) {
     load();
     const interval = setInterval(load, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshKey]);
 
   /* Assign stable colors to projects */
   const coloredProjects = useMemo(
