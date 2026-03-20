@@ -4,8 +4,9 @@
  */
 
 function fillColor(pct) {
-  if (pct > 90) return "bg-red-400";
-  if (pct > 70) return "bg-yellow-400";
+  if (pct > 95) return "bg-red-400";
+  if (pct > 80) return "bg-orange-400";
+  if (pct > 60) return "bg-yellow-400";
   return "bg-green-400";
 }
 

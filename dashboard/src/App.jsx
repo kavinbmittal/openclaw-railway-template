@@ -10,6 +10,7 @@ import Inbox from "./pages/Inbox.jsx";
 import Activity from "./pages/Activity.jsx";
 import Issues from "./pages/Issues.jsx";
 import IssueDetail from "./pages/IssueDetail.jsx";
+import Costs from "./pages/Costs.jsx";
 
 export default function App() {
   const [page, setPage] = useState("overview");
@@ -66,6 +67,7 @@ export default function App() {
             {page === "approvals" && <Approvals navigate={navigate} />}
             {page === "inbox" && <Inbox navigate={navigate} />}
             {page === "activity" && <Activity navigate={navigate} />}
+            {page === "costs" && <Costs navigate={navigate} />}
             {page === "issues" && selectedProject && (
               <Issues projectSlug={selectedProject} navigate={navigate} />
             )}

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getFile } from "../api.js";
 import { MetricCard } from "../components/MetricCard.jsx";
 import { Badge } from "../components/ui/Badge.jsx";
-import { Circle, Clock, Pause, CheckCircle2, ListTodo } from "lucide-react";
+import { Circle, Clock, Pause, CheckCircle2, ListTodo, ChevronRight } from "lucide-react";
 
 const AGENTS = [
   { name: "Sam", workspace: "workspace", role: "Cross-project coordinator", canLead: false },
@@ -67,7 +67,7 @@ function parseTasks(raw) {
   return Object.keys(sections).length > 0 ? sections : null;
 }
 
-export default function AgentList() {
+export default function AgentList({ navigate }) {
   const [tasks, setTasks] = useState({});
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function AgentList() {
         </h3>
         <div className="border border-border divide-y divide-border">
           {leads.map((agent) => (
-            <AgentRow key={agent.name} agent={agent} rawTasks={tasks[agent.name]} />
+            <AgentRow key={agent.name} agent={agent} rawTasks={tasks[agent.name]} navigate={navigate} />
           ))}
         </div>
       </div>
@@ -110,7 +110,7 @@ export default function AgentList() {
         </h3>
         <div className="border border-border divide-y divide-border">
           {specialists.map((agent) => (
-            <AgentRow key={agent.name} agent={agent} rawTasks={tasks[agent.name]} />
+            <AgentRow key={agent.name} agent={agent} rawTasks={tasks[agent.name]} navigate={navigate} />
           ))}
         </div>
       </div>
@@ -118,32 +118,57 @@ export default function AgentList() {
   );
 }
 
-function AgentRow({ agent, rawTasks }) {
+function AgentRow({ agent, rawTasks, navigate }) {
   const [expanded, setExpanded] = useState(false);
   const parsed = parseTasks(rawTasks);
 
   // Count in-progress tasks for the badge
   const inProgressCount = parsed?.["In Progress"]?.length || 0;
+  const firstTask = parsed?.["In Progress"]?.[0]?.text;
+  const isActive = inProgressCount > 0;
+
+  const handleClick = () => {
+    if (navigate) {
+      navigate("agent-detail", agent.workspace);
+    }
+  };
+
+  const handleExpandToggle = (e) => {
+    e.stopPropagation();
+    setExpanded(!expanded);
+  };
 
   return (
     <div>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-3 px-4 py-2.5 text-sm w-full text-left transition-colors hover:bg-accent/50"
+      <div
+        onClick={handleClick}
+        className="flex items-center gap-3 px-4 py-2.5 text-sm w-full text-left transition-colors hover:bg-accent/50 cursor-pointer"
       >
+        {/* Status dot */}
         <span className="relative flex h-2 w-2 shrink-0">
-          {inProgressCount > 0 ? (
+          {isActive ? (
             <>
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-70" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22c55e] opacity-50" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22c55e]" />
             </>
           ) : (
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6b7280]" />
           )}
         </span>
 
-        <span className="font-medium text-foreground w-20 shrink-0">{agent.name}</span>
-        <span className="text-xs text-muted-foreground flex-1 truncate">{agent.role}</span>
+        {/* Name and role */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-foreground shrink-0">{agent.name}</span>
+            <span className="text-xs text-muted-foreground truncate">{agent.role}</span>
+          </div>
+          {/* Current work subtitle */}
+          {firstTask && (
+            <p className="text-xs text-muted-foreground/60 truncate mt-0.5">
+              {firstTask}
+            </p>
+          )}
+        </div>
 
         {inProgressCount > 0 && (
           <span className="text-xs text-cyan-400 font-mono tabular-nums shrink-0">
@@ -157,13 +182,20 @@ function AgentRow({ agent, rawTasks }) {
           </Badge>
         )}
 
-        <span className="text-muted-foreground/50 text-xs shrink-0">
+        {/* Expand toggle */}
+        <button
+          onClick={handleExpandToggle}
+          className="text-muted-foreground/50 text-xs shrink-0 p-1 hover:text-foreground transition-colors"
+        >
           {rawTasks !== undefined ? (expanded ? "\u25BE" : "\u25B8") : ""}
-        </span>
-      </button>
+        </button>
+
+        {/* Navigate arrow */}
+        <ChevronRight size={14} className="text-muted-foreground/30 shrink-0" />
+      </div>
 
       {expanded && rawTasks !== undefined && (
-        <div className="px-4 pb-3 pt-1">
+        <div className="px-4 pb-3 pt-1" onClick={(e) => e.stopPropagation()}>
           {parsed ? (
             <div className="space-y-3">
               {Object.entries(SECTION_CONFIG).map(([key, config]) => {

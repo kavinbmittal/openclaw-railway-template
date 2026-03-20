@@ -10,6 +10,7 @@ import {
   Inbox,
   Activity,
   CircleDot,
+  DollarSign,
 } from "lucide-react";
 import { getApprovals, getProjects, getInbox } from "../api.js";
 
@@ -198,6 +199,12 @@ export default function Sidebar({ page, navigate, refreshKey }) {
             onClick={() => navigate("activity")}
             icon={Activity}
             label="Activity"
+          />
+          <SidebarNavItem
+            active={page === "costs"}
+            onClick={() => navigate("costs")}
+            icon={DollarSign}
+            label="Costs"
           />
         </div>
 

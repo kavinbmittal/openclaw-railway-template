@@ -318,6 +318,164 @@ export default function ProjectDetail({ projectId, navigate }) {
   );
 }
 
+function ProjectCostsTab({ costs, costSummary, budgetPolicy, totalCost, projectId, onEditBudget }) {
+  const cs = costSummary || {};
+  const budget = cs.budget || 0;
+  const utilizationPct = cs.utilizationPct || 0;
+  const remaining = cs.remaining || 0;
+  const dailyBurnRate = cs.dailyBurnRate || 0;
+  const exhaustionDate = cs.exhaustionDate;
+  const entries = cs.entries || [];
+  const agentSummaries = cs.agents || [];
+
+  if (costs.length === 0 && entries.length === 0) {
+    return (
+      <EmptyState icon={DollarSign} text="No cost data yet" sub="Agents will log their token usage here." />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Budget policy card */}
+      <div className="border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Wallet size={14} className="text-muted-foreground/50" />
+            <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              Budget Policy
+            </h3>
+          </div>
+          <button
+            onClick={onEditBudget}
+            className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+          >
+            <Pencil size={12} />
+            Edit Budget
+          </button>
+        </div>
+
+        {budget > 0 && (
+          <QuotaBar
+            label="Weekly Budget"
+            percentUsed={utilizationPct}
+            leftLabel={`$${totalCost.toFixed(2)} / $${budget}`}
+            rightLabel={`${utilizationPct}%`}
+          />
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60">Spend</p>
+            <p className="text-lg font-semibold font-mono tabular-nums mt-0.5">${totalCost.toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60">Budget</p>
+            <p className="text-lg font-semibold font-mono tabular-nums mt-0.5">
+              {budget > 0 ? `$${budget}/wk` : "No cap"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60">Remaining</p>
+            <p className="text-lg font-semibold font-mono tabular-nums mt-0.5">
+              {budget > 0 ? `$${remaining.toFixed(2)}` : "--"}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60">Burn Rate</p>
+            <div className="mt-0.5">
+              <BurnRateIndicator dailyRate={dailyBurnRate} compact />
+            </div>
+          </div>
+        </div>
+
+        {exhaustionDate && (
+          <p className="text-xs text-muted-foreground">
+            Projected exhaustion: <span className="font-mono tabular-nums">{exhaustionDate}</span>
+          </p>
+        )}
+
+        {budgetPolicy && (
+          <div className="flex gap-4 text-[10px] text-muted-foreground/50 pt-1 border-t border-border/50">
+            <span>Warn: {Math.round((budgetPolicy.warn_threshold || 0.8) * 100)}%</span>
+            <span>Stop: {Math.round((budgetPolicy.stop_threshold || 1.0) * 100)}%</span>
+            {budgetPolicy.per_agent_limits && Object.keys(budgetPolicy.per_agent_limits).length > 0 && (
+              <span>
+                Agent limits: {Object.entries(budgetPolicy.per_agent_limits)
+                  .map(([a, l]) => `${a}: $${l}`)
+                  .join(", ")}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Summary metrics */}
+      <div className="grid grid-cols-2 gap-1">
+        <MetricCard
+          label="Total Spend"
+          value={`$${totalCost.toFixed(2)}`}
+          mono
+        />
+        <MetricCard
+          label="Entries"
+          value={entries.length || costs.reduce((sum, c) => sum + (c.entries?.length || 0), 0)}
+        />
+      </div>
+
+      {/* Per-agent breakdown */}
+      {(agentSummaries.length > 0 || costs.length > 0) && (
+        <div>
+          <h4 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-2">
+            Per-Agent Breakdown
+          </h4>
+          <div className="border border-border divide-y divide-border">
+            {(agentSummaries.length > 0 ? agentSummaries : costs).map((c) => {
+              const agentName = c.agent;
+              const agentTotal = c.totalUsd ?? c.total_usd ?? 0;
+              const agentLimit = budgetPolicy?.per_agent_limits?.[agentName];
+              const agentPct = agentLimit ? Math.round((agentTotal / agentLimit) * 100) : null;
+
+              return (
+                <div key={agentName} className="px-4 py-3">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium text-foreground">{agentName}</span>
+                    <span className="text-sm font-mono tabular-nums text-foreground">
+                      ${agentTotal.toFixed(2)}
+                    </span>
+                  </div>
+                  {agentLimit && (
+                    <QuotaBar
+                      label=""
+                      percentUsed={agentPct}
+                      leftLabel={`$${agentTotal.toFixed(2)} / $${agentLimit}`}
+                      rightLabel={`${agentPct}%`}
+                      className="mt-1"
+                    />
+                  )}
+                  <p className="text-[10px] text-muted-foreground/50 mt-1">
+                    {c.entryCount ?? c.entries?.length ?? 0} entries
+                    {agentLimit ? ` | Limit: $${agentLimit}` : ""}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Cost timeline */}
+      {entries.length > 0 && (
+        <div>
+          <h4 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-2">
+            Cost Timeline
+          </h4>
+          <CostTimeline entries={entries.slice(0, 50)} />
+        </div>
+      )}
+    </div>
+  );
+}
+
 async function loadStandups(projectId) {
   try {
     const dir = await getFile(`shared/projects/${projectId}/standups`);
