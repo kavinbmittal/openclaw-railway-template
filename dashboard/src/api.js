@@ -58,7 +58,7 @@ export async function createProject({ name, mission, lead, budget, gates }) {
 **Created:** ${today}
 **Status:** active
 
-## Mission
+## Mission / Goal
 ${mission}
 
 ## Approval Gates
@@ -189,39 +189,11 @@ export async function updateBudgetPolicy({ project, weekly_budget_usd, warn_thre
   return res.json();
 }
 
-// --- Goals API ---
+// --- Projects Summary API ---
 
-export async function getGoals() {
-  const data = await fetchJSON(`${BASE}/goals`);
-  return data.goals || [];
-}
-
-export async function createGoal({ title, level, parent, projects, status }) {
-  const res = await fetch(`${BASE}/goals`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, level, parent, projects, status }),
-  });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json();
-}
-
-export async function updateGoal(id, updates) {
-  const res = await fetch(`${BASE}/goals/${encodeURIComponent(id)}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updates),
-  });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json();
-}
-
-export async function deleteGoal(id) {
-  const res = await fetch(`${BASE}/goals/${encodeURIComponent(id)}`, {
-    method: "DELETE",
-  });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json();
+export async function getProjectsSummary() {
+  const data = await fetchJSON(`${BASE}/projects/summary`);
+  return data.projects || [];
 }
 
 // --- Org Chart API ---

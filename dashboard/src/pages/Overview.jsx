@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getProjects, getInbox, getIssues, getGoals } from "../api.js";
-import { FolderKanban, User, DollarSign, ArrowRight, AlertTriangle, CheckCircle, ArrowUpRight, CircleDot, Target } from "lucide-react";
+import { getProjects, getInbox, getIssues, getProjectsSummary } from "../api.js";
+import { FolderKanban, User, DollarSign, ArrowRight, AlertTriangle, CheckCircle, ArrowUpRight, CircleDot, Milestone } from "lucide-react";
 import { Skeleton } from "../components/ui/Skeleton.jsx";
 import { MetricCard } from "../components/MetricCard.jsx";
 import { StatusBadge, STATUS_DOT } from "../components/StatusBadge.jsx";
@@ -8,6 +8,7 @@ import { EmptyState } from "../components/EmptyState.jsx";
 import { EntityRow } from "../components/EntityRow.jsx";
 import { PriorityDot } from "../components/PriorityIcon.jsx";
 import { StatusCircle } from "../components/StatusSelect.jsx";
+import { QuotaBar } from "../components/QuotaBar.jsx";
 
 function timeAgo(iso) {
   if (!iso) return "";
@@ -20,24 +21,37 @@ function timeAgo(iso) {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
+function parseBudgetNumber(budgetStr) {
+  if (!budgetStr) return 0;
+  const m = budgetStr.match(/\$(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+function truncate(str, max) {
+  if (!str) return "";
+  const firstLine = str.split("\n")[0];
+  if (firstLine.length <= max) return firstLine;
+  return firstLine.slice(0, max) + "...";
+}
+
 export default function Overview({ navigate }) {
   const [projects, setProjects] = useState([]);
+  const [projectSummaries, setProjectSummaries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [inboxCount, setInboxCount] = useState(null);
   const [recentIssues, setRecentIssues] = useState([]);
-  const [goals, setGoals] = useState([]);
 
   useEffect(() => {
     Promise.all([
       getProjects(),
       getInbox().catch(() => null),
-      getGoals().catch(() => []),
+      getProjectsSummary().catch(() => []),
     ])
-      .then(async ([projs, inbox, goalsData]) => {
+      .then(async ([projs, inbox, summaries]) => {
         setProjects(projs);
+        setProjectSummaries(summaries);
         if (inbox?.counts) setInboxCount(inbox.counts.total || 0);
-        setGoals(goalsData || []);
         // Load recent issues across all projects
         try {
           const allIssues = [];
@@ -83,11 +97,11 @@ export default function Overview({ navigate }) {
 
   const activeCount = projects.filter((p) => p.status === "active").length;
   const totalBudget = projects
-    .map((p) => {
-      const match = p.budget?.match(/\$(\d+)/);
-      return match ? parseInt(match[1]) : 0;
-    })
+    .map((p) => parseBudgetNumber(p.budget))
     .reduce((a, b) => a + b, 0);
+
+  // Use summaries if available, else fall back to basic projects list
+  const displayProjects = projectSummaries.length > 0 ? projectSummaries : projects;
 
   return (
     <div className="space-y-6">
@@ -133,47 +147,108 @@ export default function Overview({ navigate }) {
         <MetricCard label="Agents" value="9" />
       </div>
 
-      {/* Projects section */}
+      {/* Project Progress section */}
       <div>
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-          Projects
+          Project Progress
         </h3>
 
-        {projects.length === 0 ? (
+        {displayProjects.length === 0 ? (
           <EmptyState
             icon={FolderKanban}
             text="No projects yet"
             sub="Create a project directory in shared/projects/"
           />
         ) : (
-          <div className="border border-border divide-y divide-border">
-            {projects.map((project) => (
-              <EntityRow
-                key={project.id}
-                onClick={() => navigate("project", project.id)}
-                leading={
-                  <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${
-                      STATUS_DOT[project.status] || STATUS_DOT.unknown
-                    }`}
-                  />
-                }
-                title={project.title}
-                trailing={
-                  <>
-                    <StatusBadge status={project.status} />
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                      <User size={12} />
-                      {project.lead}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-mono tabular-nums shrink-0">
-                      {project.budget}
-                    </span>
-                    <ArrowRight size={14} className="text-muted-foreground/50 shrink-0" />
-                  </>
-                }
-              />
-            ))}
+          <div className="border border-border overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left">
+                  <th className="px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60 font-medium">Project</th>
+                  <th className="px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60 font-medium hidden lg:table-cell">Mission / Goal</th>
+                  <th className="px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60 font-medium hidden sm:table-cell">Lead</th>
+                  <th className="px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60 font-medium hidden md:table-cell">Milestone</th>
+                  <th className="px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60 font-medium">Issues</th>
+                  <th className="px-4 py-2.5 text-[10px] uppercase tracking-[0.16em] text-muted-foreground/60 font-medium hidden sm:table-cell min-w-[140px]">Budget</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {displayProjects.map((project) => {
+                  const slug = project.id || project.slug;
+                  const budgetNum = parseBudgetNumber(project.budget);
+                  const spend = project.totalSpend || 0;
+                  const utilizationPct = budgetNum > 0 ? Math.round((spend / budgetNum) * 100) : 0;
+
+                  return (
+                    <tr
+                      key={slug}
+                      onClick={() => navigate("project", slug)}
+                      className="cursor-pointer hover:bg-accent/50 transition-colors"
+                    >
+                      {/* Project name + status */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-2 h-2 rounded-full shrink-0 ${
+                              STATUS_DOT[project.status] || STATUS_DOT.unknown
+                            }`}
+                          />
+                          <span className="font-medium text-foreground truncate max-w-[200px]">
+                            {project.title || slug}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Mission / Goal */}
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        <span className="text-xs text-muted-foreground truncate block max-w-[240px]">
+                          {truncate(project.mission || "", 60) || "--"}
+                        </span>
+                      </td>
+
+                      {/* Lead */}
+                      <td className="px-4 py-3 hidden sm:table-cell">
+                        <span className="text-xs text-muted-foreground capitalize">{project.lead || "--"}</span>
+                      </td>
+
+                      {/* Milestone */}
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <span className="text-xs text-muted-foreground truncate block max-w-[200px]">
+                          {project.currentMilestone
+                            ? truncate(project.currentMilestone, 40)
+                            : <span className="text-muted-foreground/40 italic">No milestones yet</span>}
+                        </span>
+                      </td>
+
+                      {/* Issues */}
+                      <td className="px-4 py-3">
+                        <span className="text-xs font-mono tabular-nums text-muted-foreground">
+                          {project.issuesDone != null
+                            ? `${project.issuesDone}/${project.issuesTotal}`
+                            : "--"}
+                        </span>
+                      </td>
+
+                      {/* Budget */}
+                      <td className="px-4 py-3 hidden sm:table-cell">
+                        {budgetNum > 0 ? (
+                          <div className="min-w-[120px]">
+                            <QuotaBar
+                              label=""
+                              percentUsed={utilizationPct}
+                              leftLabel={`$${spend.toFixed(0)}/$${budgetNum}`}
+                              rightLabel={`${utilizationPct}%`}
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/40">No budget</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
@@ -213,58 +288,6 @@ export default function Overview({ navigate }) {
                 }
               />
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Goals summary section */}
-      {goals.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Goals
-            </h3>
-            <button
-              onClick={() => navigate("goals")}
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              View all <ArrowRight size={12} />
-            </button>
-          </div>
-          <div className="border border-border divide-y divide-border">
-            {goals
-              .filter((g) => g.level === "company" || !g.parent)
-              .slice(0, 5)
-              .map((goal) => {
-                const pct = Math.round((goal.progress || 0) * 100);
-                return (
-                  <EntityRow
-                    key={goal.id}
-                    onClick={() => navigate("goals")}
-                    leading={
-                      <Target size={14} className="text-muted-foreground" />
-                    }
-                    title={goal.title}
-                    trailing={
-                      <>
-                        <div className="flex items-center gap-1.5 shrink-0 w-20 hidden sm:flex">
-                          <div className="relative h-1.5 flex-1 bg-muted overflow-hidden rounded-full">
-                            <div
-                              className={`absolute inset-y-0 left-0 rounded-full transition-all ${
-                                pct >= 100 ? "bg-green-400" : pct >= 60 ? "bg-blue-400" : pct >= 30 ? "bg-yellow-400" : "bg-muted-foreground/40"
-                              }`}
-                              style={{ width: `${Math.min(pct, 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-[10px] text-muted-foreground tabular-nums">{pct}%</span>
-                        </div>
-                        <StatusBadge status={goal.status} />
-                        <ArrowRight size={14} className="text-muted-foreground/50 shrink-0" />
-                      </>
-                    }
-                  />
-                );
-              })}
           </div>
         </div>
       )}

@@ -2369,101 +2369,99 @@ app.put("/mc/api/budget-policy", requireSetupAuth, (req, res) => {
   return res.json({ ok: true, policy });
 });
 
-// --- Goals API ---
+// --- Projects Summary API ---
 
-app.get("/mc/api/goals", requireSetupAuth, (_req, res) => {
-  const goalsPath = path.join(STATE_DIR, "shared", "goals.json");
-  try {
-    if (!fs.existsSync(goalsPath)) {
-      return res.json({ goals: [] });
-    }
-    const data = JSON.parse(fs.readFileSync(goalsPath, "utf8"));
-    return res.json({ goals: data.goals || [] });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to read goals", detail: err.message });
+app.get("/mc/api/projects/summary", requireSetupAuth, (_req, res) => {
+  const projectsDir = path.join(STATE_DIR, "shared", "projects");
+  if (!fs.existsSync(projectsDir)) {
+    return res.json({ projects: [] });
   }
-});
-
-app.post("/mc/api/goals", requireSetupAuth, (req, res) => {
-  const goalsPath = path.join(STATE_DIR, "shared", "goals.json");
   try {
-    let data = { goals: [] };
-    if (fs.existsSync(goalsPath)) {
-      data = JSON.parse(fs.readFileSync(goalsPath, "utf8"));
-      if (!Array.isArray(data.goals)) data.goals = [];
-    }
+    const entries = fs.readdirSync(projectsDir, { withFileTypes: true });
+    const projects = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => {
+        const projDir = path.join(projectsDir, e.name);
+        const projectPath = path.join(projDir, "PROJECT.md");
+        let meta = { id: e.name, title: e.name, lead: "unassigned", budget: "none", status: "unknown", mission: "" };
 
-    const { title, level, parent, projects, status } = req.body;
-    if (!title || typeof title !== "string") {
-      return res.status(400).json({ error: "Missing title" });
-    }
+        if (fs.existsSync(projectPath)) {
+          const raw = fs.readFileSync(projectPath, "utf8");
+          const titleMatch = raw.match(/^#\s+(.+)/m);
+          const leadMatch = raw.match(/\*\*Lead:\*\*\s*(\S+)/);
+          const budgetMatch = raw.match(/\*\*Budget:\*\*\s*(.+)/);
+          const statusMatch = raw.match(/\*\*Status:\*\*\s*(\S+)/);
+          const missionMatch = raw.match(/## Mission\s*(?:\/\s*Goal)?\n+([\s\S]*?)(?=\n## |$)/);
+          meta.title = titleMatch?.[1] || e.name;
+          meta.lead = leadMatch?.[1] || "unassigned";
+          meta.budget = budgetMatch?.[1]?.trim() || "none";
+          meta.status = statusMatch?.[1] || "unknown";
+          meta.mission = missionMatch?.[1]?.trim() || "";
+        }
 
-    const id = `g-${String(data.goals.length + 1).padStart(3, "0")}`;
-    const goal = {
-      id,
-      title: title.trim(),
-      level: level || "project",
-      status: status || "not_started",
-      parent: parent || null,
-      projects: Array.isArray(projects) ? projects : [],
-      progress: 0,
-      created: new Date().toISOString().split("T")[0],
-    };
+        // Parse milestones.md for current milestone
+        const milestonesPath = path.join(projDir, "milestones.md");
+        let currentMilestone = null;
+        if (fs.existsSync(milestonesPath)) {
+          const milestonesRaw = fs.readFileSync(milestonesPath, "utf8");
+          const lines = milestonesRaw.split("\n");
+          for (const line of lines) {
+            const m = line.match(/^[-*]\s+\[([x ])\]\s+(.+)/i);
+            if (m && m[1] === " ") {
+              currentMilestone = m[2].trim();
+              break;
+            }
+          }
+          if (!currentMilestone) {
+            // Check for heading-style milestones
+            for (const line of lines) {
+              if (line.match(/^##\s+/) && !line.toLowerCase().includes("completed")) {
+                currentMilestone = line.replace(/^##\s+/, "").trim();
+                break;
+              }
+            }
+          }
+        }
+        meta.currentMilestone = currentMilestone;
 
-    data.goals.push(goal);
-    fs.mkdirSync(path.dirname(goalsPath), { recursive: true });
-    fs.writeFileSync(goalsPath, JSON.stringify(data, null, 2), "utf8");
-    return res.json({ ok: true, goal });
+        // Count issues by status
+        const issuesDir = path.join(projDir, "issues");
+        let issuesDone = 0;
+        let issuesTotal = 0;
+        if (fs.existsSync(issuesDir)) {
+          const issueFiles = fs.readdirSync(issuesDir).filter((f) => f.endsWith(".json"));
+          for (const f of issueFiles) {
+            try {
+              const issue = JSON.parse(fs.readFileSync(path.join(issuesDir, f), "utf8"));
+              issuesTotal++;
+              if (issue.status === "done" || issue.status === "closed" || issue.status === "completed") {
+                issuesDone++;
+              }
+            } catch { /* skip */ }
+          }
+        }
+        meta.issuesDone = issuesDone;
+        meta.issuesTotal = issuesTotal;
+
+        // Get cost data for budget utilization
+        const costsDir = path.join(projDir, "costs");
+        let totalSpend = 0;
+        if (fs.existsSync(costsDir)) {
+          const costFiles = fs.readdirSync(costsDir).filter((f) => f.endsWith(".json"));
+          for (const f of costFiles) {
+            try {
+              const costData = JSON.parse(fs.readFileSync(path.join(costsDir, f), "utf8"));
+              totalSpend += costData.total_usd || 0;
+            } catch { /* skip */ }
+          }
+        }
+        meta.totalSpend = totalSpend;
+
+        return meta;
+      });
+    return res.json({ projects });
   } catch (err) {
-    return res.status(500).json({ error: "Failed to create goal", detail: err.message });
-  }
-});
-
-app.patch("/mc/api/goals/:id", requireSetupAuth, (req, res) => {
-  const goalsPath = path.join(STATE_DIR, "shared", "goals.json");
-  try {
-    if (!fs.existsSync(goalsPath)) {
-      return res.status(404).json({ error: "No goals file" });
-    }
-    const data = JSON.parse(fs.readFileSync(goalsPath, "utf8"));
-    const idx = (data.goals || []).findIndex((g) => g.id === req.params.id);
-    if (idx === -1) {
-      return res.status(404).json({ error: "Goal not found" });
-    }
-
-    const updates = req.body;
-    const goal = data.goals[idx];
-    if (updates.title !== undefined) goal.title = updates.title;
-    if (updates.status !== undefined) goal.status = updates.status;
-    if (updates.progress !== undefined) goal.progress = Number(updates.progress);
-    if (updates.parent !== undefined) goal.parent = updates.parent || null;
-    if (updates.projects !== undefined) goal.projects = updates.projects;
-    if (updates.level !== undefined) goal.level = updates.level;
-
-    data.goals[idx] = goal;
-    fs.writeFileSync(goalsPath, JSON.stringify(data, null, 2), "utf8");
-    return res.json({ ok: true, goal });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to update goal", detail: err.message });
-  }
-});
-
-app.delete("/mc/api/goals/:id", requireSetupAuth, (req, res) => {
-  const goalsPath = path.join(STATE_DIR, "shared", "goals.json");
-  try {
-    if (!fs.existsSync(goalsPath)) {
-      return res.status(404).json({ error: "No goals file" });
-    }
-    const data = JSON.parse(fs.readFileSync(goalsPath, "utf8"));
-    const idx = (data.goals || []).findIndex((g) => g.id === req.params.id);
-    if (idx === -1) {
-      return res.status(404).json({ error: "Goal not found" });
-    }
-    data.goals.splice(idx, 1);
-    fs.writeFileSync(goalsPath, JSON.stringify(data, null, 2), "utf8");
-    return res.json({ ok: true });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to delete goal", detail: err.message });
+    return res.status(500).json({ error: "Failed to load project summaries", detail: err.message });
   }
 });
 

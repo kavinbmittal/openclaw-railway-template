@@ -96,7 +96,7 @@ export default function CreateProject({ navigate }) {
         {/* Mission */}
         <div className="space-y-1.5">
           <label className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            Mission
+            Mission / Goal
           </label>
           <textarea
             value={mission}

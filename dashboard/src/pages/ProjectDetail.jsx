@@ -32,7 +32,7 @@ function parseProjectMd(raw) {
   const budgetMatch = raw.match(/\*\*Budget:\*\*\s*(.+)/);
   const statusMatch = raw.match(/\*\*Status:\*\*\s*(\S+)/);
   const createdMatch = raw.match(/\*\*Created:\*\*\s*(\S+)/);
-  const missionMatch = raw.match(/## Mission\n+([\s\S]*?)(?=\n## |$)/);
+  const missionMatch = raw.match(/## Mission\s*(?:\/\s*Goal)?\n+([\s\S]*?)(?=\n## |$)/);
   const gatesMatch = raw.match(/## Approval Gates\n+([\s\S]*?)(?=\n## |$)/);
   const subagentsMatch = raw.match(/## Sub-agents\n+([\s\S]*?)(?=\n## |$)/);
   return {
@@ -192,7 +192,7 @@ export default function ProjectDetail({ projectId, navigate }) {
                 <div className="flex items-center gap-2 mb-3">
                   <Target size={14} className="text-muted-foreground/50" />
                   <h3 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                    Mission
+                    Mission / Goal
                   </h3>
                 </div>
                 <p className="text-sm text-foreground/80 leading-relaxed">{project.mission}</p>

@@ -11,7 +11,6 @@ import {
   Activity,
   CircleDot,
   DollarSign,
-  Target,
   Network,
   Terminal,
 } from "lucide-react";
@@ -273,12 +272,6 @@ export default function Sidebar({ page, navigate, refreshKey }) {
             onClick={() => navigate("agents")}
             icon={Bot}
             label="Agents"
-          />
-          <SidebarNavItem
-            active={page === "goals"}
-            onClick={() => navigate("goals")}
-            icon={Target}
-            label="Goals"
           />
           <SidebarNavItem
             active={page === "org-chart"}
