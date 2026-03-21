@@ -116,20 +116,33 @@ function ApprovalCard({ approval, onResolved, navigate }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <button
-              onClick={() => navigate("project", approval._project || approval.project)}
-              className="text-sm font-medium text-foreground hover:underline"
-            >
-              {approval._project || approval.project}
-            </button>
+            {approval._project ? (
+              <button
+                onClick={() => navigate("project", approval._project)}
+                className="text-sm font-medium text-foreground hover:underline"
+              >
+                {approval._project}
+              </button>
+            ) : (
+              <span className="text-sm font-medium text-muted-foreground">
+                {approval.requester}
+              </span>
+            )}
             <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
               {approval.gate}
             </span>
           </div>
           <p className="text-sm text-foreground/80">{approval.what}</p>
-          {approval.why && (
+          {approval.why && approval._source === "deliverables" ? (
+            <details className="mt-2">
+              <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">View deliverable content</summary>
+              <div className="mt-2 text-xs text-muted-foreground whitespace-pre-wrap border border-border p-3 bg-background max-h-64 overflow-y-auto">
+                {approval.why}
+              </div>
+            </details>
+          ) : approval.why ? (
             <p className="text-xs text-muted-foreground mt-1">{approval.why}</p>
-          )}
+          ) : null}
         </div>
         <div className="text-right shrink-0">
           <span className="text-xs text-muted-foreground">{approval.requester}</span>

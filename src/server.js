@@ -1435,14 +1435,23 @@ app.get("/mc/api/approvals", requireSetupAuth, (_req, res) => {
       const entries = Array.isArray(index) ? index : (index.deliverables || index.entries || []);
       for (const entry of entries) {
         if (entry.status !== "needs-feedback") continue;
+        // Read deliverable content if file exists
+        let deliverableContent = null;
+        if (entry.deliverable) {
+          const delivPath = path.join(STATE_DIR, entry.deliverable);
+          if (fs.existsSync(delivPath)) {
+            try { deliverableContent = fs.readFileSync(delivPath, "utf8"); } catch {}
+          }
+        }
         approvals.push({
           id: entry.id || entry.taskId || entry.file,
-          gate: "deliverable",
-          what: entry.title || entry.description || entry.file || "Deliverable review",
-          why: entry.summary || entry.description || null,
+          gate: "deliverable-review",
+          what: entry.summary || entry.title || entry.description || "Deliverable review",
+          why: deliverableContent || entry.description || null,
           requester: entry.agent || entry.author || "unknown",
           created: entry.created || entry.timestamp || entry.date || null,
-          _project: entry.project || "general",
+          _project: entry.project || null,
+          _deliverablePath: entry.deliverable || null,
           _file: entry.file || entry.id,
           _source: "deliverables",
         });
