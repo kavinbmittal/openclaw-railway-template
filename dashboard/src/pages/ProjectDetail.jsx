@@ -16,6 +16,7 @@ import { CostTimeline } from "../components/CostTimeline.jsx";
 import { BurnRateIndicator } from "../components/BurnRateIndicator.jsx";
 import { BudgetEditModal } from "../components/BudgetEditModal.jsx";
 import Issues from "./Issues.jsx";
+import { CollapsibleSection } from "../components/CollapsibleSection.jsx";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: FileText },
@@ -262,15 +263,19 @@ export default function ProjectDetail({ projectId, navigate }) {
           {standups.length === 0 ? (
             <EmptyState icon={Activity} text="No standups yet" sub="The lead will post daily updates here." />
           ) : (
-            <div className="space-y-3">
-              {standups.map((s) => (
-                <div key={s.name} className="border border-border p-4">
-                  <h4 className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
-                    {s.name.replace(".md", "")}
-                  </h4>
-                  <Markdown content={s.content} />
-                </div>
-              ))}
+            <div className="space-y-2">
+              {standups.map((s, i) => {
+                const isLatest = i === 0;
+                return (
+                  <CollapsibleSection
+                    key={s.name}
+                    title={s.name.replace(".md", "")}
+                    defaultOpen={isLatest}
+                  >
+                    <Markdown content={s.content} />
+                  </CollapsibleSection>
+                );
+              })}
             </div>
           )}
         </TabsContent>
