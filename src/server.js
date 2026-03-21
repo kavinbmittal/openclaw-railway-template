@@ -2092,27 +2092,6 @@ app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
   const dir = issueDir(project);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, `${id}.json`), JSON.stringify(issue, null, 2), "utf8");
-
-  // Notify assignee
-  if (assignee) {
-    const notifDir = path.join(STATE_DIR, "shared", "projects", project, "notifications");
-    fs.mkdirSync(notifDir, { recursive: true });
-    const notif = {
-      type: "issue-assigned",
-      to: assignee,
-      project,
-      issue_id: id,
-      issue_title: title,
-      message: `Kavin assigned you issue #${id} "${title}" in project ${project}.`,
-      created: now,
-      read: false,
-    };
-    fs.writeFileSync(
-      path.join(notifDir, `${Date.now()}-issue-assigned.json`),
-      JSON.stringify(notif, null, 2), "utf8"
-    );
-  }
-
   return res.json(issue);
 });
 
@@ -2163,27 +2142,6 @@ app.post("/mc/api/issues/:id/comments", requireSetupAuth, (req, res) => {
     existing.comments.push(comment);
     existing.updated = new Date().toISOString();
     fs.writeFileSync(filePath, JSON.stringify(existing, null, 2), "utf8");
-
-    // Write notification for the assignee
-    if (existing.assignee) {
-      const notifDir = path.join(STATE_DIR, "shared", "projects", slug, "notifications");
-      fs.mkdirSync(notifDir, { recursive: true });
-      const notif = {
-        type: "issue-comment",
-        to: existing.assignee,
-        project: slug,
-        issue_id: id,
-        issue_title: existing.title,
-        message: `Kavin commented on issue #${id} "${existing.title}": ${text.slice(0, 100)}`,
-        created: new Date().toISOString(),
-        read: false,
-      };
-      fs.writeFileSync(
-        path.join(notifDir, `${Date.now()}-issue-comment.json`),
-        JSON.stringify(notif, null, 2), "utf8"
-      );
-    }
-
     return res.json({ ok: true, comment, issue: existing });
   } catch (err) {
     return res.status(500).json({ error: "Failed to add comment" });
