@@ -40,6 +40,9 @@ const WORKSPACE_DIR =
   process.env.OPENCLAW_WORKSPACE_DIR?.trim() ||
   path.join(STATE_DIR, "workspace");
 
+// Canonical heartbeat message — source of truth is shared/protocols/projects.md
+const HEARTBEAT_MESSAGE = `Project heartbeat (scan only — do NOT do actual work): Read shared/protocols/projects.md. Check shared/projects/ for projects where you are lead. (1) Check notifications/ — process and delete. (2) Check issues/ — update statuses, propose new issues if needed (status: proposed). (3) Post daily standup if not done today. (4) If .budget-exceeded exists, message Kavin you are paused. Do NOT execute work items in this turn.`;
+
 // Protect /setup with a user-provided password.
 const SETUP_PASSWORD = process.env.SETUP_PASSWORD?.trim();
 
@@ -2965,8 +2968,6 @@ app.post("/mc/api/heartbeat/enable", requireSetupAuth, (req, res) => {
   const { agent } = req.body;
   if (!agent) return res.status(400).json({ error: "agent required" });
 
-  const heartbeatMsg = `Project heartbeat: Check shared/projects/ for projects where you are lead. For each project: (1) Check notifications/ for unread files — process and delete them. (2) Check issues/ for issues assigned to you in todo status — pick up the highest priority one, set status to in_progress, do the work, set to done when complete. (3) If you have milestones but no issues yet, check the current state first then create issues for what actually needs doing. (4) Post a daily standup to standups/ if you have not today.`;
-
   // Try to find and enable existing disabled cron first
   const listResult = childProcess.spawnSync("openclaw", ["cron", "list", "--json"], {
     cwd: STATE_DIR, timeout: 15000, encoding: "utf-8"
@@ -3000,8 +3001,8 @@ app.post("/mc/api/heartbeat/enable", requireSetupAuth, (req, res) => {
     "--agent", agent,
     "--every", "15m",
     "--session", "isolated",
-    "--message", heartbeatMsg,
-    "--timeout-seconds", "180",
+    "--message", HEARTBEAT_MESSAGE,
+    "--timeout-seconds", "120",
     "--model", "anthropic/claude-haiku-4-5",
     "--no-deliver"
   ], { cwd: STATE_DIR, timeout: 15000, encoding: "utf-8" });
