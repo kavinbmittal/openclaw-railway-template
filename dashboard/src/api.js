@@ -87,6 +87,15 @@ ${gateLines}
     ),
   ]);
 
+  // Enable heartbeat cron for the lead agent
+  try {
+    await fetch("/mc/api/heartbeat/enable", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ agent: lead }),
+    });
+  } catch (_) { /* non-fatal — heartbeat can be enabled manually */ }
+
   return { slug };
 }
 

@@ -2660,6 +2660,58 @@ app.get("/mc/api/workspaces", requireSetupAuth, (req, res) => {
   }
 });
 
+// POST /mc/api/heartbeat/enable — enable or create heartbeat cron for a project lead
+app.post("/mc/api/heartbeat/enable", requireSetupAuth, (req, res) => {
+  const { agent } = req.body;
+  if (!agent) return res.status(400).json({ error: "agent required" });
+
+  const heartbeatMsg = `Project heartbeat: Check shared/projects/ for projects where you are lead. For each project: (1) Check notifications/ for unread files — process and delete them. (2) Check issues/ for issues assigned to you in todo status — pick up the highest priority one, set status to in_progress, do the work, set to done when complete. (3) If you have milestones but no issues yet, check the current state first then create issues for what actually needs doing. (4) Post a daily standup to standups/ if you have not today.`;
+
+  // Try to find and enable existing disabled cron first
+  const listResult = childProcess.spawnSync("openclaw", ["cron", "list", "--json"], {
+    cwd: STATE_DIR, timeout: 15000, encoding: "utf-8"
+  });
+
+  let existingId = null;
+  if (listResult.stdout) {
+    try {
+      // Output may have extra text before JSON — find the array
+      const match = listResult.stdout.match(/\[[\s\S]*\]/);
+      if (match) {
+        const jobs = JSON.parse(match[0]);
+        const existing = jobs.find(j => j.name === `project-heartbeat-${agent}`);
+        if (existing) existingId = existing.id;
+      }
+    } catch (_) { /* ignore parse errors */ }
+  }
+
+  if (existingId) {
+    // Enable existing cron
+    const enableResult = childProcess.spawnSync("openclaw", ["cron", "enable", existingId], {
+      cwd: STATE_DIR, timeout: 15000, encoding: "utf-8"
+    });
+    return res.json({ ok: true, action: "enabled", id: existingId });
+  }
+
+  // Create new heartbeat cron
+  const addResult = childProcess.spawnSync("openclaw", [
+    "cron", "add",
+    "--name", `project-heartbeat-${agent}`,
+    "--agent", agent,
+    "--every", "15m",
+    "--session", "isolated",
+    "--message", heartbeatMsg,
+    "--timeout-seconds", "180",
+    "--model", "anthropic/claude-haiku-4-5",
+    "--no-deliver"
+  ], { cwd: STATE_DIR, timeout: 15000, encoding: "utf-8" });
+
+  if (addResult.status !== 0) {
+    return res.status(500).json({ error: "Failed to create heartbeat", detail: addResult.stderr });
+  }
+  return res.json({ ok: true, action: "created" });
+});
+
 // Serve the Mission Control SPA
 if (fs.existsSync(DASHBOARD_DIR)) {
   app.use("/mc", express.static(DASHBOARD_DIR));

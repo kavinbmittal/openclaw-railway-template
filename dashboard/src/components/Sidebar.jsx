@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   ShieldCheck,
   Plus,
-  SquarePen,
   ChevronRight,
   Search,
   Bot,
@@ -168,12 +167,6 @@ export default function Sidebar({ page, navigate, refreshKey }) {
       <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-auto-hide flex flex-col gap-4 px-3 py-2">
         {/* Top actions + navigation (no section label, like Paperclip) */}
         <div className="flex flex-col gap-0.5">
-          <SidebarNavItem
-            active={page === "create-project"}
-            onClick={() => navigate("create-project")}
-            icon={SquarePen}
-            label="New Project"
-          />
           <SidebarNavItem
             active={page === "overview"}
             onClick={() => navigate("overview")}
