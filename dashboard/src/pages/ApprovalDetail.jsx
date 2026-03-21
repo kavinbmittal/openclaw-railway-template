@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Clock, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import { getApprovalDetail, resolveApproval } from "../api.js";
+import { Clock, CheckCircle2, XCircle, RotateCcw, Loader2 } from "lucide-react";
+import { getApprovalDetail, resolveApproval, requestRevision } from "../api.js";
 import { formatTimeAgo } from "../utils/formatDate.js";
 import Markdown from "../components/Markdown.jsx";
 
@@ -15,6 +15,12 @@ function StatusBadgeInline({ status }) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-900/50 text-red-300">
         <XCircle size={12} /> Rejected
+      </span>
+    );
+  if (status === "revision_requested")
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
+        <RotateCcw size={12} /> Revision Requested
       </span>
     );
   return (
@@ -42,8 +48,10 @@ export default function ApprovalDetail({ approvalId, navigate }) {
   }, [approvalId]);
 
   async function handleResolve(decision) {
-    if (decision === "rejected" && !comment.trim()) {
-      setError("A note is required when rejecting.");
+    if ((decision === "rejected" || decision === "revision_requested") && !comment.trim()) {
+      setError(decision === "revision_requested"
+        ? "Feedback is required when requesting a revision."
+        : "A note is required when rejecting.");
       return;
     }
 
@@ -51,17 +59,30 @@ export default function ApprovalDetail({ approvalId, navigate }) {
     setError(null);
 
     try {
-      await resolveApproval({
-        project: approval._project || approval.project,
-        id: approval.id,
-        decision,
-        comment: comment.trim() || null,
-        requester: approval.requester,
-        gate: approval.gate,
-        what: approval.what || approval.title,
-        why: approval.why,
-        created: approval.created,
-      });
+      if (decision === "revision_requested") {
+        await requestRevision({
+          project: approval._project || approval.project,
+          id: approval.id,
+          feedback: comment.trim(),
+          requester: approval.requester,
+          gate: approval.gate,
+          what: approval.what || approval.title,
+          why: approval.why,
+          created: approval.created,
+        });
+      } else {
+        await resolveApproval({
+          project: approval._project || approval.project,
+          id: approval.id,
+          decision,
+          comment: comment.trim() || null,
+          requester: approval.requester,
+          gate: approval.gate,
+          what: approval.what || approval.title,
+          why: approval.why,
+          created: approval.created,
+        });
+      }
       setResolved({ decision, comment: comment.trim() || null });
       // Refresh approval data
       const updated = await getApprovalDetail(approvalId).catch(() => null);
@@ -97,6 +118,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
   const title = approval.what || approval.title || "";
   const status = resolved ? resolved.decision : (approval.status || "pending");
   const isPending = status === "pending";
+  const isRevisionRequested = status === "revision_requested";
   const isDeliverable =
     approval._source === "deliverables" ||
     approval.gate === "deliverable" ||
@@ -138,12 +160,16 @@ export default function ApprovalDetail({ approvalId, navigate }) {
           className={`border rounded-lg px-4 py-3 ${
             resolved.decision === "approved"
               ? "border-green-700/40 bg-green-900/20"
-              : "border-red-700/40 bg-red-900/20"
+              : resolved.decision === "revision_requested"
+                ? "border-amber-700/40 bg-amber-900/20"
+                : "border-red-700/40 bg-red-900/20"
           }`}
         >
           <div className="flex items-center gap-2">
             {resolved.decision === "approved" ? (
               <CheckCircle2 size={16} className="text-green-300" />
+            ) : resolved.decision === "revision_requested" ? (
+              <RotateCcw size={16} className="text-amber-300" />
             ) : (
               <XCircle size={16} className="text-red-300" />
             )}
@@ -151,10 +177,16 @@ export default function ApprovalDetail({ approvalId, navigate }) {
               className={`text-sm font-medium ${
                 resolved.decision === "approved"
                   ? "text-green-100"
-                  : "text-red-100"
+                  : resolved.decision === "revision_requested"
+                    ? "text-amber-100"
+                    : "text-red-100"
               }`}
             >
-              {resolved.decision === "approved" ? "Approved" : "Rejected"}
+              {resolved.decision === "approved"
+                ? "Approved"
+                : resolved.decision === "revision_requested"
+                  ? "Revision Requested"
+                  : "Rejected"}
               {resolved.comment && (
                 <span className="font-normal text-xs ml-2 opacity-80">
                   — {resolved.comment}
@@ -258,7 +290,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Decision note (required for rejections)"
+            placeholder="Decision note (required for rejections and revisions)"
             rows={3}
             className="w-full px-3 py-2 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none rounded"
           />
@@ -279,6 +311,18 @@ export default function ApprovalDetail({ approvalId, navigate }) {
               Approve
             </button>
             <button
+              onClick={() => handleResolve("revision_requested")}
+              disabled={submitting || !comment.trim()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors disabled:opacity-50"
+            >
+              {submitting ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <RotateCcw size={14} />
+              )}
+              Request Revision
+            </button>
+            <button
               onClick={() => handleResolve("rejected")}
               disabled={submitting || !comment.trim()}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
@@ -295,7 +339,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
       )}
 
       {/* Already resolved info */}
-      {!isPending && !resolved && (
+      {!isPending && !isRevisionRequested && !resolved && (
         <div className="border border-border rounded-lg p-6">
           <div className="flex items-center gap-2">
             {status === "approved" ? (
@@ -315,6 +359,29 @@ export default function ApprovalDetail({ approvalId, navigate }) {
               Note: {approval.comment}
             </p>
           )}
+        </div>
+      )}
+
+      {/* Revision requested — waiting on agent */}
+      {isRevisionRequested && !resolved && (
+        <div className="border border-amber-700/40 rounded-lg p-6 bg-amber-900/10">
+          <div className="flex items-center gap-2">
+            <RotateCcw size={16} className="text-amber-400" />
+            <span className="text-sm font-medium text-amber-200">Revision Requested</span>
+            {approval.revision_requested_at && (
+              <span className="text-xs text-muted-foreground ml-2">
+                {formatTimeAgo(approval.revision_requested_at)}
+              </span>
+            )}
+          </div>
+          {approval.revision_feedback && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Feedback: {approval.revision_feedback}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground mt-3">
+            Waiting for {approval.requester || "agent"} to resubmit.
+          </p>
         </div>
       )}
     </div>

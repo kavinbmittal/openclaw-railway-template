@@ -277,3 +277,38 @@ export async function resolveApproval({ project, id, decision, comment, requeste
     writeFile(`shared/projects/${project}/notifications/${timestamp}-approval-${id}.json`, JSON.stringify(notification, null, 2)),
   ]);
 }
+
+export async function requestRevision({ project, id, feedback, requester, gate, what, why, created }) {
+  const now = new Date().toISOString();
+  const timestamp = Date.now();
+
+  // Update the pending approval in-place with revision status + feedback
+  const updated = {
+    id,
+    project,
+    requester,
+    gate,
+    what,
+    why,
+    created,
+    status: "revision_requested",
+    revision_feedback: feedback,
+    revision_requested_at: now,
+    revision_requested_by: "kavin",
+  };
+
+  const notification = {
+    type: "approval-revision-requested",
+    to: requester,
+    project,
+    approval_id: id,
+    feedback,
+    created: now,
+    read: false,
+  };
+
+  await Promise.all([
+    writeFile(`shared/projects/${project}/approvals/pending/${id}.json`, JSON.stringify(updated, null, 2)),
+    writeFile(`shared/projects/${project}/notifications/${timestamp}-revision-${id}.json`, JSON.stringify(notification, null, 2)),
+  ]);
+}
