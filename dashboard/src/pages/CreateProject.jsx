@@ -22,6 +22,7 @@ const DEFAULT_GATES = [
 export default function CreateProject({ navigate }) {
  const [name, setName] = useState("");
  const [mission, setMission] = useState("");
+ const [nsm, setNsm] = useState("");
  const [lead, setLead] = useState("binny");
  const [budget, setBudget] = useState("500");
  const [gates, setGates] = useState(DEFAULT_GATES);
@@ -45,6 +46,7 @@ export default function CreateProject({ navigate }) {
    const { slug } = await createProject({
     name: name.trim(),
     mission: mission.trim(),
+    nsm: nsm.trim() || null,
     lead,
     budget: parseInt(budget) || 200,
     gates,
@@ -106,6 +108,23 @@ export default function CreateProject({ navigate }) {
       rows={3}
       className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none"
      />
+    </div>
+
+    {/* North Star Metric */}
+    <div className="space-y-1.5">
+     <label className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground">
+      North Star Metric
+     </label>
+     <input
+      type="text"
+      value={nsm}
+      onChange={(e) => setNsm(e.target.value)}
+      placeholder="e.g., Paying customers with >7 day retention"
+      className="w-full px-3 py-2 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors"
+     />
+     <p className="text-[11px] text-muted-foreground/60">
+      How you measure progress against this mission. Combine quantity and quality.
+     </p>
     </div>
 
     {/* Lead */}

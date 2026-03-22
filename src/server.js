@@ -1666,6 +1666,38 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
     }
   }
 
+  // Check proposed themes (shared/projects/*/themes/*.json)
+  if (fs.existsSync(projectsDir)) {
+    const projects = fs.readdirSync(projectsDir, { withFileTypes: true }).filter((e) => e.isDirectory());
+    for (const proj of projects) {
+      const themesDir = path.join(projectsDir, proj.name, "themes");
+      if (!fs.existsSync(themesDir)) continue;
+      const themeFiles = fs.readdirSync(themesDir).filter((f) => f.endsWith(".json"));
+      for (const file of themeFiles) {
+        try {
+          const raw = fs.readFileSync(path.join(themesDir, file), "utf8");
+          const theme = JSON.parse(raw);
+          const themeId = theme.id || file.replace(".json", "");
+          if (themeId !== id) continue;
+          return res.json({
+            id: themeId,
+            type: "proposed-theme",
+            what: theme.title || file.replace(".json", ""),
+            title: theme.title || file.replace(".json", ""),
+            description: theme.description || null,
+            proxy_metrics: theme.proxy_metrics || [],
+            requester: theme.proposed_by || "agent",
+            created: theme.proposed_at || null,
+            status: theme.status || "proposed",
+            _project: proj.name,
+            _file: file,
+            _source: "theme",
+          });
+        } catch { /* skip */ }
+      }
+    }
+  }
+
   return res.status(404).json({ error: "Approval not found" });
 });
 
@@ -1718,9 +1750,37 @@ app.get("/mc/api/approvals", requireSetupAuth, (req, res) => {
               created: issue.created || null,
               status: "pending",
               priority: issue.priority || null,
+              theme_title: issue.theme_title || null,
+              proxy_metric_names: issue.proxy_metric_names || null,
               _project: proj.name,
               _file: file,
               _source: "issue",
+            });
+          } catch { /* skip malformed files */ }
+        }
+      }
+
+      // Source 3: Proposed themes (shared/projects/*/themes/*.json with status "proposed")
+      const themesDir = path.join(projectsDir, proj.name, "themes");
+      if (fs.existsSync(themesDir)) {
+        const themeFiles = fs.readdirSync(themesDir).filter((f) => f.endsWith(".json"));
+        for (const file of themeFiles) {
+          try {
+            const raw = fs.readFileSync(path.join(themesDir, file), "utf8");
+            const theme = JSON.parse(raw);
+            if (theme.status !== "proposed") continue;
+            approvals.push({
+              id: theme.id || file.replace(".json", ""),
+              type: "proposed-theme",
+              what: theme.title || file.replace(".json", ""),
+              description: theme.description || null,
+              proxy_metrics: theme.proxy_metrics || [],
+              requester: theme.proposed_by || "agent",
+              created: theme.proposed_at || null,
+              status: "pending",
+              _project: proj.name,
+              _file: file,
+              _source: "theme",
             });
           } catch { /* skip malformed files */ }
         }
@@ -1798,6 +1858,34 @@ app.get("/mc/api/projects", requireSetupAuth, (_req, res) => {
       return meta;
     });
   return res.json({ projects });
+});
+
+// List themes for a project (approved and proposed)
+app.get("/mc/api/themes", requireSetupAuth, (req, res) => {
+  const projectSlug = req.query.project;
+  if (!projectSlug) return res.status(400).json({ error: "project query param required" });
+
+  const themesDir = path.join(STATE_DIR, "shared", "projects", projectSlug, "themes");
+  if (!fs.existsSync(themesDir)) return res.json({ themes: [] });
+
+  const themes = [];
+  const files = fs.readdirSync(themesDir).filter((f) => f.endsWith(".json"));
+  for (const file of files) {
+    try {
+      const raw = fs.readFileSync(path.join(themesDir, file), "utf8");
+      const theme = JSON.parse(raw);
+      themes.push(theme);
+    } catch { /* skip malformed files */ }
+  }
+
+  // Sort: approved first, then by proposed_at descending
+  themes.sort((a, b) => {
+    if (a.status === "approved" && b.status !== "approved") return -1;
+    if (b.status === "approved" && a.status !== "approved") return 1;
+    return (b.proposed_at || "").localeCompare(a.proposed_at || "");
+  });
+
+  return res.json({ themes });
 });
 
 // Unified inbox — aggregates approvals, budget warnings, stale tasks, recent standups
@@ -2883,11 +2971,13 @@ app.get("/mc/api/projects/summary", requireSetupAuth, (_req, res) => {
           const budgetMatch = raw.match(/\*\*Budget:\*\*\s*(.+)/);
           const statusMatch = raw.match(/\*\*Status:\*\*\s*(\S+)/);
           const missionMatch = raw.match(/## Mission\s*(?:\/\s*Goal)?\n+([\s\S]*?)(?=\n## |$)/);
+          const nsmMatch = raw.match(/\*\*NSM:\*\*\s*(.+)/);
           meta.title = titleMatch?.[1] || e.name;
           meta.lead = leadMatch?.[1] || "unassigned";
           meta.budget = budgetMatch?.[1]?.trim() || "none";
           meta.status = statusMatch?.[1] || "unknown";
           meta.mission = missionMatch?.[1]?.trim() || "";
+          meta.nsm = nsmMatch?.[1]?.trim() || null;
         }
 
         // Parse milestones.md for current milestone

@@ -1,6 +1,6 @@
 import { useState, useEffect } from"react";
-import { Clock, CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText } from"lucide-react";
-import { getApprovalDetail, resolveApproval, requestRevision, updateIssue, deleteIssue } from"../api.js";
+import { Clock, CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3 } from"lucide-react";
+import { getApprovalDetail, resolveApproval, requestRevision, updateIssue, deleteIssue, resolveTheme } from"../api.js";
 import { formatTimeAgo } from"../utils/formatDate.js";
 import Markdown from"../components/Markdown.jsx";
 import { StatusBadge } from"../components/StatusBadge.jsx";
@@ -50,8 +50,10 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
  const isProposedIssue = approval?._source ==="issue";
 
+ const isThemeProposal = approval?._source === "theme";
+
  async function handleResolve(decision) {
-  if (!isProposedIssue && (decision ==="rejected" || decision ==="revision_requested") && !comment.trim()) {
+  if (!isProposedIssue && !isThemeProposal && (decision ==="rejected" || decision ==="revision_requested") && !comment.trim()) {
    setError(decision ==="revision_requested"
     ?"Feedback is required when requesting a revision."
     :"A note is required when rejecting.");
@@ -64,7 +66,10 @@ export default function ApprovalDetail({ approvalId, navigate }) {
   try {
    const projectName = approval._project || approval.project;
 
-   if (isProposedIssue) {
+   if (isThemeProposal) {
+    // Theme proposals: approve/reject/revise via resolveTheme
+    await resolveTheme(projectName, approval.id, decision, comment.trim() || null);
+   } else if (isProposedIssue) {
     // Proposed issues: approve → move to todo, reject → delete
     if (decision ==="approved") {
      await updateIssue(approval.id, projectName, { status:"todo" });
@@ -96,8 +101,8 @@ export default function ApprovalDetail({ approvalId, navigate }) {
     });
    }
    setResolved({ decision, comment: comment.trim() || null });
-   // Refresh approval data (skip for deleted issues)
-   if (!(isProposedIssue && decision ==="rejected")) {
+   // Refresh approval data (skip for deleted items)
+   if (!(isProposedIssue && decision ==="rejected") && !(isThemeProposal && decision ==="rejected")) {
     const updated = await getApprovalDetail(approvalId).catch(() => null);
     if (updated) setApproval(updated);
    }
@@ -139,6 +144,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
   approval.gate ==="deliverable-review";
  const isExperiment = approval.gate ==="experiment-start" || approval.gate ==="autoresearch-start";
  const isIssue = approval._source ==="issue";
+ const isTheme = approval._source ==="theme";
 
  const timeAgo = approval.created
   ? formatTimeAgo(approval.created)
@@ -198,10 +204,10 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        }`}
       >
        {resolved.decision ==="approved"
-        ? (isIssue ?"Issue approved — moved to todo" :"Approved")
+        ? (isThemeProposal ? "Theme approved" : isIssue ?"Issue approved — moved to todo" :"Approved")
         : resolved.decision ==="revision_requested"
          ?"Revision Requested"
-         : (isIssue ?"Issue rejected — removed" :"Rejected")}
+         : (isThemeProposal ? "Theme rejected — removed" : isIssue ?"Issue rejected — removed" :"Rejected")}
        {resolved.comment && (
         <span className="font-normal text-xs ml-2 opacity-80">
          — {resolved.comment}
@@ -217,7 +223,11 @@ export default function ApprovalDetail({ approvalId, navigate }) {
     {/* Type + Status + Title */}
     <div className="flex items-start justify-between gap-3">
      <div className="flex items-center gap-2 flex-wrap">
-      {isIssue ? (
+      {isTheme ? (
+       <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-teal-900/50 text-teal-300">
+        <Compass size={12} /> Theme
+       </span>
+      ) : isIssue ? (
        <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-violet-900/50 text-violet-300">
         <CircleDot size={12} /> Issue
        </span>
@@ -284,6 +294,55 @@ export default function ApprovalDetail({ approvalId, navigate }) {
     )}
    </div>
 
+   {/* Theme proposal — structured proxy metrics display */}
+   {isTheme && (
+    <div className="border border-border p-6 space-y-4">
+     {approval.description && (
+      <div>
+       <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-2">
+        Description
+       </h3>
+       <p className="text-sm text-foreground/80">{approval.description}</p>
+      </div>
+     )}
+     {approval.proxy_metrics && approval.proxy_metrics.length > 0 && (
+      <div>
+       <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-3">
+        Proxy Metrics
+       </h3>
+       <div className="space-y-3">
+        {approval.proxy_metrics.map((pm, i) => (
+         <div key={pm.id || i} className="flex items-start gap-3 p-3 border border-border/60 bg-accent/10">
+          <BarChart3 size={14} className="text-teal-400 mt-0.5 shrink-0" />
+          <div>
+           <p className="text-sm font-medium text-foreground">{pm.name}</p>
+           {pm.description && (
+            <p className="text-xs text-muted-foreground mt-0.5">{pm.description}</p>
+           )}
+          </div>
+         </div>
+        ))}
+       </div>
+      </div>
+     )}
+    </div>
+   )}
+
+   {/* Theme tag on issue/experiment — shows which theme this work targets */}
+   {!isTheme && approval.theme_title && (
+    <div className="border border-teal-700/30 bg-teal-900/10 px-4 py-3">
+     <div className="flex items-center gap-2">
+      <Compass size={14} className="text-teal-400" />
+      <span className="text-xs text-teal-300 font-medium">Theme: {approval.theme_title}</span>
+      {approval.proxy_metric_names && approval.proxy_metric_names.length > 0 && (
+       <span className="text-xs text-muted-foreground">
+        — targeting: {approval.proxy_metric_names.join(", ")}
+       </span>
+      )}
+     </div>
+    </div>
+   )}
+
    {/* Proposed issue description */}
    {isIssue && approval.why && (
     <div className="bg-card rounded-sm border border-border shadow-sm p-6">
@@ -342,7 +401,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
       <textarea
        value={comment}
        onChange={(e) => setComment(e.target.value)}
-       placeholder="Decision note (required for rejections and revisions)"
+       placeholder={isThemeProposal ? "Feedback (optional)" : "Decision note (required for rejections and revisions)"}
        rows={3}
        className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none"
       />
@@ -361,9 +420,9 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        ) : (
         <CheckCircle2 size={14} />
        )}
-       {isIssue ?"Approve Issue" :"Approve"}
+       {isThemeProposal ? "Approve Theme" : isIssue ?"Approve Issue" :"Approve"}
       </button>
-      {!isIssue && (
+      {(!isIssue) && (
        <button
         onClick={() => handleResolve("revision_requested")}
         disabled={submitting || !comment.trim()}
@@ -379,7 +438,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
       )}
       <button
        onClick={() => handleResolve("rejected")}
-       disabled={submitting || (!isIssue && !comment.trim())}
+       disabled={submitting || (!isIssue && !isThemeProposal && !comment.trim())}
        className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
       >
        {submitting ? (
@@ -387,7 +446,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        ) : (
         <XCircle size={14} />
        )}
-       {isIssue ?"Reject Issue" :"Reject"}
+       {isThemeProposal ? "Reject Theme" : isIssue ?"Reject Issue" :"Reject"}
       </button>
      </div>
     </div>

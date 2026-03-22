@@ -29,7 +29,7 @@ function timeAgo(iso) {
  return formatTimeAgo(iso);
 }
 
-export default function Issues({ projectSlug, navigate }) {
+export default function Issues({ projectSlug, navigate, themes = [] }) {
  const [issues, setIssues] = useState([]);
  const [loading, setLoading] = useState(true);
  const [view, setView] = useState("list"); //"list" or"board"
@@ -196,6 +196,7 @@ export default function Issues({ projectSlug, navigate }) {
      projectSlug={projectSlug}
      onCreated={handleCreated}
      onClose={() => setShowCreate(false)}
+     themes={themes}
     />
    )}
 

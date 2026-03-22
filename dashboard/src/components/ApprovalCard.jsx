@@ -1,4 +1,4 @@
-import { Check, X, Clock, CheckCircle2, XCircle, CircleDot, FlaskConical, FileText } from"lucide-react";
+import { Check, X, Clock, CheckCircle2, XCircle, CircleDot, FlaskConical, FileText, Compass } from"lucide-react";
 import { formatTimeAgo } from"../utils/formatDate.js";
 
 function statusIcon(status) {
@@ -25,6 +25,14 @@ function TypeBadge({ type }) {
    <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
     <FlaskConical size={10} />
     Experiment
+   </span>
+  );
+ }
+ if (type ==="proposed-theme" || type ==="theme") {
+  return (
+   <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-teal-900/50 text-teal-300">
+    <Compass size={10} />
+    Theme
    </span>
   );
  }
@@ -83,6 +91,13 @@ export default function ApprovalCard({
     <span className="text-sm font-medium text-foreground truncate">
      {title}
     </span>
+    {/* Theme tag — shows which theme this work is tagged to */}
+    {approval.theme_title && (
+     <span className="shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium bg-teal-900/40 text-teal-300">
+      <Compass size={9} />
+      {approval.theme_title}
+     </span>
+    )}
     {!hideProject && projectName && (
      <span
       className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-accent text-accent-foreground cursor-pointer hover:underline"

@@ -7,13 +7,15 @@ import { createIssue } from"../api.js";
 import { ALL_PRIORITIES, PriorityIcon } from"./PriorityIcon.jsx";
 import { AGENTS, AgentInitial } from"./AssigneeSelect.jsx";
 
-export function CreateIssue({ projectSlug, onCreated, onClose }) {
+export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
  const [title, setTitle] = useState("");
  const [description, setDescription] = useState("");
  const [priority, setPriority] = useState("none");
  const [assignee, setAssignee] = useState("");
  const [labelInput, setLabelInput] = useState("");
  const [labels, setLabels] = useState([]);
+ const [selectedTheme, setSelectedTheme] = useState("");
+ const [selectedProxyMetrics, setSelectedProxyMetrics] = useState([]);
  const [submitting, setSubmitting] = useState(false);
  const [error, setError] = useState(null);
 
@@ -49,6 +51,8 @@ export function CreateIssue({ projectSlug, onCreated, onClose }) {
     priority,
     assignee: assignee || null,
     labels,
+    theme: selectedTheme || null,
+    proxy_metrics: selectedProxyMetrics.length > 0 ? selectedProxyMetrics : null,
    });
    onCreated?.(issue);
   } catch (err) {
@@ -130,6 +134,56 @@ export function CreateIssue({ projectSlug, onCreated, onClose }) {
       </select>
      </div>
     </div>
+
+    {/* Theme + Proxy Metrics — only shown when project has approved themes */}
+    {themes.length > 0 && (
+     <div className="space-y-3">
+      <div>
+       <label className="text-xs text-muted-foreground mb-1 block">Theme</label>
+       <select
+        value={selectedTheme}
+        onChange={(e) => {
+         setSelectedTheme(e.target.value);
+         setSelectedProxyMetrics([]); // reset metrics when theme changes
+        }}
+        className="border border-border bg-transparent px-2 py-1.5 text-xs outline-none"
+       >
+        <option value="">Select theme...</option>
+        {themes.map((t) => (
+         <option key={t.id} value={t.id}>{t.title}</option>
+        ))}
+       </select>
+      </div>
+      {selectedTheme && (() => {
+       const theme = themes.find((t) => t.id === selectedTheme);
+       if (!theme || !theme.proxy_metrics?.length) return null;
+       return (
+        <div>
+         <label className="text-xs text-muted-foreground mb-1 block">Target Proxy Metrics</label>
+         <div className="space-y-1.5">
+          {theme.proxy_metrics.map((pm) => (
+           <label key={pm.id} className="flex items-center gap-2 text-xs cursor-pointer">
+            <input
+             type="checkbox"
+             checked={selectedProxyMetrics.includes(pm.id)}
+             onChange={() => {
+              setSelectedProxyMetrics((prev) =>
+               prev.includes(pm.id)
+                ? prev.filter((id) => id !== pm.id)
+                : [...prev, pm.id]
+              );
+             }}
+             className="accent-teal-400"
+            />
+            <span className="text-foreground/80">{pm.name}</span>
+           </label>
+          ))}
+         </div>
+        </div>
+       );
+      })()}
+     </div>
+    )}
 
     {/* Labels */}
     <div>

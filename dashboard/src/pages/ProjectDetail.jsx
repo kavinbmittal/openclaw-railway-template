@@ -1,9 +1,9 @@
 import { useState, useEffect } from"react";
-import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getApprovals, resolveApproval, updateIssue, deleteIssue, getExperiments } from"../api.js";
+import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getApprovals, resolveApproval, updateIssue, deleteIssue, getExperiments, getThemes } from"../api.js";
 import { formatDate as formatDateUtil, formatTimeAgo } from"../utils/formatDate.js";
 import {
  ArrowLeft, FileText, Activity, DollarSign, Clock,
- User, Wallet, Target, ShieldCheck, Bot, CircleDot, Pencil, FlaskConical,
+ User, Wallet, Target, ShieldCheck, Bot, CircleDot, Pencil, FlaskConical, Compass, BarChart3,
 } from"lucide-react";
 import Markdown from"../components/Markdown.jsx";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
@@ -23,6 +23,7 @@ import { RejectModal } from "../components/RejectModal.jsx";
 
 const TABS = [
  { id:"overview", label:"Overview", icon: FileText },
+ { id:"strategy", label:"Strategy", icon: Compass },
  { id:"issues", label:"Issues", icon: CircleDot },
  { id:"experiments", label:"Experiments", icon: FlaskConical },
  { id:"standups", label:"Standups", icon: Activity },
@@ -40,6 +41,7 @@ function parseProjectMd(raw) {
  const createdMatch = raw.match(/\*\*Created:\*\*\s*(\S+)/);
  const missionMatch = raw.match(/## Mission\s*(?:\/\s*Goal)?\n+([\s\S]*?)(?=\n## |$)/);
  const gatesMatch = raw.match(/## Approval Gates\n+([\s\S]*?)(?=\n## |$)/);
+ const nsmMatch = raw.match(/\*\*NSM:\*\*\s*(.+)/);
  const subagentsMatch = raw.match(/## Sub-agents\n+([\s\S]*?)(?=\n## |$)/);
  return {
   title: titleMatch?.[1] ||"",
@@ -47,6 +49,7 @@ function parseProjectMd(raw) {
   budget: budgetMatch?.[1]?.trim() ||"none",
   status: statusMatch?.[1] ||"unknown",
   created: createdMatch?.[1] ||"",
+  nsm: nsmMatch?.[1]?.trim() || null,
   mission: missionMatch?.[1]?.trim() ||"",
   gates: gatesMatch?.[1]?.trim() ||"",
   subagents: subagentsMatch?.[1]?.trim() ||"",
@@ -90,6 +93,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
  const [activityLog, setActivityLog] = useState("");
  const [approvals, setApprovals] = useState([]);
  const [experiments, setExperiments] = useState([]);
+ const [themes, setThemes] = useState([]);
  const [loading, setLoading] = useState(true);
 
  useEffect(() => {
@@ -103,7 +107,8 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
    getBudgetPolicy(projectId).catch(() => null),
    getApprovals(projectId).catch(() => []),
    getExperiments(projectId).catch(() => []),
-  ]).then(([proj, miles, activity, standupList, costList, costData, policyData, approvalList, experimentList]) => {
+   getThemes(projectId).catch(() => []),
+  ]).then(([proj, miles, activity, standupList, costList, costData, policyData, approvalList, experimentList, themeList]) => {
    setProjectRaw(proj?.content || null);
    setMilestones(miles?.content || null);
    setActivityLog(activity?.content ||"");
@@ -113,6 +118,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
    setBudgetPolicy(policyData?.policy || null);
    setApprovals(approvalList);
    setExperiments(experimentList);
+   setThemes(themeList);
    setLoading(false);
   });
  }, [projectId]);
@@ -291,9 +297,14 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
      </div>
     </TabsContent>
 
+    {/* Strategy tab */}
+    <TabsContent value="strategy">
+     <StrategyTab project={project} themes={themes} projectId={projectId} navigate={navigate} />
+    </TabsContent>
+
     {/* Issues tab */}
     <TabsContent value="issues">
-     <Issues projectSlug={projectId} navigate={navigate} />
+     <Issues projectSlug={projectId} navigate={navigate} themes={themes.filter((t) => t.status === "approved")} />
     </TabsContent>
 
     {/* Experiments tab */}
@@ -371,6 +382,111 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
      )}
     </TabsContent>
    </Tabs>
+  </div>
+ );
+}
+
+function StrategyTab({ project, themes, projectId, navigate }) {
+ const approvedThemes = themes.filter((t) => t.status === "approved");
+ const pendingThemes = themes.filter((t) => t.status === "proposed");
+
+ return (
+  <div className="space-y-4">
+   {/* North Star Metric */}
+   <div className="border border-border border-l-2 border-l-cyan-400 bg-accent/20 p-4">
+    <div className="flex items-center gap-2 mb-2">
+     <Target size={14} className="text-cyan-400" />
+     <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground">
+      North Star Metric
+     </h3>
+    </div>
+    {project.nsm ? (
+     <p className="text-sm font-medium text-foreground">{project.nsm}</p>
+    ) : (
+     <p className="text-sm text-muted-foreground/60">No NSM defined yet.</p>
+    )}
+    {project.mission && (
+     <p className="text-xs text-muted-foreground mt-2">
+      Mission: {project.mission}
+     </p>
+    )}
+   </div>
+
+   {/* Pending theme proposals */}
+   {pendingThemes.length > 0 && (
+    <div>
+     <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-2">
+      Proposed Themes
+     </h3>
+     <div className="space-y-2">
+      {pendingThemes.map((theme) => (
+       <div key={theme.id} className="border border-amber-700/40 bg-amber-900/10 p-4">
+        <div className="flex items-center gap-2 mb-2">
+         <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
+          <Clock size={12} /> Pending
+         </span>
+         <span className="text-sm font-medium text-foreground">{theme.title}</span>
+        </div>
+        {theme.description && (
+         <p className="text-xs text-muted-foreground mb-3">{theme.description}</p>
+        )}
+        <div className="space-y-1.5">
+         {(theme.proxy_metrics || []).map((pm) => (
+          <div key={pm.id} className="flex items-center gap-2 text-xs">
+           <BarChart3 size={12} className="text-muted-foreground/50 shrink-0" />
+           <span className="text-foreground/80">{pm.name}</span>
+          </div>
+         ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground/50 mt-2">
+         Proposed by {theme.proposed_by} — awaiting approval
+        </p>
+       </div>
+      ))}
+     </div>
+    </div>
+   )}
+
+   {/* Approved themes */}
+   {approvedThemes.length > 0 ? (
+    <div>
+     <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-2">
+      Key Themes
+     </h3>
+     <div className="space-y-2">
+      {approvedThemes.map((theme) => (
+       <div key={theme.id} className="border border-border p-4">
+        <div className="flex items-center gap-2 mb-1">
+         <Compass size={14} className="text-teal-400 shrink-0" />
+         <h4 className="text-sm font-medium text-foreground">{theme.title}</h4>
+        </div>
+        {theme.description && (
+         <p className="text-xs text-muted-foreground mb-3 ml-[22px]">{theme.description}</p>
+        )}
+        <div className="space-y-2 ml-[22px]">
+         {(theme.proxy_metrics || []).map((pm) => (
+          <div key={pm.id} className="flex items-start gap-2">
+           <BarChart3 size={12} className="text-muted-foreground/50 mt-0.5 shrink-0" />
+           <div>
+            <span className="text-xs font-medium text-foreground/80">{pm.name}</span>
+            {pm.description && (
+             <p className="text-[11px] text-muted-foreground/60">{pm.description}</p>
+            )}
+           </div>
+          </div>
+         ))}
+        </div>
+       </div>
+      ))}
+     </div>
+    </div>
+   ) : !pendingThemes.length && (
+    <EmptyState
+     icon={Compass}
+     text="No themes yet"
+     sub="The lead agent will propose themes after reviewing the mission and NSM."
+    />
+   )}
   </div>
  );
 }

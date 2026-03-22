@@ -49,7 +49,7 @@ export async function getApprovalDetail(id) {
   return fetchJSON(`${BASE}/approvals/${encodeURIComponent(id)}`);
 }
 
-export async function createProject({ name, mission, lead, budget, gates }) {
+export async function createProject({ name, mission, nsm, lead, budget, gates }) {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const today = new Date().toISOString().split("T")[0];
 
@@ -58,12 +58,14 @@ export async function createProject({ name, mission, lead, budget, gates }) {
     .map((g) => `- ${g.id}: requires kavin`)
     .join("\n");
 
+  const nsmLine = nsm ? `\n**NSM:** ${nsm}` : "";
+
   const projectMd = `# ${name}
 
 **Lead:** ${lead}
 **Budget:** $${budget}/week
 **Created:** ${today}
-**Status:** active
+**Status:** active${nsmLine}
 
 ## Mission / Goal
 ${mission}
@@ -99,6 +101,7 @@ ${gateLines}
     writeFile(`shared/projects/${slug}/standups/.gitkeep`, ""),
     writeFile(`shared/projects/${slug}/experiments/.gitkeep`, ""),
     writeFile(`shared/projects/${slug}/issues/.gitkeep`, ""),
+    writeFile(`shared/projects/${slug}/themes/.gitkeep`, ""),
   ]);
 
   // Enable heartbeat cron for the lead agent
@@ -246,6 +249,74 @@ export async function getWorkspaces({ project, agent, status } = {}) {
 export async function getExperiments(projectSlug) {
   const data = await fetchJSON(`${BASE}/experiments?project=${encodeURIComponent(projectSlug)}`);
   return data.experiments || [];
+}
+
+// --- Themes API ---
+
+export async function getThemes(projectSlug) {
+  const data = await fetchJSON(`${BASE}/themes?project=${encodeURIComponent(projectSlug)}`);
+  return data.themes || [];
+}
+
+export async function resolveTheme(projectSlug, themeId, decision, comment) {
+  const now = new Date().toISOString();
+  const timestamp = Date.now();
+
+  // Read current theme file, update status
+  const theme = await fetchJSON(
+    `${BASE}/files?path=${encodeURIComponent(`shared/projects/${projectSlug}/themes/${themeId}.json`)}`
+  );
+  const themeData = typeof theme.content === "string" ? JSON.parse(theme.content) : theme.content;
+
+  if (decision === "approved") {
+    themeData.status = "approved";
+    themeData.approved_at = now;
+  } else if (decision === "rejected") {
+    // Delete the theme file
+    await deleteFile(`shared/projects/${projectSlug}/themes/${themeId}.json`);
+
+    // Notify agent
+    const notification = {
+      type: "theme-rejected",
+      to: themeData.proposed_by,
+      project: projectSlug,
+      theme_id: themeId,
+      theme_title: themeData.title,
+      comment: comment || null,
+      created: now,
+      read: false,
+    };
+    await writeFile(
+      `shared/projects/${projectSlug}/notifications/${timestamp}-theme-${themeId}.json`,
+      JSON.stringify(notification, null, 2)
+    );
+    return;
+  } else if (decision === "revision_requested") {
+    themeData.status = "revision_requested";
+    themeData.revision_feedback = comment;
+    themeData.revision_requested_at = now;
+  }
+
+  await writeFile(
+    `shared/projects/${projectSlug}/themes/${themeId}.json`,
+    JSON.stringify(themeData, null, 2)
+  );
+
+  // Notify agent
+  const notification = {
+    type: `theme-${decision}`,
+    to: themeData.proposed_by,
+    project: projectSlug,
+    theme_id: themeId,
+    theme_title: themeData.title,
+    comment: comment || null,
+    created: now,
+    read: false,
+  };
+  await writeFile(
+    `shared/projects/${projectSlug}/notifications/${timestamp}-theme-${themeId}.json`,
+    JSON.stringify(notification, null, 2)
+  );
 }
 
 export async function resolveApproval({ project, id, decision, comment, requester, gate, what, why, created }) {
