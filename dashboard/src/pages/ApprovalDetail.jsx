@@ -227,7 +227,9 @@ export default function ApprovalDetail({ approvalId, navigate }) {
      ];
      const colors = themeIdx >= 0 ? TC[themeIdx % TC.length] : TC[0];
      const sortedPms = approvalTheme ? (approvalTheme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999)) : [];
-     const approvalPms = (approval.proxy_metrics || []).map((pm) => {
+     // proxy_metrics (objects) for experiments/themes, proxy_metric_names (strings) for proposed issues
+     const rawPms = approval.proxy_metrics || (approval.proxy_metric_names || []).map((n) => ({ id: n, name: n }));
+     const approvalPms = rawPms.map((pm) => {
       const pmId = typeof pm === "string" ? pm : pm.id;
       const found = sortedPms.find((p) => p.id === pmId || p.name === pmId || p.name === pm.name);
       return found || { id: pmId, name: pm.name || pmId };
