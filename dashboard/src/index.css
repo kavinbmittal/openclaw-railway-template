@@ -26,14 +26,13 @@
 html {
   height: 100%;
   color-scheme: dark;
-  zoom: 1.2;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
-  font-size: 16px;
+  font-size: 19.2px; /* 16px × 1.2 — replaces html zoom: 1.2 to fix scroll cutoff */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
