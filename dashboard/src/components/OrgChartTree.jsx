@@ -39,9 +39,9 @@ function TreeNode({ node, nodeMap, onNodeClick, isLast = false }) {
            isOnly
             ?"bg-transparent"
             : isFirst
-            ?"bg-gradient-to-r from-transparent from-50% to-border to-50%"
+            ?"bg-border [clip-path:inset(0_0_0_50%)]"
             : isChildLast
-            ?"bg-gradient-to-r from-border from-50% to-transparent to-50%"
+            ?"bg-border [clip-path:inset(0_50%_0_0)]"
             :"bg-border"
           }`}
          />
