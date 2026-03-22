@@ -173,11 +173,11 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
 
      {/* Description */}
      {issue.description ? (
-      <div className="border border-border p-4 rounded-sm">
+      <div className="border border-border p-4">
        <Markdown content={issue.description} />
       </div>
      ) : (
-      <div className="border border-border border-dashed p-4 rounded-sm">
+      <div className="border border-border border-dashed p-4">
        <p className="text-sm text-muted-foreground/50 italic">No description provided.</p>
       </div>
      )}
@@ -205,7 +205,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
 
     {/* Right sidebar: metadata */}
     <div className="lg:w-64 shrink-0 space-y-4">
-     <div className="border border-border p-4 rounded-sm space-y-1">
+     <div className="border border-border p-4 space-y-1">
       <PropertyRow label="Status">
        <StatusSelect
         value={issue.status}

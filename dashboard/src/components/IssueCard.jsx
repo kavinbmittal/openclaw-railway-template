@@ -8,7 +8,7 @@ import { AgentInitial } from"./AssigneeSelect.jsx";
 export function IssueCard({ issue, onClick, className ="" }) {
  return (
   <div
-   className={`rounded-md border border-border bg-card p-2.5 cursor-pointer transition-shadow hover:shadow-sm ${className}`}
+   className={`border border-border bg-card p-2.5 cursor-pointer hover:bg-accent/30 transition-colors ${className}`}
    onClick={onClick}
   >
    <div className="flex items-start gap-1.5 mb-1.5">

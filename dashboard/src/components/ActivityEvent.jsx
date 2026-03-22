@@ -58,7 +58,7 @@ export function ActivityEvent({ event, onNavigate }) {
    {event.agent && (
     <span className="shrink-0">
      <span
-      className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium text-white rounded-sm cursor-pointer hover:opacity-80 ${agentColor(event.agent)}`}
+      className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium text-white cursor-pointer hover:opacity-80 ${agentColor(event.agent)}`}
       onClick={() => {
        if (!onNavigate) return;
        const name = event.agent.toLowerCase();

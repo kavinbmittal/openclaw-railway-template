@@ -66,7 +66,7 @@ export function AssigneeSelect({ value, onChange, agents = AGENTS, className =""
     )}
    </button>
    {open && (
-    <div className="absolute z-50 mt-1 w-48 rounded-md border border-border bg-card p-1 shadow-lg">
+    <div className="absolute z-50 mt-1 w-48 border border-border bg-card p-1">
      <input
       className="w-full px-2 py-1.5 text-xs bg-transparent outline-none border-b border-border mb-1 placeholder:text-muted-foreground/50"
       placeholder="Search agents..."
