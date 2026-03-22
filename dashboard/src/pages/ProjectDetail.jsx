@@ -739,13 +739,17 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate, theme
  // Find theme data for an approval
  function getApprovalThemeData(approval) {
   const allThemes = themes || [];
-  const expTheme = allThemes.find((t) => t.id === approval.theme || t.title === approval.theme || t.id === approval.theme_id);
+  const expTheme = allThemes.find((t) => t.id === approval.theme || t.title === approval.theme || t.id === approval.theme_id || t.title === approval.theme_title);
   if (!expTheme) return null;
   const sortedThemes = allThemes.filter((t) => t.status === "approved").sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   const themeIdx = sortedThemes.indexOf(expTheme);
   const themeColors = THEME_COLORS[themeIdx >= 0 ? themeIdx % THEME_COLORS.length : 0];
   const sortedPms = (expTheme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
-  const proxyMetric = sortedPms.find((pm) => pm.id === approval.proxy_metric || pm.name === approval.proxy_metric || (approval.proxy_metrics && approval.proxy_metrics.some((apm) => (apm.id || apm) === pm.id)));
+  const proxyMetric = sortedPms.find((pm) =>
+   pm.id === approval.proxy_metric || pm.name === approval.proxy_metric ||
+   (approval.proxy_metrics && approval.proxy_metrics.some((apm) => (apm.id || apm) === pm.id || apm.name === pm.name)) ||
+   (approval.proxy_metric_names && approval.proxy_metric_names.some((n) => n === pm.name || n === pm.id))
+  );
   const pmIdx = proxyMetric ? sortedPms.indexOf(proxyMetric) : -1;
   return { expTheme, themeIdx, themeColors, proxyMetric, pmIdx };
  }
