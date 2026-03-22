@@ -37,8 +37,11 @@ export async function deleteFile(filePath) {
   return res.json();
 }
 
-export async function getApprovals() {
-  const data = await fetchJSON(`${BASE}/approvals`);
+export async function getApprovals(project) {
+  const url = project
+    ? `${BASE}/approvals?project=${encodeURIComponent(project)}`
+    : `${BASE}/approvals`;
+  const data = await fetchJSON(url);
   return data.approvals || [];
 }
 

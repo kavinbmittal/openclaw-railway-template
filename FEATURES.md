@@ -3,7 +3,8 @@
 ## Mission Control Dashboard
 - View project overview, issues, costs, and agent activity
 - Inbox aggregates approvals, budget warnings, standups, and proposed issues
-- Approve or reject agent-proposed issues from the Issues tab
+- Unified Approvals page: proposed issues, experiment gates, and deliverable reviews in one view, grouped by project
+- Approve or reject any pending item (proposed issue or gate request) from the Approvals page or per-project Approvals tab
 - Create and manage projects with automatic directory scaffolding
 
 ## Agent Heartbeats

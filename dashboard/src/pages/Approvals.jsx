@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { getApprovals, resolveApproval } from "../api.js";
+import { getApprovals, resolveApproval, updateIssue, deleteIssue } from "../api.js";
 import { ShieldCheck } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/Tabs.jsx";
 import { EmptyState } from "../components/EmptyState.jsx";
@@ -30,19 +30,40 @@ export default function Approvals({ navigate }) {
 
   const displayedApprovals = tab === "pending" ? pendingApprovals : approvals;
 
+  // Group by project, sorted alphabetically; within each group, newest first (already sorted by backend)
+  const grouped = useMemo(() => {
+    const groups = {};
+    for (const item of displayedApprovals) {
+      const project = item._project || item.project || "Unknown";
+      if (!groups[project]) groups[project] = [];
+      groups[project].push(item);
+    }
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+  }, [displayedApprovals]);
+
   async function handleApprove(approval) {
     try {
-      await resolveApproval({
-        project: approval._project || approval.project,
-        id: approval.id,
-        decision: "approved",
-        comment: null,
-        requester: approval.requester,
-        gate: approval.gate,
-        what: approval.what || approval.title,
-        why: approval.why,
-        created: approval.created,
-      });
+      if (approval._source === "issue") {
+        // Proposed issue — move to todo
+        await updateIssue(
+          approval.id,
+          approval._project || approval.project,
+          { status: "todo" }
+        );
+      } else {
+        // Gate request — resolve via file writes
+        await resolveApproval({
+          project: approval._project || approval.project,
+          id: approval.id,
+          decision: "approved",
+          comment: null,
+          requester: approval.requester,
+          gate: approval.gate,
+          what: approval.what || approval.title,
+          why: approval.why,
+          created: approval.created,
+        });
+      }
       refresh();
     } catch (err) {
       setError(err.message);
@@ -50,23 +71,37 @@ export default function Approvals({ navigate }) {
   }
 
   async function handleReject(approval) {
-    const comment = prompt("Reason for rejection:");
-    if (!comment) return;
-    try {
-      await resolveApproval({
-        project: approval._project || approval.project,
-        id: approval.id,
-        decision: "rejected",
-        comment,
-        requester: approval.requester,
-        gate: approval.gate,
-        what: approval.what || approval.title,
-        why: approval.why,
-        created: approval.created,
-      });
-      refresh();
-    } catch (err) {
-      setError(err.message);
+    if (approval._source === "issue") {
+      // Proposed issue — delete it
+      try {
+        await deleteIssue(
+          approval.id,
+          approval._project || approval.project
+        );
+        refresh();
+      } catch (err) {
+        setError(err.message);
+      }
+    } else {
+      // Gate request — require a comment
+      const comment = prompt("Reason for rejection:");
+      if (!comment) return;
+      try {
+        await resolveApproval({
+          project: approval._project || approval.project,
+          id: approval.id,
+          decision: "rejected",
+          comment,
+          requester: approval.requester,
+          gate: approval.gate,
+          what: approval.what || approval.title,
+          why: approval.why,
+          created: approval.created,
+        });
+        refresh();
+      } catch (err) {
+        setError(err.message);
+      }
     }
   }
 
@@ -116,27 +151,39 @@ export default function Approvals({ navigate }) {
         </div>
       )}
 
-      {displayedApprovals.length === 0 ? (
+      {grouped.length === 0 ? (
         <EmptyState
           icon={ShieldCheck}
           text={
             tab === "pending"
-              ? "No pending approvals"
+              ? "All clear — nothing needs your approval"
               : "No approvals"
           }
           sub="Approvals will appear here when agents need your sign-off."
         />
       ) : (
-        <div className="border border-border rounded-lg overflow-hidden">
-          {displayedApprovals.map((approval) => (
-            <ApprovalCard
-              key={approval.id || approval._file}
-              approval={approval}
-              onApprove={handleApprove}
-              onReject={handleReject}
-              navigate={navigate}
-              hideProject={false}
-            />
+        <div className="space-y-4">
+          {grouped.map(([project, items]) => (
+            <div key={project}>
+              <button
+                onClick={() => navigate("project", project)}
+                className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground hover:text-foreground transition-colors mb-1.5 px-1"
+              >
+                {project}
+              </button>
+              <div className="border border-border rounded-lg overflow-hidden">
+                {items.map((approval) => (
+                  <ApprovalCard
+                    key={approval.id || approval._file}
+                    approval={approval}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                    navigate={navigate}
+                    hideProject={true}
+                  />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       )}
