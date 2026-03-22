@@ -3,102 +3,102 @@
  * Uses flexbox for layout, no SVG needed.
  */
 
-import { OrgChartNode } from "./OrgChartNode.jsx";
+import { OrgChartNode } from"./OrgChartNode.jsx";
 
 function TreeNode({ node, nodeMap, onNodeClick, isLast = false }) {
-  const children = (node.children || [])
-    .map((id) => nodeMap[id])
-    .filter(Boolean);
+ const children = (node.children || [])
+  .map((id) => nodeMap[id])
+  .filter(Boolean);
 
-  return (
-    <div className="flex flex-col items-center">
-      {/* The node card */}
-      <OrgChartNode
-        node={node}
-        onClick={() => onNodeClick?.(node)}
-      />
+ return (
+  <div className="flex flex-col items-center">
+   {/* The node card */}
+   <OrgChartNode
+    node={node}
+    onClick={() => onNodeClick?.(node)}
+   />
 
-      {/* Connector + children */}
-      {children.length > 0 && (
-        <>
-          {/* Vertical line down from parent */}
-          <div className="w-px h-6 bg-border" />
+   {/* Connector + children */}
+   {children.length > 0 && (
+    <>
+     {/* Vertical line down from parent */}
+     <div className="w-px h-6 bg-border" />
 
-          {/* Horizontal line spanning all children */}
-          <div className="flex items-start">
-            {children.map((child, i) => {
-              const isFirst = i === 0;
-              const isChildLast = i === children.length - 1;
-              const isOnly = children.length === 1;
+     {/* Horizontal line spanning all children */}
+     <div className="flex items-start">
+      {children.map((child, i) => {
+       const isFirst = i === 0;
+       const isChildLast = i === children.length - 1;
+       const isOnly = children.length === 1;
 
-              return (
-                <div key={child.id} className="flex flex-col items-center">
-                  {/* Horizontal connector segment */}
-                  <div
-                    className={`h-px self-stretch ${
-                      isOnly
-                        ? "bg-transparent"
-                        : isFirst
-                        ? "bg-gradient-to-r from-transparent from-50% to-border to-50%"
-                        : isChildLast
-                        ? "bg-gradient-to-r from-border from-50% to-transparent to-50%"
-                        : "bg-border"
-                    }`}
-                  />
-                  {/* Vertical line down to child */}
-                  <div className="w-px h-6 bg-border" />
-                  {/* Recurse */}
-                  <div className="px-3">
-                    <TreeNode
-                      node={child}
-                      nodeMap={nodeMap}
-                      onNodeClick={onNodeClick}
-                      isLast={isChildLast}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
+       return (
+        <div key={child.id} className="flex flex-col items-center">
+         {/* Horizontal connector segment */}
+         <div
+          className={`h-px self-stretch ${
+           isOnly
+            ?"bg-transparent"
+            : isFirst
+            ?"bg-gradient-to-r from-transparent from-50% to-border to-50%"
+            : isChildLast
+            ?"bg-gradient-to-r from-border from-50% to-transparent to-50%"
+            :"bg-border"
+          }`}
+         />
+         {/* Vertical line down to child */}
+         <div className="w-px h-6 bg-border" />
+         {/* Recurse */}
+         <div className="px-3">
+          <TreeNode
+           node={child}
+           nodeMap={nodeMap}
+           onNodeClick={onNodeClick}
+           isLast={isChildLast}
+          />
+         </div>
+        </div>
+       );
+      })}
+     </div>
+    </>
+   )}
+  </div>
+ );
 }
 
 export function OrgChartTree({ nodes, onNodeClick }) {
-  // Build lookup map
-  const nodeMap = {};
-  for (const n of nodes) {
-    nodeMap[n.id] = n;
-  }
+ // Build lookup map
+ const nodeMap = {};
+ for (const n of nodes) {
+  nodeMap[n.id] = n;
+ }
 
-  // Find roots (nodes that no other node lists as a child)
-  const childIds = new Set();
-  for (const n of nodes) {
-    for (const cid of n.children || []) {
-      childIds.add(cid);
-    }
+ // Find roots (nodes that no other node lists as a child)
+ const childIds = new Set();
+ for (const n of nodes) {
+  for (const cid of n.children || []) {
+   childIds.add(cid);
   }
-  const roots = nodes.filter((n) => !childIds.has(n.id));
+ }
+ const roots = nodes.filter((n) => !childIds.has(n.id));
 
-  if (roots.length === 0 && nodes.length > 0) {
-    // Fallback: use the first node
-    roots.push(nodes[0]);
-  }
+ if (roots.length === 0 && nodes.length > 0) {
+  // Fallback: use the first node
+  roots.push(nodes[0]);
+ }
 
-  return (
-    <div className="flex justify-center overflow-x-auto py-6 px-4">
-      <div className="flex items-start gap-8">
-        {roots.map((root) => (
-          <TreeNode
-            key={root.id}
-            node={root}
-            nodeMap={nodeMap}
-            onNodeClick={onNodeClick}
-          />
-        ))}
-      </div>
-    </div>
-  );
+ return (
+  <div className="flex justify-center overflow-x-auto py-6 px-4">
+   <div className="flex items-start gap-8">
+    {roots.map((root) => (
+     <TreeNode
+      key={root.id}
+      node={root}
+      nodeMap={nodeMap}
+      onNodeClick={onNodeClick}
+     />
+    ))}
+   </div>
+  </div>
+ );
 }

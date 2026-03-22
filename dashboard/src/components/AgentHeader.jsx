@@ -15,7 +15,7 @@ export function AgentHeader({ agent, navigate }) {
           <ArrowLeft size={14} />
           Agents
         </button>
-        <span className="text-muted-foreground/40">/</span>
+        <span className="text-muted-foreground/40">&rsaquo;</span>
         <span className="text-[13px] font-semibold text-foreground truncate">
           {agent.name}
         </span>
@@ -24,13 +24,14 @@ export function AgentHeader({ agent, navigate }) {
       {/* Agent header */}
       <div className="flex items-start gap-4">
         {/* Avatar / Emoji */}
-        <div className="flex items-center justify-center h-12 w-12 bg-accent text-2xl shrink-0">
+        <div className="flex items-center justify-center h-12 w-12 bg-accent border border-border text-2xl shrink-0">
           {agent.emoji || agent.name?.charAt(0)?.toUpperCase()}
         </div>
 
+        {/* Left: name + role + projects */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-xl font-semibold text-foreground">{agent.name}</h2>
+            <h2 className="text-2xl font-semibold text-foreground">{agent.name}</h2>
             <span className="relative flex h-2.5 w-2.5 shrink-0">
               {agent.status === "active" ? (
                 <>
@@ -41,7 +42,6 @@ export function AgentHeader({ agent, navigate }) {
                 <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${statusDot}`} />
               )}
             </span>
-            <StatusBadge status={agent.status} />
           </div>
 
           {agent.role && (
@@ -62,6 +62,21 @@ export function AgentHeader({ agent, navigate }) {
                 </button>
               ))}
             </div>
+          )}
+        </div>
+
+        {/* Right: status badge + metadata */}
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <StatusBadge status={agent.status} />
+          {agent.lastSeen && (
+            <span className="text-[11px] text-muted-foreground font-mono tabular-nums">
+              Last seen {agent.lastSeen}
+            </span>
+          )}
+          {agent.runCount != null && (
+            <span className="text-[11px] text-muted-foreground">
+              {agent.runCount} runs
+            </span>
           )}
         </div>
       </div>
