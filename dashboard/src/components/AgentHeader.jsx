@@ -31,7 +31,7 @@ export function AgentHeader({ agent, navigate }) {
         {/* Left: name + role + projects */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-2xl font-semibold text-foreground">{agent.name}</h2>
+            <h2 className="text-3xl font-semibold text-foreground">{agent.name}</h2>
             <span className="relative flex h-2.5 w-2.5 shrink-0">
               {agent.status === "active" ? (
                 <>

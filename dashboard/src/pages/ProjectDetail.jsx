@@ -166,7 +166,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
    {/* Project header */}
    <div>
     <div className="flex items-center gap-3 mb-2">
-     <h2 className="text-2xl font-semibold text-foreground">
+     <h2 className="text-3xl font-semibold text-foreground">
       {project.title || projectId}
      </h2>
      <StatusBadge status={project.status} />
