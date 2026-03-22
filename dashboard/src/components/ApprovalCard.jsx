@@ -62,7 +62,23 @@ export default function ApprovalCard({
     <p className={`text-[14px] text-foreground ${isRejected ?"line-through decoration-muted-foreground/40" :""}`}>
      {title}
     </p>
-    <div className="text-[15px] text-muted-foreground flex items-center gap-2">
+    {/* Theme + proxy metrics */}
+    {(approval.theme_title || (approval.proxy_metric_names && approval.proxy_metric_names.length > 0)) && (
+     <div className="flex items-center gap-2 flex-wrap">
+      {approval.theme_title && (
+       <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-teal-500/20 bg-teal-500/10 text-teal-400">
+        <Compass size={10} />
+        {approval.theme_title}
+       </span>
+      )}
+      {approval.proxy_metric_names && approval.proxy_metric_names.map((pm, i) => (
+       <span key={i} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-zinc-700 bg-zinc-800/50 text-zinc-400">
+        {pm}
+       </span>
+      ))}
+     </div>
+    )}
+    <div className="text-[13px] text-muted-foreground flex items-center gap-2">
      {approval.requester && <span>Requested by: {approval.requester}</span>}
      {approval.requester && timeAgo && <span>·</span>}
      {timeAgo && <span>{timeAgo}</span>}
@@ -81,22 +97,6 @@ export default function ApprovalCard({
       </>
      )}
     </div>
-    {/* Theme + proxy metrics */}
-    {(approval.theme_title || (approval.proxy_metric_names && approval.proxy_metric_names.length > 0)) && (
-     <div className="flex items-center gap-2 flex-wrap">
-      {approval.theme_title && (
-       <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-teal-500/20 bg-teal-500/10 text-teal-400">
-        <Compass size={10} />
-        {approval.theme_title}
-       </span>
-      )}
-      {approval.proxy_metric_names && approval.proxy_metric_names.map((pm, i) => (
-       <span key={i} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-zinc-700 bg-zinc-800/50 text-zinc-400">
-        {pm}
-       </span>
-      ))}
-     </div>
-    )}
     {/* Rejection comment */}
     {isRejected && approval.comment && (
      <div className="text-[15px] text-red-400 flex items-center gap-1.5 mt-2 bg-red-500/10 px-3 py-1.5 rounded-[4px] border border-red-500/20 w-fit">
