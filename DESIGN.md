@@ -96,9 +96,35 @@
 
 ### Cards
 - Default: `bg-card border border-border rounded-[2px] shadow-sm`
-- Card with header: `p-[20px] border-b border-border` for header, `p-[20px]` for body
-- Section header text: `text-[14px] font-semibold text-foreground tracking-tight`
+- Card body: `p-[20px]`
 - Elevated (primary status): `border-l-2 border-l-{color} bg-accent/20` — max one per view
+
+### Card Section Headers (Tinted)
+Every card section header uses a colored tinted pattern — icon in a circle badge, tinted background, colored title text:
+```
+<div class="flex items-center gap-3 px-5 py-3 bg-{color}-500/[0.02] transition-colors">
+  <div class="w-6 h-6 rounded-full bg-{color}-500/10 border border-{color}-500/20 flex items-center justify-center">
+    <Icon class="w-3.5 h-3.5 text-{color}-400" />
+  </div>
+  <div class="text-[15px] font-medium text-{color}-100">Title</div>
+</div>
+```
+
+**Color assignments by meaning:**
+| Color | Sections |
+|-------|----------|
+| Indigo | Mission, NSM, Themes, Project Details form, Edit Issue, Description, Project Progress |
+| Cyan | Sub-agents, Hypothesis, Program, Run History, New Experiment |
+| Amber | Approval Gates, Budget/Costs, all approval cards, Pending Approvals (inbox) |
+| Emerald | Standups (inbox + project) |
+| Violet | Recent Issues, New Issue form |
+| Blue | Comments |
+| Red | Budget Alerts (inbox) |
+
+**Rules:**
+- Neutral info cards (Details sidebar with Status/Lead/Budget) do NOT get tinted headers
+- The `border-b` is removed from tinted headers — the tint creates visual separation
+- Count badges use matching colors: `text-[10px] font-mono bg-{color}-500/10 border border-{color}-500/20 px-1.5 py-0.5 rounded-[2px] text-{color}-400`
 
 ### Status Badges
 - Pill shape: `rounded-full px-2.5 py-0.5 text-[11px] font-medium`
@@ -198,3 +224,4 @@
 | 2026-03-22 | `max-w-4xl` for forms, `max-w-6xl` for details, `max-w-[1400px]` for lists | Content width varies by page density needs |
 | 2026-03-23 | Removed `html { zoom: 1.2 }`, set `body { font-size: 19.2px }` | CSS zoom broke scroll calculations on detail pages, clipping bottom content |
 | 2026-03-23 | Bumped all `text-[13px]` to `text-[15px]` | Sidebar, breadcrumbs, buttons, tabs, metadata, secondary text — all up 2px for readability |
+| 2026-03-23 | Colored tinted card section headers | Every card header gets a semantic color: icon circle + tinted bg + colored title. Inspired by Issues tab theme groups. Adds visual identity without decoration |
