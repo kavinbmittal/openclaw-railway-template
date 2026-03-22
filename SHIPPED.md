@@ -1,6 +1,7 @@
 # SHIPPED.md
 
 ## 2026-03-22
+- **style:** Port exact Aura HTML classes to Issues and Experiments tabs — filter selects, buttons, experiment card radius, hypothesis text size, and theme header hover classes all match reference HTML literally (`0131b25`)
 - **style:** Issues tab groups by theme with collapsible sections, colored badges, and proxy metric display; experiment cards show "Hypothesis:" prefix, proxy metric name, and "Propose New Experiment" empty-state card
 - **feat:** Experiment detail page — click any experiment card to see full hypothesis, program (rendered as markdown), run history table with best-run highlighting, metrics sidebar, and action buttons
 - **fix:** Clicking approval rows now navigates to approval detail instead of dashboard; sticky headers on all detail pages (IssueDetail, AgentDetail, ProjectDetail, CreateProject, ApprovalDetail)
