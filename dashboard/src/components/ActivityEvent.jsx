@@ -12,17 +12,8 @@ const EVENT_TYPE_COLORS = {
  activity:"bg-muted-foreground",
 };
 
-const AGENT_COLORS = [
-"bg-pink-600","bg-indigo-600","bg-green-600","bg-purple-600",
-"bg-blue-600","bg-amber-600","bg-red-600","bg-teal-600",
-"bg-cyan-600","bg-orange-600",
-];
-
-function agentColor(name) {
- if (!name) return"bg-muted-foreground";
- let hash = 0;
- for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
- return AGENT_COLORS[Math.abs(hash) % AGENT_COLORS.length];
+function agentColor() {
+ return"bg-accent text-accent-foreground";
 }
 
 function formatTime(isoString) {
@@ -58,7 +49,7 @@ export function ActivityEvent({ event, onNavigate }) {
    {event.agent && (
     <span className="shrink-0">
      <span
-      className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium text-white cursor-pointer hover:opacity-80 ${agentColor(event.agent)}`}
+      className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium cursor-pointer hover:opacity-80 ${agentColor(event.agent)}`}
       onClick={() => {
        if (!onNavigate) return;
        const name = event.agent.toLowerCase();
