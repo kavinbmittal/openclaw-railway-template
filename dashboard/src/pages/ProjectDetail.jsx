@@ -151,11 +151,73 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
 
  if (loading) {
   return (
-   <div className="max-w-[1400px] mx-auto space-y-4">
-    <Skeleton className="h-4 w-32" />
-    <Skeleton className="h-8 w-64 mb-2" />
-    <Skeleton className="h-4 w-48" />
-    <Skeleton className="h-64 w-full rounded-[2px] mt-4" />
+   <div className="p-8 max-w-[1400px] mx-auto w-full animate-pulse transition-opacity duration-300">
+    {/* Header Skeleton */}
+    <div className="space-y-4">
+     <div className="h-4 w-48 bg-zinc-800/50 rounded-[4px]"></div>
+     <div>
+      <div className="flex items-center gap-4">
+       <div className="h-9 w-64 bg-zinc-800/60 rounded-[4px]"></div>
+       <div className="h-6 w-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full"></div>
+      </div>
+      <div className="flex items-center gap-3 mt-4">
+       <div className="h-4 w-16 bg-zinc-800/50 rounded-[4px]"></div>
+       <div className="h-1 w-1 bg-zinc-700 rounded-full"></div>
+       <div className="h-4 w-16 bg-zinc-800/50 rounded-[4px]"></div>
+       <div className="h-1 w-1 bg-zinc-700 rounded-full"></div>
+       <div className="h-4 w-24 bg-zinc-800/50 rounded-[4px]"></div>
+      </div>
+     </div>
+    </div>
+
+    {/* Tabs Skeleton */}
+    <div className="flex gap-8 mt-8 border-b border-zinc-800 pb-3">
+     <div className="h-5 w-24 bg-zinc-800/60 rounded-[4px]"></div>
+     <div className="h-5 w-20 bg-zinc-800/40 rounded-[4px]"></div>
+     <div className="h-5 w-28 bg-zinc-800/40 rounded-[4px]"></div>
+     <div className="h-5 w-24 bg-zinc-800/40 rounded-[4px]"></div>
+    </div>
+
+    {/* Content Skeleton */}
+    <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6 pb-12">
+     {/* Left Column Skeleton */}
+     <div className="xl:col-span-2 space-y-6">
+      <div className="h-32 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col justify-between">
+       <div className="h-4 w-20 bg-zinc-800/60 rounded-[4px]"></div>
+       <div className="space-y-2.5">
+        <div className="h-3 w-full bg-zinc-800/40 rounded-[4px]"></div>
+        <div className="h-3 w-3/4 bg-zinc-800/40 rounded-[4px]"></div>
+       </div>
+      </div>
+      <div className="h-32 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col justify-between">
+       <div className="h-4 w-40 bg-zinc-800/60 rounded-[4px]"></div>
+       <div className="flex items-center gap-4">
+        <div className="h-12 w-12 rounded-full bg-zinc-800/50"></div>
+        <div className="space-y-2.5 flex-1">
+         <div className="h-6 w-48 bg-zinc-800/60 rounded-[4px]"></div>
+         <div className="h-3 w-64 bg-zinc-800/40 rounded-[4px]"></div>
+        </div>
+       </div>
+      </div>
+      <div className="h-[400px] bg-[#121214] border border-zinc-800/60 rounded-[2px]"></div>
+     </div>
+     {/* Right Column Skeleton */}
+     <div className="space-y-6">
+      <div className="h-48 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col gap-4">
+       <div className="h-4 w-20 bg-zinc-800/60 rounded-[4px] mb-2"></div>
+       <div className="flex justify-between"><div className="h-3 w-16 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-24 bg-zinc-800/60 rounded-[4px]"></div></div>
+       <div className="flex justify-between"><div className="h-3 w-12 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-20 bg-zinc-800/60 rounded-[4px]"></div></div>
+       <div className="flex justify-between"><div className="h-3 w-14 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-16 bg-zinc-800/60 rounded-[4px]"></div></div>
+       <div className="flex justify-between"><div className="h-3 w-20 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-24 bg-zinc-800/60 rounded-[4px]"></div></div>
+      </div>
+      <div className="h-64 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col gap-3">
+       <div className="h-4 w-24 bg-zinc-800/60 rounded-[4px] mb-2"></div>
+       <div className="h-10 bg-zinc-800/40 rounded-[4px]"></div>
+       <div className="h-10 bg-zinc-800/40 rounded-[4px]"></div>
+       <div className="h-10 bg-zinc-800/40 rounded-[4px]"></div>
+      </div>
+     </div>
+    </div>
    </div>
   );
  }
@@ -274,14 +336,14 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
             const colors = THEME_COLORS[idx % THEME_COLORS.length];
             return (
              <div key={theme.id} className={`px-5 py-4 ${idx < arr.length - 1 ? "border-b border-zinc-800/50" : ""}`}>
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-1.5">
                <div className={`w-6 h-6 rounded-full ${colors.badgeBg} border ${colors.badgeBorder} flex items-center justify-center text-xs font-mono font-medium ${colors.text} flex-shrink-0`}>
                 {theme.order ?? idx + 1}
                </div>
                <h3 className="text-sm font-medium text-zinc-200">{theme.title}</h3>
               </div>
               {theme.description && (
-               <p className="text-sm text-zinc-400 ml-9 mb-2">{theme.description}</p>
+               <p className="text-xs text-zinc-500 ml-9 mb-3">{theme.description}</p>
               )}
               <div className="ml-9 space-y-2.5">
                {(theme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999)).map((pm, pmIdx) => (
@@ -446,6 +508,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
        approvals={approvals}
        projectId={projectId}
        navigate={navigate}
+       themes={themes.filter((t) => t.status === "approved")}
        onResolved={() => {
         getApprovals(projectId)
          .then(setApprovals)
@@ -605,7 +668,7 @@ function ProjectCostsTab({ costs, costSummary, budgetPolicy, totalCost, projectI
 }
 
 /* ──────────────── APPROVALS TAB COMPONENT ──────────────── */
-function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate }) {
+function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate, themes = [] }) {
  const [rejectingApproval, setRejectingApproval] = useState(null);
 
  async function handleApprove(approval) {
@@ -673,23 +736,113 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate }) {
   return <EmptyState icon={ShieldCheck} text="No approvals" sub="All clear — no approvals for this project." />;
  }
 
+ // Find theme data for an approval
+ function getApprovalThemeData(approval) {
+  const allThemes = themes || [];
+  const expTheme = allThemes.find((t) => t.id === approval.theme);
+  if (!expTheme) return null;
+  const themeIdx = allThemes.indexOf(expTheme);
+  const themeColors = THEME_COLORS[themeIdx % THEME_COLORS.length];
+  const proxyMetric = expTheme.proxy_metrics?.find((pm) => pm.id === approval.proxy_metric);
+  const pmIdx = proxyMetric && expTheme.proxy_metrics ? expTheme.proxy_metrics.indexOf(proxyMetric) : -1;
+  return { expTheme, themeIdx, themeColors, proxyMetric, pmIdx };
+ }
+
  return (
   <div className="space-y-4">
    {pendingCount > 0 && (
     <p className="text-[13px] text-muted-foreground">{pendingCount} pending</p>
    )}
-   <div className="bg-card border border-border rounded-[2px] shadow-sm overflow-hidden">
-    {approvals.map((approval) => (
-     <ApprovalCard
+   {approvals.map((approval) => {
+    const isPending = !approval.status || approval.status === "pending" || approval.status === "proposed";
+    const isRejected = approval.status === "rejected";
+    const title = approval.what || approval.title || "";
+    const itemType = approval.type || approval.gate || null;
+    const timeAgo = approval.created ? formatTimeAgo(approval.created) : approval.timestamp ? formatTimeAgo(approval.timestamp) : "";
+    const td = getApprovalThemeData(approval);
+
+    // Type badge config
+    const typeBadges = {
+     "proposed-issue": { label: "Issue", cls: "border-violet-500/20 bg-violet-500/10 text-violet-400" },
+     "experiment-start": { label: "Experiment", cls: "border-cyan-500/20 bg-cyan-500/10 text-cyan-400" },
+     "autoresearch-start": { label: "Experiment", cls: "border-cyan-500/20 bg-cyan-500/10 text-cyan-400" },
+     "proposed-theme": { label: "Theme", cls: "border-teal-500/20 bg-teal-500/10 text-teal-400" },
+     theme: { label: "Theme", cls: "border-teal-500/20 bg-teal-500/10 text-teal-400" },
+     "deliverable-review": { label: "Deliverable", cls: "border-blue-500/20 bg-blue-500/10 text-blue-400" },
+    };
+    const badge = typeBadges[itemType] || (itemType ? { label: itemType, cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" } : null);
+
+    return (
+     <div
       key={approval.id || approval._file}
-      approval={approval}
-      onApprove={handleApprove}
-      onReject={handleReject}
-      navigate={navigate}
-      hideProject={true}
-     />
-    ))}
-   </div>
+      className={`bg-[#121214] border border-zinc-800 rounded-[2px] p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm ${isRejected ? "opacity-60" : ""}`}
+      onClick={() => navigate && navigate("approval-detail", approval.id)}
+     >
+      <div className="space-y-2.5 cursor-pointer">
+       {badge && (
+        <div>
+         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${badge.cls}`}>{badge.label}</span>
+        </div>
+       )}
+       <p className={`text-sm font-medium text-zinc-100 ${isRejected ? "line-through decoration-zinc-500" : ""}`}>{title}</p>
+
+       {/* Theme + Proxy Metric pill row */}
+       {td && (
+        <div className="flex flex-wrap items-center gap-2">
+         <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+          <div className={`w-3.5 h-3.5 rounded-full ${td.themeColors.badgeBg} border ${td.themeColors.badgeBorder} flex items-center justify-center text-[9px] font-mono font-medium ${td.themeColors.text} flex-shrink-0`}>
+           {td.expTheme.order ?? td.themeIdx + 1}
+          </div>
+          <span className="text-xs text-zinc-300">{td.expTheme.title}</span>
+         </div>
+         {td.proxyMetric && (
+          <>
+           <span className="text-zinc-600 text-sm">{"\u203A"}</span>
+           <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+            <div className="w-3.5 h-3.5 rounded bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[9px] font-mono text-zinc-500 flex-shrink-0">
+             {String.fromCharCode(97 + (td.pmIdx >= 0 ? td.pmIdx : 0))}
+            </div>
+            <span className="text-xs text-zinc-400">{td.proxyMetric.name}</span>
+           </div>
+          </>
+         )}
+        </div>
+       )}
+
+       <div className="text-xs text-zinc-500 flex items-center gap-2 pt-0.5">
+        {approval.requester && <span>Requested by: {approval.requester}</span>}
+        {approval.requester && timeAgo && <span>&middot;</span>}
+        {timeAgo && <span>{timeAgo}</span>}
+       </div>
+
+       {/* Rejection comment */}
+       {isRejected && approval.comment && (
+        <div className="text-xs text-red-400 flex items-center gap-1.5 mt-2 bg-red-500/10 px-3 py-1.5 rounded-[4px] border border-red-500/20 inline-flex w-fit">
+         Rejected: {approval.comment}
+        </div>
+       )}
+      </div>
+
+      {/* Right: action buttons */}
+      {isPending && (
+       <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+        <button
+         onClick={() => handleReject(approval)}
+         className="px-4 py-1.5 rounded-[6px] border border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors text-sm font-medium focus:outline-none focus:ring-[3px] focus:ring-red-500/30"
+        >
+         Reject
+        </button>
+        <button
+         onClick={() => handleApprove(approval)}
+         className="px-4 py-1.5 rounded-[6px] border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-sm font-medium focus:outline-none focus:ring-[3px] focus:ring-emerald-500/30"
+        >
+         Approve
+        </button>
+       </div>
+      )}
+     </div>
+    );
+   })}
    {rejectingApproval && (
     <RejectModal
      onConfirm={confirmReject}
@@ -734,13 +887,13 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
 
    {experiments.length === 0 && !showCreate ? (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-     <div
+     <button
       onClick={() => setShowCreate(true)}
-      className="border border-dashed border-zinc-800 rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 min-h-[160px] cursor-pointer hover:border-zinc-700 hover:text-zinc-400 transition-colors"
+      className="border border-dashed border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus:outline-none focus:ring-[3px] focus:ring-zinc-700/50 lg:col-span-2"
      >
       <Plus size={24} className="mb-2" />
-      <span className="text-sm">Propose New Experiment</span>
-     </div>
+      <span className="text-sm font-medium">Propose New Experiment</span>
+     </button>
     </div>
    ) : experiments.length > 0 && (
     <>
@@ -752,21 +905,54 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
 
      {/* Experiment cards — Aura: grid-cols-2, compact with hypothesis */}
      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {experiments.map((exp) => (
-       <div key={exp.dir} onClick={() => navigate("experiment-detail", { slug: projectSlug, dir: exp.dir })} className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm p-5 flex flex-col h-full cursor-pointer hover:bg-zinc-800/30 transition-colors">
-        <div className="flex justify-between items-start mb-3">
+      {experiments.map((exp) => {
+       const expTheme = themes.find((t) => t.id === exp.theme);
+       const themeIdx = expTheme ? themes.indexOf(expTheme) : -1;
+       const themeColors = themeIdx >= 0 ? THEME_COLORS[themeIdx % THEME_COLORS.length] : null;
+       const proxyMetric = expTheme?.proxy_metrics?.find((pm) => pm.id === exp.proxy_metric);
+       const pmIdx = proxyMetric && expTheme?.proxy_metrics ? expTheme.proxy_metrics.indexOf(proxyMetric) : -1;
+
+       return (
+       <div key={exp.dir} onClick={() => navigate("experiment-detail", { slug: projectSlug, dir: exp.dir })} className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm p-5 flex flex-col h-full gap-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+        <div className="space-y-2.5">
+         <div>
+          <StatusBadge status={exp.status} />
+         </div>
          <h3 className="text-sm font-medium text-zinc-100">{exp.name}</h3>
-         <StatusBadge status={exp.status} />
+
+         {/* Theme + Proxy Metric pill row */}
+         {expTheme && (
+          <div className="flex flex-wrap items-center gap-2">
+           <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+            <div className={`w-3.5 h-3.5 rounded-full ${themeColors?.badgeBg || "bg-zinc-800/50"} border ${themeColors?.badgeBorder || "border-zinc-700/50"} flex items-center justify-center text-[9px] font-mono font-medium ${themeColors?.text || "text-zinc-500"} flex-shrink-0`}>
+             {expTheme.order ?? themeIdx + 1}
+            </div>
+            <span className="text-xs text-zinc-300">{expTheme.title}</span>
+           </div>
+           {proxyMetric && (
+            <>
+             <span className="text-zinc-600 text-sm">{"\u203A"}</span>
+             <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+              <div className="w-3.5 h-3.5 rounded bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[9px] font-mono text-zinc-500 flex-shrink-0">
+               {String.fromCharCode(97 + (pmIdx >= 0 ? pmIdx : 0))}
+              </div>
+              <span className="text-xs text-zinc-400">{proxyMetric.name}</span>
+             </div>
+            </>
+           )}
+          </div>
+         )}
         </div>
+
         {exp.hypothesis && (
-         <p className="text-sm text-zinc-400 mb-6 flex-1 line-clamp-2">
+         <p className="text-sm text-zinc-400 flex-1">
           Hypothesis: {exp.hypothesis}
          </p>
         )}
         <div className="grid grid-cols-2 gap-4 border-t border-zinc-800/50 pt-4 mt-auto">
          {exp.proxy_metric && (
           <div>
-           <div className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-1">{exp.proxy_metric}</div>
+           <div className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-1">{proxyMetric?.name || exp.proxy_metric}</div>
            <div className={`text-sm font-medium ${exp.best_metric !== null ? "text-emerald-400" : "text-zinc-400"}`}>
             {exp.best_metric !== null ? exp.best_metric : "\u2014"}
            </div>
@@ -778,15 +964,16 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
          </div>
         </div>
        </div>
-      ))}
+       );
+      })}
       {/* Propose New Experiment card */}
-      <div
+      <button
        onClick={() => setShowCreate(true)}
-       className="border border-dashed border-zinc-800 rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 min-h-[160px] cursor-pointer hover:border-zinc-700 hover:text-zinc-400 transition-colors"
+       className="border border-dashed border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus:outline-none focus:ring-[3px] focus:ring-zinc-700/50 lg:col-span-2"
       >
        <Plus size={24} className="mb-2" />
-       <span className="text-sm">Propose New Experiment</span>
-      </div>
+       <span className="text-sm font-medium">Propose New Experiment</span>
+      </button>
      </div>
     </>
    )}
