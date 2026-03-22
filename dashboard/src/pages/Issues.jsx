@@ -1,10 +1,11 @@
 /**
  * Issues — issue list + kanban board for a project.
  * UI ported from Aura HTML reference.
+ * List view groups issues by theme with collapsible sections.
  */
 import { useState, useEffect, useMemo } from"react";
 import { getIssues, updateIssue } from"../api.js";
-import { List, LayoutGrid, Plus, Search, CircleDot } from"lucide-react";
+import { List, LayoutGrid, Plus, Search, CircleDot, ChevronDown } from"lucide-react";
 import { formatTimeAgo } from"../utils/formatDate.js";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
 import { StatusBadge } from"../components/StatusBadge.jsx";
@@ -21,6 +22,38 @@ function timeAgo(iso) {
  return formatTimeAgo(iso);
 }
 
+// Theme color palette — cycle through based on theme index
+const THEME_COLORS = [
+ { bg: "bg-indigo-500/[0.02]", bgHover: "bg-indigo-500/[0.05]", badgeBg: "bg-indigo-500/10", badgeBorder: "border-indigo-500/20", text: "text-indigo-400", titleText: "text-indigo-100", countBg: "bg-indigo-500/10", countBorder: "border-indigo-500/20", chevron: "text-indigo-400/50" },
+ { bg: "bg-emerald-500/[0.02]", bgHover: "bg-emerald-500/[0.05]", badgeBg: "bg-emerald-500/10", badgeBorder: "border-emerald-500/20", text: "text-emerald-400", titleText: "text-emerald-100", countBg: "bg-emerald-500/10", countBorder: "border-emerald-500/20", chevron: "text-emerald-400/50" },
+ { bg: "bg-amber-500/[0.02]", bgHover: "bg-amber-500/[0.05]", badgeBg: "bg-amber-500/10", badgeBorder: "border-amber-500/20", text: "text-amber-400", titleText: "text-amber-100", countBg: "bg-amber-500/10", countBorder: "border-amber-500/20", chevron: "text-amber-400/50" },
+ { bg: "bg-cyan-500/[0.02]", bgHover: "bg-cyan-500/[0.05]", badgeBg: "bg-cyan-500/10", badgeBorder: "border-cyan-500/20", text: "text-cyan-400", titleText: "text-cyan-100", countBg: "bg-cyan-500/10", countBorder: "border-cyan-500/20", chevron: "text-cyan-400/50" },
+ { bg: "bg-rose-500/[0.02]", bgHover: "bg-rose-500/[0.05]", badgeBg: "bg-rose-500/10", badgeBorder: "border-rose-500/20", text: "text-rose-400", titleText: "text-rose-100", countBg: "bg-rose-500/10", countBorder: "border-rose-500/20", chevron: "text-rose-400/50" },
+];
+
+/** Single issue row inside a theme group */
+function IssueRow({ issue, onClick }) {
+ const isDone = issue.status === "done" || issue.status === "cancelled";
+ return (
+  <div
+   onClick={onClick}
+   className="flex items-center gap-4 px-5 py-3 border-t border-zinc-800/50 hover:bg-zinc-800/30 cursor-pointer transition-colors"
+  >
+   <PriorityDot priority={issue.priority} />
+   <StatusCircle status={issue.status} />
+   <span className="text-[12px] font-mono text-zinc-500 shrink-0 whitespace-nowrap">{issue.id}</span>
+   <span className={`text-sm flex-1 truncate ${isDone ? "text-zinc-500 line-through decoration-zinc-600" : "text-zinc-200"}`}>
+    {issue.title}
+   </span>
+   <StatusBadge status={issue.status} />
+   {issue.assignee && (
+    <span className="text-[12px] text-zinc-400 w-24 truncate capitalize hidden sm:block">{issue.assignee}</span>
+   )}
+   <span className="text-[12px] font-mono text-zinc-500 w-20 text-right shrink-0">{timeAgo(issue.updated)}</span>
+  </div>
+ );
+}
+
 export default function Issues({ projectSlug, navigate, themes = [] }) {
  const [issues, setIssues] = useState([]);
  const [loading, setLoading] = useState(true);
@@ -30,6 +63,11 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
  const [filterStatus, setFilterStatus] = useState("");
  const [filterPriority, setFilterPriority] = useState("");
  const [filterAssignee, setFilterAssignee] = useState("");
+ const [expandedThemes, setExpandedThemes] = useState({});
+
+ function toggleTheme(id) {
+  setExpandedThemes(prev => ({ ...prev, [id]: prev[id] === false ? true : false }));
+ }
 
  function loadIssues() {
   getIssues(projectSlug)
@@ -59,6 +97,18 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
   if (filterAssignee) result = result.filter((i) => i.assignee === filterAssignee);
   return result;
  }, [activeIssues, searchQuery, filterStatus, filterPriority, filterAssignee]);
+
+ // Approved themes sorted by order
+ const sortedThemes = useMemo(() =>
+  themes.filter(t => t.status === "approved").sort((a, b) => (a.order ?? 999) - (b.order ?? 999)),
+  [themes]
+ );
+
+ // Issues that don't belong to any approved theme
+ const unthemedIssues = useMemo(() =>
+  filteredIssues.filter(i => !i.theme || !sortedThemes.find(t => t.id === i.theme)),
+  [filteredIssues, sortedThemes]
+ );
 
  async function handleStatusChange(issueId, newStatus) {
   try {
@@ -92,7 +142,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
 
  return (
   <div className="space-y-4">
-   {/* Filters & Actions — Aura: flex justify-between, rounded-[6px] buttons */}
+   {/* Filters & Actions */}
    <div className="flex justify-between items-center">
     <div className="flex gap-2">
      <select
@@ -161,37 +211,87 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
    ) : view ==="board" ? (
     <KanbanBoard issues={filteredIssues} onIssueClick={handleIssueClick} />
    ) : (
-    /* List view — Aura: card with issue rows */
-    <div className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
-     {filteredIssues.map((issue, i) => {
-      const isDone = issue.status ==="done" || issue.status ==="cancelled";
+    /* List view — grouped by theme */
+    <div className="space-y-4">
+     {/* Theme groups */}
+     {sortedThemes.map((theme, themeIdx) => {
+      const themeIssues = filteredIssues.filter(i => i.theme === theme.id);
+      const isExpanded = expandedThemes[theme.id] !== false; // default expanded
+      const themeColors = THEME_COLORS[themeIdx % THEME_COLORS.length];
+
       return (
-       <div
-        key={issue.id}
-        onClick={() => handleIssueClick(issue)}
-        className={`flex items-center gap-4 px-5 py-3 hover:bg-accent/40 transition-colors cursor-pointer ${
-         i < filteredIssues.length - 1 ?"border-b border-border/50" :""
-        }`}
-        tabIndex="0"
-       >
-        <PriorityDot priority={issue.priority} />
-        <StatusCircle status={issue.status} />
-        <span className="text-[12px] font-mono text-muted-foreground shrink-0 whitespace-nowrap">{issue.id}</span>
-        <span className={`text-[14px] flex-1 truncate ${isDone ?"text-muted-foreground line-through decoration-muted-foreground/40" :"text-foreground"}`}>
-         {issue.title}
-        </span>
-        <StatusBadge status={issue.status} />
-        {issue.assignee && (
-         <span className="text-[12px] text-muted-foreground w-24 truncate hidden sm:block capitalize">
-          {issue.assignee}
-         </span>
+       <div key={theme.id} className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm flex flex-col">
+        {/* Theme Header */}
+        <div
+         onClick={() => toggleTheme(theme.id)}
+         className={`flex items-center gap-3 px-5 py-3 ${themeColors.bg} hover:${themeColors.bgHover} transition-colors cursor-pointer select-none`}
+        >
+         <div className={`w-6 h-6 rounded-full ${themeColors.badgeBg} border ${themeColors.badgeBorder} flex items-center justify-center text-[11px] font-mono font-medium ${themeColors.text} flex-shrink-0`}>
+          {theme.order ?? themeIdx + 1}
+         </div>
+         <div className={`text-[13px] font-medium ${themeColors.titleText}`}>{theme.title}</div>
+         <div className={`text-[10px] font-mono ${themeColors.countBg} border ${themeColors.countBorder} px-1.5 py-0.5 rounded-[2px] ${themeColors.text}`}>
+          {themeIssues.length}
+         </div>
+         <ChevronDown size={14} className={`${themeColors.chevron} ml-auto transition-transform duration-200 ${isExpanded ? "" : "-rotate-90"}`} />
+        </div>
+
+        {/* Theme Content */}
+        {isExpanded && (
+         <div className="border-t border-zinc-800/50">
+          {/* Proxy Metrics */}
+          {(theme.proxy_metrics || []).length > 0 && (
+           <div className="ml-9 mb-2 mt-2 space-y-1.5">
+            {(theme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999)).map((pm, pmIdx) => (
+             <div key={pm.id} className="flex items-center gap-2 text-[12px] text-zinc-400">
+              <div className="w-4 h-4 rounded bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[9px] font-mono text-zinc-500 flex-shrink-0">
+               {String.fromCharCode(97 + pmIdx)}
+              </div>
+              <span>{pm.name}</span>
+             </div>
+            ))}
+           </div>
+          )}
+
+          {/* Issue rows or empty state */}
+          {themeIssues.length === 0 ? (
+           <div className="text-center text-[13px] text-zinc-500 py-4 border-t border-zinc-800/50">
+            No issues for this theme
+           </div>
+          ) : (
+           <div>
+            {themeIssues.map(issue => (
+             <IssueRow key={issue.id} issue={issue} onClick={() => handleIssueClick(issue)} />
+            ))}
+           </div>
+          )}
+         </div>
         )}
-        <span className="text-[12px] text-muted-foreground w-20 text-right font-mono shrink-0">
-         {timeAgo(issue.updated)}
-        </span>
        </div>
       );
      })}
+
+     {/* Unthemed group */}
+     {unthemedIssues.length > 0 && (
+      <div className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm flex flex-col">
+       <div
+        onClick={() => toggleTheme("_unthemed")}
+        className="flex items-center gap-3 px-5 py-3 bg-zinc-800/[0.2] hover:bg-zinc-800/[0.4] transition-colors cursor-pointer select-none"
+       >
+        <div className="w-6 h-6 rounded-full border border-dashed border-zinc-700 bg-zinc-800/30 flex items-center justify-center text-[10px] font-medium text-zinc-400 flex-shrink-0">&mdash;</div>
+        <div className="text-[13px] font-medium text-zinc-200">Unthemed</div>
+        <div className="text-[10px] font-mono bg-zinc-800/50 border border-zinc-700/50 px-1.5 py-0.5 rounded-[2px] text-zinc-400">{unthemedIssues.length}</div>
+        <ChevronDown size={14} className={`text-zinc-500 ml-auto transition-transform duration-200 ${expandedThemes["_unthemed"] === false ? "-rotate-90" : ""}`} />
+       </div>
+       {expandedThemes["_unthemed"] !== false && (
+        <div className="border-t border-zinc-800/50">
+         {unthemedIssues.map(issue => (
+          <IssueRow key={issue.id} issue={issue} onClick={() => handleIssueClick(issue)} />
+         ))}
+        </div>
+       )}
+      </div>
+     )}
     </div>
    )}
   </div>

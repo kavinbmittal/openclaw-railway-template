@@ -3,7 +3,7 @@ import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getAppro
 import { formatDate as formatDateUtil, formatTimeAgo } from"../utils/formatDate.js";
 import {
  ArrowLeft, FileText, Activity, DollarSign, Clock,
- User, Wallet, Target, ShieldCheck, Bot, CircleDot, Pencil, FlaskConical, Compass,
+ User, Wallet, Target, ShieldCheck, Bot, CircleDot, Pencil, FlaskConical, Compass, Plus,
 } from"lucide-react";
 import Markdown from"../components/Markdown.jsx";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
@@ -827,7 +827,15 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
    )}
 
    {experiments.length === 0 && !showCreate ? (
-    <EmptyState icon={FlaskConical} text="No experiments yet" sub="The lead can start one via the autoresearch protocol." />
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+     <div
+      onClick={() => setShowCreate(true)}
+      className="border border-dashed border-zinc-800 rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 min-h-[160px] cursor-pointer hover:border-zinc-700 hover:text-zinc-400 transition-colors"
+     >
+      <Plus size={24} className="mb-2" />
+      <span className="text-sm">Propose New Experiment</span>
+     </div>
+    </div>
    ) : experiments.length > 0 && (
     <>
      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -845,26 +853,34 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
          <StatusBadge status={exp.status} />
         </div>
         {exp.hypothesis && (
-         <p className="text-[13px] text-zinc-400 mb-4 flex-1 line-clamp-2">
-          {exp.hypothesis}
+         <p className="text-[13px] text-zinc-400 mb-6 flex-1 line-clamp-2">
+          Hypothesis: {exp.hypothesis}
          </p>
         )}
-        {(exp.best_metric !== null || exp.result_count > 0) && (
-         <div className="grid grid-cols-2 gap-4 border-t border-zinc-800/50 pt-4 mt-auto">
-          {exp.best_metric !== null && (
-           <div>
-            <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-zinc-500 mb-1">Best Metric</div>
-            <div className="text-sm font-medium font-mono text-zinc-200">{exp.best_metric}</div>
-           </div>
-          )}
+        <div className="grid grid-cols-2 gap-4 border-t border-zinc-800/50 pt-4 mt-auto">
+         {exp.proxy_metric && (
           <div>
-           <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-zinc-500 mb-1">Runs</div>
-           <div className="text-sm font-medium font-mono text-zinc-200">{exp.result_count}</div>
+           <div className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-1">{exp.proxy_metric}</div>
+           <div className={`text-sm font-medium ${exp.best_metric !== null ? "text-emerald-400" : "text-zinc-400"}`}>
+            {exp.best_metric !== null ? exp.best_metric : "\u2014"}
+           </div>
           </div>
+         )}
+         <div>
+          <div className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-1">Runs</div>
+          <div className="text-sm font-medium text-zinc-200">{exp.result_count}</div>
          </div>
-        )}
+        </div>
        </div>
       ))}
+      {/* Propose New Experiment card */}
+      <div
+       onClick={() => setShowCreate(true)}
+       className="border border-dashed border-zinc-800 rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 min-h-[160px] cursor-pointer hover:border-zinc-700 hover:text-zinc-400 transition-colors"
+      >
+       <Plus size={24} className="mb-2" />
+       <span className="text-sm">Propose New Experiment</span>
+      </div>
      </div>
     </>
    )}
