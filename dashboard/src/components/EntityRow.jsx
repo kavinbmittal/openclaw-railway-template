@@ -18,7 +18,7 @@ export function EntityRow({
  return (
   <div
    className={`flex items-center gap-4 px-5 py-3 text-[14px] transition-colors ${
-    isClickable ?"cursor-pointer hover:bg-accent/50" :""
+    isClickable ?"cursor-pointer hover:bg-accent/50 transition-colors" :""
    } ${selected ?"bg-accent/30" :""} ${className}`}
    onClick={onClick}
   >

@@ -101,7 +101,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
         step="0.01"
         value={weeklyBudget}
         onChange={(e) => setWeeklyBudget(e.target.value)}
-        className="w-full bg-background border border-border px-3 py-2 pl-7 text-[14px] font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        className="w-full bg-background border border-border px-3 py-2 pl-7 text-[14px] font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow"
         placeholder="0.00"
        />
       </div>
@@ -179,7 +179,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
            type="text"
            value={item.agent}
            onChange={(e) => handleAgentChange(i,"agent", e.target.value)}
-           className="flex-1 bg-background border border-border px-3 py-1.5 text-[14px] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+           className="flex-1 bg-background border border-border px-3 py-1.5 text-[14px] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow"
            placeholder="Agent name"
           />
           <div className="relative w-28">
@@ -192,7 +192,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
             step="0.01"
             value={item.limit}
             onChange={(e) => handleAgentChange(i,"limit", e.target.value)}
-            className="w-full bg-background border border-border px-3 py-1.5 pl-5 text-[14px] font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="w-full bg-background border border-border px-3 py-1.5 pl-5 text-[14px] font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow"
             placeholder="0.00"
            />
           </div>

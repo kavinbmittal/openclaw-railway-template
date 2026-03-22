@@ -859,13 +859,13 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate, theme
        <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
         <button
          onClick={() => handleReject(approval)}
-         className="px-4 py-1.5 rounded-[6px] border border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors text-[14px] font-medium focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/30"
+         className="px-4 py-1.5 rounded-[6px] border border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-[color,box-shadow] text-[14px] font-medium focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/30"
         >
          Reject
         </button>
         <button
          onClick={() => handleApprove(approval)}
-         className="px-4 py-1.5 rounded-[6px] border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-[14px] font-medium focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-emerald-500/30"
+         className="px-4 py-1.5 rounded-[6px] border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-[color,box-shadow] text-[14px] font-medium focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-emerald-500/30"
         >
          Approve
         </button>
@@ -900,7 +900,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
     <div />
     <button
      onClick={() => setShowCreate(!showCreate)}
-     className="rounded-[6px] border border-border bg-card text-[15px] font-medium text-zinc-300 px-3 py-1.5 hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+     className="rounded-[6px] border border-border bg-card text-[15px] font-medium text-zinc-300 px-3 py-1.5 hover:bg-zinc-800 transition-[color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
      New Experiment
     </button>
@@ -920,7 +920,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
      <button
       onClick={() => setShowCreate(true)}
-      className="border border-dashed border-border hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-[20px] flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
+      className="border border-dashed border-border hover:border-zinc-700 hover:bg-zinc-800/20 transition-[color,box-shadow] rounded-[2px] p-[20px] flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
      >
       <Plus size={24} className="mb-2" />
       <span className="text-[14px] font-medium">Propose New Experiment</span>
@@ -1002,7 +1002,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
       {/* Propose New Experiment card */}
       <button
        onClick={() => setShowCreate(true)}
-       className="border border-dashed border-border hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-[20px] flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
+       className="border border-dashed border-border hover:border-zinc-700 hover:bg-zinc-800/20 transition-[color,box-shadow] rounded-[2px] p-[20px] flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
       >
        <Plus size={24} className="mb-2" />
        <span className="text-[14px] font-medium">Propose New Experiment</span>

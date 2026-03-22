@@ -164,7 +164,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* Waiting on */}
       {agent.waitingOn && agent.waitingOn.length > 0 && (
-       <div className="bg-card rounded-sm border border-border shadow-sm p-[20px]">
+       <div className="bg-card rounded-[2px] border border-border shadow-sm p-[20px]">
         <div className="flex items-center gap-2 mb-3">
          <Clock size={14} className="text-amber-400" />
          <h3 className="text-[14px] font-semibold text-muted-foreground">
@@ -184,7 +184,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* Projects */}
       {agent.projects && agent.projects.length > 0 && (
-       <div className="bg-card rounded-sm border border-border shadow-sm p-[20px]">
+       <div className="bg-card rounded-[2px] border border-border shadow-sm p-[20px]">
         <div className="flex items-center gap-2 mb-3">
          <Briefcase size={14} className="text-muted-foreground/50" />
          <h3 className="text-[14px] font-semibold text-muted-foreground">
@@ -198,7 +198,7 @@ export default function AgentDetail({ agentId, navigate }) {
            onClick={() => navigate("project", p.id)}
            className="flex items-center gap-2 text-[14px] text-foreground/80 hover:text-foreground transition-colors w-full text-left py-1"
           >
-           <span className="w-3 h-3 rounded-sm bg-primary/30 shrink-0" />
+           <span className="w-3 h-3 rounded-[2px] bg-primary/30 shrink-0" />
            {p.title}
           </button>
          ))}
@@ -208,7 +208,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* SOUL summary */}
       {agent.soulSummary && (
-       <div className="bg-card rounded-sm border border-border shadow-sm p-[20px]">
+       <div className="bg-card rounded-[2px] border border-border shadow-sm p-[20px]">
         <div className="flex items-center gap-2 mb-3">
          <Brain size={14} className="text-muted-foreground/50" />
          <h3 className="text-[14px] font-semibold text-muted-foreground">
@@ -223,7 +223,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* Idle state */}
       {agent.status ==="idle" && (!agent.inProgress || agent.inProgress.length === 0) && (
-       <div className="bg-card rounded-sm border border-border shadow-sm p-[20px] text-center">
+       <div className="bg-card rounded-[2px] border border-border shadow-sm p-[20px] text-center">
         <p className="text-[14px] text-muted-foreground/60">
          {agent.name} is currently idle with no active tasks.
         </p>

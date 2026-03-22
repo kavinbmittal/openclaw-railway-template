@@ -23,8 +23,8 @@ export function ProjectCostCard({ project, onClick }) {
 
  return (
   <div
-   className={`bg-card rounded-sm border border-border shadow-sm p-[20px] space-y-3 transition-colors ${
-    onClick ?"hover:bg-accent/50 cursor-pointer" :""
+   className={`bg-card rounded-[2px] border border-border shadow-sm p-[20px] space-y-3 transition-colors ${
+    onClick ?"hover:bg-accent/50 cursor-pointer transition-colors" :""
    }`}
    onClick={onClick}
   >

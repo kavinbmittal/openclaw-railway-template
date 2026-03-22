@@ -163,7 +163,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
      <div className="xl:col-span-2 flex flex-col gap-6">
 
       {/* Created box */}
-      <div className="bg-card border border-border rounded-sm shadow-sm p-[20px]">
+      <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
        <div className="text-[12px] uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Created</div>
        <div className="text-[14px] text-zinc-200">{data.created || "Unknown"}</div>
       </div>
@@ -172,7 +172,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
       {(theme || proxy_metric) && (
        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {theme && (
-         <div className="bg-card border border-border rounded-sm shadow-sm p-[20px]">
+         <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
           <div className="text-[12px] uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Theme</div>
           <div className="text-[14px] text-zinc-200 flex items-center gap-2">
            <ThemeDot theme={theme} />
@@ -181,7 +181,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
          </div>
         )}
         {(proxy_metrics?.length > 0 || proxy_metric) && (
-         <div className="bg-card border border-border rounded-sm shadow-sm p-[20px]">
+         <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
           <div className="text-[12px] uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Proxy Metrics</div>
           {proxy_metrics?.length > 0 ? (
            <div className="space-y-2">
@@ -202,7 +202,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
 
       {/* Hypothesis card */}
       {hypothesis && (
-       <div className="bg-card border border-border rounded-sm shadow-sm">
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
         <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
          <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
           <Lightbulb className="w-3.5 h-3.5 text-cyan-400" />
@@ -219,7 +219,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
 
       {/* Program card — renders only the ## Program section, not the full file */}
       {(program || program_md) && (
-       <div className="bg-card border border-border rounded-sm shadow-sm">
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
         <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
          <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
           <Code className="w-3.5 h-3.5 text-cyan-400" />
@@ -234,13 +234,13 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
       )}
 
       {/* Run History card */}
-      <div className="bg-card border border-border rounded-sm shadow-sm">
+      <div className="bg-card border border-border rounded-[2px] shadow-sm">
        <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
          <History className="w-3.5 h-3.5 text-cyan-400" />
         </div>
         <div className="text-[15px] font-medium text-cyan-100">Run History</div>
-        <span className="text-[12px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded-sm text-zinc-400">{result_count}</span>
+        <span className="text-[12px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded-[2px] text-zinc-400">{result_count}</span>
        </div>
        {results.length === 0 ? (
         <div className="p-8 text-center text-[14px] text-zinc-500">No runs recorded yet</div>
@@ -291,7 +291,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
      <div className="xl:col-span-1 sticky top-0 flex flex-col gap-6">
 
       {/* Metrics card */}
-      <div className="bg-card border border-border rounded-sm shadow-sm p-[20px] space-y-6">
+      <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px] space-y-6">
        {target_value && (
         <div>
          <div className="text-[12px] uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Target Value</div>
@@ -318,20 +318,20 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
       </div>
 
       {/* Last Run card */}
-      <div className="bg-card border border-border rounded-sm shadow-sm p-[20px]">
+      <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
        <div className="text-[12px] uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Last Run</div>
        <div className="text-[14px] text-zinc-200">{results.length > 0 ? "Just now" : "No runs yet"}</div>
       </div>
 
       {/* Actions card */}
-      <div className="bg-card border border-border rounded-sm shadow-sm p-[20px] flex flex-col gap-2">
-       <button className="w-full py-2 px-3 rounded-md border border-cyan-500/30 bg-cyan-500/10 text-[14px] text-cyan-400 hover:bg-cyan-500/20 transition-colors">
+      <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px] flex flex-col gap-2">
+       <button className="w-full py-2 px-3 rounded-[6px] border border-cyan-500/30 bg-cyan-500/10 text-[14px] text-cyan-400 hover:bg-cyan-500/20 transition-colors">
         Re-run Experiment
        </button>
-       <button className="w-full py-2 px-3 rounded-md border border-amber-500/30 bg-amber-500/10 text-[14px] text-amber-400 hover:bg-amber-500/20 transition-colors">
+       <button className="w-full py-2 px-3 rounded-[6px] border border-amber-500/30 bg-amber-500/10 text-[14px] text-amber-400 hover:bg-amber-500/20 transition-colors">
         Pause Experiment
        </button>
-       <button className="w-full py-2 px-3 rounded-md border border-red-500/20 bg-red-500/10 text-[14px] text-red-400 hover:bg-red-500/20 transition-colors mt-2">
+       <button className="w-full py-2 px-3 rounded-[6px] border border-red-500/20 bg-red-500/10 text-[14px] text-red-400 hover:bg-red-500/20 transition-colors mt-2">
         Delete Experiment
        </button>
       </div>

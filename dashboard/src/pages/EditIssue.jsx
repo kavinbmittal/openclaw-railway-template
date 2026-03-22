@@ -179,7 +179,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           </div>
         </header>
         <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-[800px] mx-auto w-full bg-card border border-border rounded-sm shadow-sm p-[20px]">
+          <div className="max-w-[800px] mx-auto w-full bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
             <div className="animate-pulse space-y-4">
               <div className="h-4 bg-zinc-800 rounded w-1/3"></div>
               <div className="h-10 bg-zinc-800 rounded"></div>
@@ -249,7 +249,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
       <div className="flex-1 overflow-y-auto p-8">
         {/* Form Card */}
         <form
-          className="max-w-[800px] mx-auto w-full bg-card border border-border rounded-sm shadow-sm flex flex-col relative overflow-hidden"
+          className="max-w-[800px] mx-auto w-full bg-card border border-border rounded-[2px] shadow-sm flex flex-col relative overflow-hidden"
           onSubmit={(e) => { e.preventDefault(); handleSave(); }}
         >
           {/* Subtle top highlight */}
@@ -276,7 +276,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-background border border-border rounded-md px-3 py-2 text-[14px] text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors shadow-sm"
+                className="w-full bg-background border border-border rounded-[6px] px-3 py-2 text-[14px] text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-[color,box-shadow] shadow-sm"
                 placeholder="Issue title"
               />
             </div>
@@ -284,7 +284,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
             {/* Description Field with Markdown Toolbar */}
             <div>
               <label className="block text-[12px] font-medium text-zinc-400 mb-2">Description</label>
-              <div className="border border-border rounded-md overflow-hidden shadow-sm focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600 transition-all bg-background">
+              <div className="border border-border rounded-[6px] overflow-hidden shadow-sm focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600 transition-all bg-background">
                 {/* Toolbar */}
                 <div className="bg-zinc-900/50 border-b border-border px-3 py-1.5 flex items-center gap-1">
                   <button type="button" onClick={() => setDescription((d) => d + "**bold**")} className="p-1 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded transition-colors flex items-center justify-center">
@@ -321,7 +321,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
-                    className="w-full appearance-none bg-background border border-border rounded-md px-3 py-2 pr-10 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    className="w-full appearance-none bg-background border border-border rounded-[6px] px-3 py-2 pr-10 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   >
                     {ALL_PRIORITIES.map((p) => (
                       <option key={p} value={p}>
@@ -342,7 +342,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                   <select
                     value={assignee}
                     onChange={(e) => setAssignee(e.target.value)}
-                    className="w-full appearance-none bg-background border border-border rounded-md px-3 py-2 pr-10 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    className="w-full appearance-none bg-background border border-border rounded-[6px] px-3 py-2 pr-10 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   >
                     <option value="">Unassigned</option>
                     {AGENTS.map((a) => (
@@ -365,7 +365,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 <select
                   value={theme}
                   onChange={(e) => handleThemeChange(e.target.value)}
-                  className="w-full appearance-none bg-background border border-border rounded-md px-3 py-2 pr-10 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="w-full appearance-none bg-background border border-border rounded-[6px] px-3 py-2 pr-10 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 >
                   <option value="">No theme</option>
                   {approvedThemes.map((t) => (
@@ -392,7 +392,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                     return (
                       <label
                         key={metric.id}
-                        className="flex items-center gap-3 p-2.5 rounded-md border border-border bg-background hover:border-zinc-700 cursor-pointer transition-colors group shadow-sm"
+                        className="flex items-center gap-3 p-2.5 rounded-[6px] border border-border bg-background hover:border-zinc-700 cursor-pointer transition-colors group shadow-sm"
                         onClick={() => toggleMetric(metric.id)}
                       >
                         {isChecked ? (
@@ -425,7 +425,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="text"
                 value={labels}
                 onChange={(e) => setLabels(e.target.value)}
-                className="w-full bg-background border border-border rounded-md px-3 py-2 text-[14px] text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors shadow-sm"
+                className="w-full bg-background border border-border rounded-[6px] px-3 py-2 text-[14px] text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-[color,box-shadow] shadow-sm"
                 placeholder="e.g. infra, database, scaling"
               />
               <p className="text-[12px] text-zinc-500 mt-2">Optional tags for categorization</p>
@@ -438,7 +438,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-4 py-2 rounded-md border border-red-500/20 bg-red-500/10 text-[14px] font-medium text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/30"
+                className="px-4 py-2 rounded-[6px] border border-red-500/20 bg-red-500/10 text-[14px] font-medium text-red-400 hover:bg-red-500/20 transition-[color,box-shadow] flex items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/30"
               >
                 <Trash2 size={16} />
                 {deleting ? "Deleting..." : "Delete Issue"}
@@ -457,7 +457,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
               <button
                 type="button"
                 onClick={() => navigate("issue-detail", { projectSlug, issueId })}
-                className="px-4 py-2 rounded-md border border-border bg-card text-[14px] font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors shadow-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                className="px-4 py-2 rounded-[6px] border border-border bg-card text-[14px] font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-[color,box-shadow] shadow-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >
                 Cancel
               </button>
@@ -465,7 +465,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="button"
                 onClick={handleSave}
                 disabled={!hasChanges || saving}
-                className={`px-4 py-2 rounded-md border border-emerald-500/50 bg-emerald-500/10 text-[14px] font-medium text-emerald-300 shadow-sm flex items-center gap-2 outline-none ${
+                className={`px-4 py-2 rounded-[6px] border border-emerald-500/50 bg-emerald-500/10 text-[14px] font-medium text-emerald-300 shadow-sm flex items-center gap-2 outline-none ${
                   hasChanges && !saving
                     ? "hover:bg-emerald-500/20 hover:border-emerald-400 transition-colors"
                     : "opacity-50 cursor-not-allowed"

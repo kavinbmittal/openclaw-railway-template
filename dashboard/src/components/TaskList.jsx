@@ -54,7 +54,7 @@ export function TaskList({ tasksRaw }) {
 
  if (!parsed) {
   return (
-   <div className="bg-card rounded-sm border border-border shadow-sm p-[20px] text-center">
+   <div className="bg-card rounded-[2px] border border-border shadow-sm p-[20px] text-center">
     <p className="text-[14px] text-muted-foreground/60">No active tasks</p>
    </div>
   );

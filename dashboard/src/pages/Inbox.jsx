@@ -202,7 +202,7 @@ export default function Inbox({ navigate }) {
 
               {/* Empty state */}
               {items.length === 0 ? (
-                <div className="py-12 flex flex-col items-center justify-center">
+                <div className="py-16 flex flex-col items-center justify-center">
                   <CheckCircle className="text-emerald-500 w-6 h-6 mb-3" />
                   <span className="text-[14px] text-muted-foreground mb-1">All clear</span>
                   <span className="text-[12px] text-muted-foreground/60">No items need your attention</span>

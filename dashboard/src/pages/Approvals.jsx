@@ -135,8 +135,8 @@ export default function Approvals({ navigate }) {
     <div className="flex-1 overflow-y-auto p-8">
      <div className="max-w-4xl mx-auto">
       <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
-       <div className="bg-zinc-800/50 h-4 w-48 mb-3 rounded-sm" />
-       <div className="bg-zinc-800/50 h-4 w-32 rounded-sm" />
+       <div className="bg-zinc-800/50 h-4 w-48 mb-3 rounded-[2px]" />
+       <div className="bg-zinc-800/50 h-4 w-32 rounded-[2px]" />
       </div>
      </div>
     </div>
@@ -189,11 +189,11 @@ export default function Approvals({ navigate }) {
 
      {grouped.length === 0 ? (
       /* Empty state — Aura */
-      <div className="flex flex-col items-center justify-center h-64 mt-12">
+      <div className="flex flex-col items-center justify-center py-16">
        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 mb-3">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>
        </svg>
-       <span className="text-[14px] text-zinc-400">
+       <span className="text-[14px] text-muted-foreground">
         {tab === "pending" ? "All clear — nothing needs your approval" : "No approvals"}
        </span>
       </div>

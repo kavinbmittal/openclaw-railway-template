@@ -27,7 +27,7 @@ function KanbanColumn({ status, issues, onIssueClick }) {
    </div>
    <div className="flex-1 min-h-[120px] p-1 space-y-1 bg-muted/20">
     {issues.length === 0 && (
-     <div className="flex items-center justify-center h-20 text-[12px] text-muted-foreground/40">
+     <div className="flex items-center justify-center py-16 text-[14px] text-muted-foreground">
       No issues
      </div>
     )}
