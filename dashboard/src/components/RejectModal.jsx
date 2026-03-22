@@ -24,7 +24,7 @@ export function RejectModal({ onConfirm, onCancel }) {
       <div className="absolute inset-0 bg-black/60" onClick={onCancel} />
       <div className="relative border border-border bg-background p-6 w-full max-w-md space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">Reject Approval</h3>
+          <h3 className="text-[14px] font-semibold text-foreground">Reject Approval</h3>
           <button
             onClick={onCancel}
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -39,20 +39,20 @@ export function RejectModal({ onConfirm, onCancel }) {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Reason for rejection..."
             rows={3}
-            className="w-full rounded-md bg-secondary border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="w-full rounded-md bg-secondary border border-border px-3 py-2 text-[14px] text-foreground placeholder:text-muted-foreground/50 resize-none focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="px-3 py-1.5 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!comment.trim()}
-              className="px-3 py-1.5 text-sm font-medium bg-destructive text-white hover:bg-destructive/90 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-[14px] font-medium bg-destructive text-white hover:bg-destructive/90 transition-colors disabled:opacity-50"
             >
               Reject
             </button>

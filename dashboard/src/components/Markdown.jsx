@@ -11,7 +11,7 @@ export default function Markdown({ content, className ="" }) {
 
  return (
   <div
-   className={`mc-prose text-sm ${className}`}
+   className={`mc-prose text-[14px] ${className}`}
    dangerouslySetInnerHTML={{ __html: html }}
   />
  );

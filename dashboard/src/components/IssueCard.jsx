@@ -12,11 +12,11 @@ export function IssueCard({ issue, onClick, className ="" }) {
    onClick={onClick}
   >
    <div className="flex items-start gap-1.5 mb-1.5">
-    <span className="text-xs text-muted-foreground font-mono shrink-0">
+    <span className="text-[12px] text-muted-foreground font-mono shrink-0">
      {issue.id}
     </span>
    </div>
-   <p className="text-sm leading-snug line-clamp-2 mb-2">{issue.title}</p>
+   <p className="text-[14px] leading-snug line-clamp-2 mb-2">{issue.title}</p>
    <div className="flex items-center gap-2">
     <PriorityDot priority={issue.priority} />
     {issue.assignee && <AgentInitial name={issue.assignee} />}

@@ -44,7 +44,7 @@ export default function OrgChart({ navigate }) {
     <div className="h-12 flex items-center">
      <h1 className="text-base font-semibold uppercase tracking-wider">Org Chart</h1>
     </div>
-    <div className="text-sm text-destructive px-3 py-2 border border-destructive/30 bg-destructive/10">
+    <div className="text-[14px] text-destructive px-3 py-2 border border-destructive/30 bg-destructive/10">
      {error}
     </div>
    </div>
@@ -60,7 +60,7 @@ export default function OrgChart({ navigate }) {
    {/* Breadcrumb bar */}
    <div className="h-12 flex items-center justify-between">
     <h1 className="text-base font-semibold uppercase tracking-wider">Org Chart</h1>
-    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+    <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
      <span>{totalAgents} agents</span>
      <span className="text-green-400">{activeCount} active</span>
     </div>

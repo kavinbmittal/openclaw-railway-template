@@ -108,12 +108,12 @@ export function InboxItem({ item, onApprove, onReject, onNavigate }) {
    {/* Content */}
    <div className="flex-1 min-w-0">
     <div className="flex items-center gap-2 mb-0.5">
-     <span className="text-sm font-medium text-foreground truncate">
+     <span className="text-[14px] font-medium text-foreground truncate">
       {item.title}
      </span>
     </div>
     {item.subtitle && (
-     <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+     <p className="text-[12px] text-muted-foreground truncate">{item.subtitle}</p>
     )}
     <div className="flex items-center gap-2 mt-1">
      {hasRealProject ? (
@@ -141,7 +141,7 @@ export function InboxItem({ item, onApprove, onReject, onNavigate }) {
 
    {/* Timestamp */}
    <div className="shrink-0 text-right">
-    <span className="text-xs text-muted-foreground/60">
+    <span className="text-[12px] text-muted-foreground/60">
      {formatTimeAgo(item.timestamp)}
     </span>
    </div>
@@ -151,14 +151,14 @@ export function InboxItem({ item, onApprove, onReject, onNavigate }) {
     <div className="hidden sm:flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
      <button
       onClick={(e) => { e.stopPropagation(); onApprove(item); }}
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-green-700 text-white hover:bg-green-600 transition-colors"
+      className="inline-flex items-center gap-1 px-2 py-1 text-[12px] font-medium rounded-md bg-green-700 text-white hover:bg-green-600 transition-colors"
      >
       <Check size={12} />
       Approve
      </button>
      <button
       onClick={(e) => { e.stopPropagation(); onReject(item); }}
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-red-700 text-white hover:bg-red-600 transition-colors"
+      className="inline-flex items-center gap-1 px-2 py-1 text-[12px] font-medium rounded-md bg-red-700 text-white hover:bg-red-600 transition-colors"
      >
       <X size={12} />
       Reject

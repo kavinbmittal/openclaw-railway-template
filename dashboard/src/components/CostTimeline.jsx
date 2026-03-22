@@ -8,7 +8,7 @@ import { formatDateTime } from"../utils/formatDate.js";
 export function CostTimeline({ entries = [] }) {
  if (entries.length === 0) {
   return (
-   <div className="text-center py-8 text-sm text-muted-foreground">
+   <div className="text-center py-8 text-[14px] text-muted-foreground">
     No cost entries yet.
    </div>
   );
@@ -33,7 +33,7 @@ export function CostTimeline({ entries = [] }) {
     return (
      <div
       key={`${entry.timestamp}-${i}`}
-      className="grid grid-cols-[1fr_80px_80px_60px] gap-2 px-4 py-2.5 text-sm items-center"
+      className="grid grid-cols-[1fr_80px_80px_60px] gap-2 px-4 py-2.5 text-[14px] items-center"
      >
       <div className="min-w-0">
        <p className="text-foreground/80 truncate text-[15px]">{entry.task ||"Untitled"}</p>
@@ -43,7 +43,7 @@ export function CostTimeline({ entries = [] }) {
         </p>
        )}
       </div>
-      <span className="text-right text-xs text-muted-foreground truncate">
+      <span className="text-right text-[12px] text-muted-foreground truncate">
        {entry.agent ||"--"}
       </span>
       <span className="text-right font-mono tabular-nums text-[15px]">

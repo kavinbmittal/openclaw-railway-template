@@ -25,7 +25,7 @@ export function MetricCard({ icon: Icon, value, label, description, mono, onClic
     {label}
    </div>
    {description && (
-    <div className="text-xs text-muted-foreground/70 mt-1.5 hidden sm:block">
+    <div className="text-[12px] text-muted-foreground/70 mt-1.5 hidden sm:block">
      {description}
     </div>
    )}

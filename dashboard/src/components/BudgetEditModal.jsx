@@ -74,7 +74,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
     <div className="flex items-center justify-between px-5 py-4 border-b border-border">
      <div className="flex items-center gap-2">
       <Wallet size={16} className="text-muted-foreground" />
-      <h3 className="text-sm font-semibold">Edit Budget Policy</h3>
+      <h3 className="text-[14px] font-semibold">Edit Budget Policy</h3>
      </div>
      <button
       onClick={onClose}
@@ -92,7 +92,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
        Weekly Budget (USD)
       </label>
       <div className="relative">
-       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[14px]">
         $
        </span>
        <input
@@ -101,7 +101,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
         step="0.01"
         value={weeklyBudget}
         onChange={(e) => setWeeklyBudget(e.target.value)}
-        className="w-full bg-background border border-border px-3 py-2 pl-7 text-sm font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+        className="w-full bg-background border border-border px-3 py-2 pl-7 text-[14px] font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
         placeholder="0.00"
        />
       </div>
@@ -124,7 +124,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
         onChange={(e) => setWarnThreshold(Number(e.target.value))}
         className="flex-1 accent-amber-400"
        />
-       <span className="text-sm font-mono tabular-nums w-12 text-right text-foreground">
+       <span className="text-[14px] font-mono tabular-nums w-12 text-right text-foreground">
         {warnThreshold}%
        </span>
       </div>
@@ -147,7 +147,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
         onChange={(e) => setStopThreshold(Number(e.target.value))}
         className="flex-1 accent-red-400"
        />
-       <span className="text-sm font-mono tabular-nums w-12 text-right text-foreground">
+       <span className="text-[14px] font-mono tabular-nums w-12 text-right text-foreground">
         {stopThreshold}%
        </span>
       </div>
@@ -168,7 +168,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
        </button>
       </div>
       {perAgentLimits.length === 0 ? (
-       <p className="text-xs text-muted-foreground/50 italic">
+       <p className="text-[12px] text-muted-foreground/50 italic">
         No per-agent limits configured.
        </p>
       ) : (
@@ -179,11 +179,11 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
            type="text"
            value={item.agent}
            onChange={(e) => handleAgentChange(i,"agent", e.target.value)}
-           className="flex-1 bg-background border border-border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+           className="flex-1 bg-background border border-border px-3 py-1.5 text-[14px] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
            placeholder="Agent name"
           />
           <div className="relative w-28">
-           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">
+           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground text-[12px]">
             $
            </span>
            <input
@@ -192,7 +192,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
             step="0.01"
             value={item.limit}
             onChange={(e) => handleAgentChange(i,"limit", e.target.value)}
-            className="w-full bg-background border border-border px-3 py-1.5 pl-5 text-sm font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="w-full bg-background border border-border px-3 py-1.5 pl-5 text-[14px] font-mono tabular-nums focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
             placeholder="0.00"
            />
           </div>
@@ -211,7 +211,7 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
 
      {/* Validation error */}
      {weeklyBudget && !isValid && (
-      <p className="text-xs text-destructive">Enter a valid non-negative dollar amount.</p>
+      <p className="text-[12px] text-destructive">Enter a valid non-negative dollar amount.</p>
      )}
 
      {/* Actions */}
@@ -219,14 +219,14 @@ export function BudgetEditModal({ project, policy, onSave, onClose, saving = fal
       <button
        type="button"
        onClick={onClose}
-       className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+       className="px-4 py-2 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
       >
        Cancel
       </button>
       <button
        type="submit"
        disabled={!isValid || saving}
-       className="px-4 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+       className="px-4 py-2 text-[14px] bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
        {saving ?"Saving..." : policy ?"Update Budget" :"Set Budget"}
       </button>

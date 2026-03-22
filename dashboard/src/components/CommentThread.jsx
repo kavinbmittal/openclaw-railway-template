@@ -37,12 +37,12 @@ export function CommentThread({ comments = [], onAdd, className ="" }) {
 
  return (
   <div className={`space-y-4 ${className}`}>
-   <h3 className="text-sm font-semibold">
+   <h3 className="text-[14px] font-semibold">
     Comments ({comments.length})
    </h3>
 
    {comments.length === 0 ? (
-    <p className="text-sm text-muted-foreground">No comments yet.</p>
+    <p className="text-[14px] text-muted-foreground">No comments yet.</p>
    ) : (
     <div className="space-y-3">
      {comments.map((comment, i) => (
@@ -53,15 +53,15 @@ export function CommentThread({ comments = [], onAdd, className ="" }) {
        <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
          <AgentInitial name={comment.author ||"?"} />
-         <span className="text-sm font-medium capitalize">
+         <span className="text-[14px] font-medium capitalize">
           {comment.author ||"Unknown"}
          </span>
         </div>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-[12px] text-muted-foreground">
          {formatTime(comment.created)}
         </span>
        </div>
-       <Markdown content={comment.text} className="text-sm" />
+       <Markdown content={comment.text} className="text-[14px]" />
       </div>
      ))}
     </div>
@@ -74,7 +74,7 @@ export function CommentThread({ comments = [], onAdd, className ="" }) {
       onChange={(e) => setBody(e.target.value)}
       onKeyDown={handleKeyDown}
       placeholder="Leave a comment..."
-      className="w-full min-h-[80px] rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 placeholder:text-muted-foreground/50 resize-y"
+      className="w-full min-h-[80px] rounded-md border border-border bg-transparent px-3 py-2 text-[14px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 placeholder:text-muted-foreground/50 resize-y"
      />
      <div className="flex items-center justify-end gap-2">
       <span className="text-[11px] text-muted-foreground/50 mr-auto">
@@ -83,7 +83,7 @@ export function CommentThread({ comments = [], onAdd, className ="" }) {
       <button
        disabled={!body.trim() || submitting}
        onClick={handleSubmit}
-       className="inline-flex items-center px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+       className="inline-flex items-center px-3 py-1.5 text-[14px] font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
        {submitting ?"Posting..." :"Comment"}
       </button>

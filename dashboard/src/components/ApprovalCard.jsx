@@ -68,15 +68,15 @@ export default function ApprovalCard({
       {approval.theme_title && (
        <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
         <Compass size={10} className="text-zinc-400" />
-        <span className="text-xs text-zinc-300">{approval.theme_title}</span>
+        <span className="text-[12px] text-zinc-300">{approval.theme_title}</span>
        </div>
       )}
       {approval.proxy_metric_names && approval.proxy_metric_names.length > 0 && approval.theme_title && (
-       <span className="text-zinc-600 text-sm">{"\u203A"}</span>
+       <span className="text-zinc-600 text-[14px]">{"\u203A"}</span>
       )}
       {approval.proxy_metric_names && approval.proxy_metric_names.map((pm, i) => (
        <div key={i} className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
-        <span className="text-xs text-zinc-400">{pm}</span>
+        <span className="text-[12px] text-zinc-400">{pm}</span>
        </div>
       ))}
      </div>

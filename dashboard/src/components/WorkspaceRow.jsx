@@ -38,7 +38,7 @@ export function WorkspaceRow({ workspace }) {
  return (
   <div className="border-b border-border last:border-b-0">
    <div
-    className="flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer hover:bg-accent/30 transition-colors"
+    className="flex items-center gap-3 px-4 py-2.5 text-[14px] cursor-pointer hover:bg-accent/30 transition-colors"
     onClick={() => setExpanded(!expanded)}
    >
     {/* Expand chevron */}
@@ -52,12 +52,12 @@ export function WorkspaceRow({ workspace }) {
     </span>
 
     {/* Project */}
-    <span className="w-28 shrink-0 truncate text-muted-foreground font-mono text-xs">
+    <span className="w-28 shrink-0 truncate text-muted-foreground font-mono text-[12px]">
      {workspace.project ||"--"}
     </span>
 
     {/* Issue */}
-    <span className="w-16 shrink-0 truncate text-muted-foreground font-mono text-xs">
+    <span className="w-16 shrink-0 truncate text-muted-foreground font-mono text-[12px]">
      {workspace.issue ||"--"}
     </span>
 
@@ -79,12 +79,12 @@ export function WorkspaceRow({ workspace }) {
     <StatusBadge status={workspace.status} />
 
     {/* Duration */}
-    <span className="w-16 shrink-0 text-right text-xs text-muted-foreground tabular-nums hidden sm:block">
+    <span className="w-16 shrink-0 text-right text-[12px] text-muted-foreground tabular-nums hidden sm:block">
      {formatDuration(workspace.duration_ms)}
     </span>
 
     {/* Started */}
-    <span className="w-16 shrink-0 text-right text-xs text-muted-foreground tabular-nums hidden md:block">
+    <span className="w-16 shrink-0 text-right text-[12px] text-muted-foreground tabular-nums hidden md:block">
      {timeAgo(workspace.started)}
     </span>
    </div>

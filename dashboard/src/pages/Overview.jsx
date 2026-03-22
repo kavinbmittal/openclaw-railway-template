@@ -91,7 +91,7 @@ export default function Overview({ navigate }) {
  if (error) {
   return (
    <div className="flex items-center justify-center h-64">
-    <p className="text-sm text-destructive">Error: {error}</p>
+    <p className="text-[14px] text-destructive">Error: {error}</p>
    </div>
   );
  }
@@ -260,7 +260,7 @@ export default function Overview({ navigate }) {
               </span>
              </div>
             ) : (
-             <span className="text-xs text-muted-foreground/40">No budget</span>
+             <span className="text-[12px] text-muted-foreground/40">No budget</span>
             )}
            </td>
           </tr>

@@ -25,7 +25,7 @@ export function PrioritySelect({ value, onChange, className ="" }) {
   <div className={`relative ${className}`} ref={ref}>
    <button
     onClick={() => setOpen(!open)}
-    className="inline-flex items-center gap-1.5 cursor-pointer hover:bg-accent/50 rounded px-1.5 py-1 transition-colors text-sm"
+    className="inline-flex items-center gap-1.5 cursor-pointer hover:bg-accent/50 rounded px-1.5 py-1 transition-colors text-[14px]"
    >
     <PriorityIcon priority={value} />
     {priorityLabel(value)}
@@ -35,7 +35,7 @@ export function PrioritySelect({ value, onChange, className ="" }) {
      {ALL_PRIORITIES.map((p) => (
       <button
        key={p}
-       className={`flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50 text-left ${
+       className={`flex items-center gap-2 w-full px-2 py-1.5 text-[12px] rounded hover:bg-accent/50 text-left ${
         p === value ?"bg-accent" :""
        }`}
        onClick={() => {

@@ -57,7 +57,7 @@ export function DailyLog({ days, activityEntries }) {
         <div className="text-[11px] font-mono text-muted-foreground/50 mb-1">
          {entry.file}
         </div>
-        <div className="text-sm text-foreground/80 max-h-[calc(100vh-300px)] overflow-y-auto scrollbar-auto-hide">
+        <div className="text-[14px] text-foreground/80 max-h-[calc(100vh-300px)] overflow-y-auto scrollbar-auto-hide">
          <Markdown content={typeof entry.content ==="string" ? entry.content : JSON.stringify(entry.content, null, 2)} />
         </div>
        </div>

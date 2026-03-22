@@ -67,17 +67,17 @@ export function RunHistory({ runs }) {
      return (
       <div
        key={run.id || i}
-       className="grid grid-cols-[1fr_120px_100px_80px_80px] gap-2 px-4 py-2.5 text-sm items-center hover:bg-accent/30 transition-colors"
+       className="grid grid-cols-[1fr_120px_100px_80px_80px] gap-2 px-4 py-2.5 text-[14px] items-center hover:bg-accent/30 transition-colors"
       >
        <div className="flex items-center gap-2 min-w-0">
         <Icon size={14} className={statusInfo?.color ||"text-muted-foreground"} />
         <span className="truncate text-foreground/80">{task}</span>
        </div>
-       <span className="text-xs text-muted-foreground font-mono tabular-nums">
+       <span className="text-[12px] text-muted-foreground font-mono tabular-nums">
         {formatTimestamp(timestamp)}
        </span>
-       <span className="text-xs text-muted-foreground truncate">{model}</span>
-       <span className="text-xs text-muted-foreground font-mono tabular-nums">
+       <span className="text-[12px] text-muted-foreground truncate">{model}</span>
+       <span className="text-[12px] text-muted-foreground font-mono tabular-nums">
         {formatDuration(duration)}
        </span>
        <span className="flex justify-end">

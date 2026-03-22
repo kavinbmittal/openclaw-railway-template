@@ -12,7 +12,7 @@ export function FilterBar({ filters, onRemove, onClear }) {
    {filters.map((f) => (
     <span
      key={f.key}
-     className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground"
+     className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2.5 py-0.5 text-[12px] font-medium text-secondary-foreground"
     >
      <span className="text-muted-foreground">{f.label}:</span>
      <span>{f.value}</span>
@@ -26,7 +26,7 @@ export function FilterBar({ filters, onRemove, onClear }) {
    ))}
    <button
     onClick={onClear}
-    className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+    className="text-[12px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
    >
     Clear all
    </button>

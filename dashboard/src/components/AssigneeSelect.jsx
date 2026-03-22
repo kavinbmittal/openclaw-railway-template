@@ -51,7 +51,7 @@ export function AssigneeSelect({ value, onChange, agents = AGENTS, className =""
   <div className={`relative ${className}`} ref={ref}>
    <button
     onClick={() => { setOpen(!open); setSearch(""); }}
-    className="inline-flex items-center gap-1.5 cursor-pointer hover:bg-accent/50 rounded px-1.5 py-1 transition-colors text-sm"
+    className="inline-flex items-center gap-1.5 cursor-pointer hover:bg-accent/50 rounded px-1.5 py-1 transition-colors text-[14px]"
    >
     {currentAgent ? (
      <>
@@ -68,7 +68,7 @@ export function AssigneeSelect({ value, onChange, agents = AGENTS, className =""
    {open && (
     <div className="absolute z-50 mt-1 w-48 rounded-md border border-border bg-card p-1 shadow-lg">
      <input
-      className="w-full px-2 py-1.5 text-xs bg-transparent outline-none border-b border-border mb-1 placeholder:text-muted-foreground/50"
+      className="w-full px-2 py-1.5 text-[12px] bg-transparent outline-none border-b border-border mb-1 placeholder:text-muted-foreground/50"
       placeholder="Search agents..."
       value={search}
       onChange={(e) => setSearch(e.target.value)}
@@ -76,7 +76,7 @@ export function AssigneeSelect({ value, onChange, agents = AGENTS, className =""
      />
      <div className="max-h-48 overflow-y-auto">
       <button
-       className={`flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50 text-left ${
+       className={`flex items-center gap-2 w-full px-2 py-1.5 text-[12px] rounded hover:bg-accent/50 text-left ${
         !value ?"bg-accent" :""
        }`}
        onClick={() => { onChange(null); setOpen(false); }}
@@ -87,7 +87,7 @@ export function AssigneeSelect({ value, onChange, agents = AGENTS, className =""
       {filtered.map((a) => (
        <button
         key={a.id}
-        className={`flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50 text-left ${
+        className={`flex items-center gap-2 w-full px-2 py-1.5 text-[12px] rounded hover:bg-accent/50 text-left ${
          a.id === value ?"bg-accent" :""
         }`}
         onClick={() => { onChange(a.id); setOpen(false); }}

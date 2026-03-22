@@ -55,7 +55,7 @@ export function TaskList({ tasksRaw }) {
  if (!parsed) {
   return (
    <div className="bg-card rounded-sm border border-border shadow-sm p-[20px] text-center">
-    <p className="text-sm text-muted-foreground/60">No active tasks</p>
+    <p className="text-[14px] text-muted-foreground/60">No active tasks</p>
    </div>
   );
  }
@@ -80,9 +80,9 @@ export function TaskList({ tasksRaw }) {
       </div>
       <div className="divide-y divide-border">
        {items.map((item, i) => (
-        <div key={i} className="flex items-start gap-3 px-4 py-2.5 text-sm">
+        <div key={i} className="flex items-start gap-3 px-4 py-2.5 text-[14px]">
          <span className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${config.dotColor}`} />
-         <span className="text-foreground/80 flex-1"><Markdown content={item.text} className="text-sm" /></span>
+         <span className="text-foreground/80 flex-1"><Markdown content={item.text} className="text-[14px]" /></span>
          {item.date && (
           <span className="text-[11px] text-muted-foreground/50 font-mono tabular-nums shrink-0">
            {item.date}

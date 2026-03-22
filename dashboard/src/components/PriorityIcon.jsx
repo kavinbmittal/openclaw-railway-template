@@ -29,7 +29,7 @@ export function PriorityIcon({ priority, showLabel = false, className ="" }) {
  return (
   <span className={`inline-flex items-center gap-1.5 shrink-0 ${className}`}>
    <Icon className={`h-3.5 w-3.5 ${config.color}`} />
-   {showLabel && <span className="text-sm">{config.label}</span>}
+   {showLabel && <span className="text-[14px]">{config.label}</span>}
   </span>
  );
 }

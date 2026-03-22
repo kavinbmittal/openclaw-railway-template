@@ -37,7 +37,7 @@ export function OrgChartNode({ node, onClick }) {
     </div>
     {/* Info */}
     <div className="flex flex-col min-w-0 flex-1">
-     <span className="text-sm font-semibold text-foreground leading-tight truncate">
+     <span className="text-[14px] font-semibold text-foreground leading-tight truncate">
       {node.name}
      </span>
      <span className="text-[11px] text-muted-foreground leading-tight mt-0.5 truncate">

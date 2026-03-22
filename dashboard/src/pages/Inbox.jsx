@@ -195,7 +195,7 @@ export default function Inbox({ navigate }) {
                   <Icon className={`w-3.5 h-3.5 ${cat.text}`} />
                 </div>
                 <div className={`text-[15px] font-medium ${cat.titleText}`}>{cat.title}</div>
-                <div className={`text-[10px] font-mono ${cat.countBg} border ${cat.countBorder} px-1.5 py-0.5 rounded-[2px] ${cat.text}`}>
+                <div className={`text-[11px] font-mono ${cat.countBg} border ${cat.countBorder} px-1.5 py-0.5 rounded-[2px] ${cat.text}`}>
                   {items.length}
                 </div>
               </div>

@@ -14,7 +14,7 @@ export function CollapsibleSection({ title, defaultOpen = false, children }) {
      size={14}
      className={`text-muted-foreground transition-transform duration-150 ${open ?"rotate-90" :""}`}
     />
-    <h4 className="text-sm font-semibold text-muted-foreground">
+    <h4 className="text-[14px] font-semibold text-muted-foreground">
      {title}
     </h4>
    </button>

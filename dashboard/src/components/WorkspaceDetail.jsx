@@ -8,7 +8,7 @@ import { GitBranch, Folder, FileText, Clock, Cpu } from"lucide-react";
 export function WorkspaceDetail({ workspace }) {
  return (
   <div className="px-4 py-3 bg-muted/20 border-t border-border/50 space-y-2">
-   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px]">
     {workspace.branch && (
      <div className="flex items-center gap-2 text-muted-foreground">
       <GitBranch className="h-3.5 w-3.5 shrink-0" />
@@ -35,7 +35,7 @@ export function WorkspaceDetail({ workspace }) {
     )}
    </div>
    {workspace.task && (
-    <div className="text-xs text-muted-foreground mt-2">
+    <div className="text-[12px] text-muted-foreground mt-2">
      <div className="flex items-center gap-1.5 mb-1">
       <FileText className="h-3.5 w-3.5 shrink-0" />
       <span className="font-medium text-foreground/70">Task</span>

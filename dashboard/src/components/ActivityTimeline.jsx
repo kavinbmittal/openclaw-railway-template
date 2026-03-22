@@ -34,7 +34,7 @@ function DateGroup({ date, events, defaultOpen, onNavigate }) {
      size={14}
      className={`text-muted-foreground transition-transform duration-150 ${open ?"rotate-90" :""}`}
     />
-    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+    <h3 className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
      {date}
     </h3>
     <span className="text-[11px] text-muted-foreground/50 ml-auto">

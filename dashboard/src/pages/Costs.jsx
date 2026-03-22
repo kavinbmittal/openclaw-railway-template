@@ -48,7 +48,7 @@ export default function Costs({ navigate }) {
  if (error) {
   return (
    <div className="max-w-[1400px] mx-auto flex items-center justify-center h-64">
-    <p className="text-sm text-destructive">Error: {error}</p>
+    <p className="text-[14px] text-destructive">Error: {error}</p>
    </div>
   );
  }
@@ -77,7 +77,7 @@ export default function Costs({ navigate }) {
 
    {/* Per-project breakdown */}
    <div>
-    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+    <h3 className="text-[14px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
      Projects
     </h3>
 

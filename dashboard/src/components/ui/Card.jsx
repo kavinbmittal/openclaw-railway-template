@@ -30,7 +30,7 @@ function CardTitle({ className ="", children, ...props }) {
 
 function CardDescription({ className ="", children, ...props }) {
  return (
-  <div className={`text-muted-foreground text-sm ${className}`} {...props}>
+  <div className={`text-muted-foreground text-[14px] ${className}`} {...props}>
    {children}
   </div>
  );

@@ -33,7 +33,7 @@ export function ActivityEvent({ event, onNavigate }) {
 
  return (
   <div
-   className="flex items-start gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-accent/30 cursor-default"
+   className="flex items-start gap-3 px-4 py-2.5 text-[14px] transition-colors hover:bg-accent/30 cursor-default"
   >
    {/* Timeline dot */}
    <div className="flex flex-col items-center shrink-0 pt-1.5">
@@ -41,7 +41,7 @@ export function ActivityEvent({ event, onNavigate }) {
    </div>
 
    {/* Time */}
-   <span className="shrink-0 text-xs text-muted-foreground font-mono tabular-nums pt-0.5 w-12">
+   <span className="shrink-0 text-[12px] text-muted-foreground font-mono tabular-nums pt-0.5 w-12">
     {formatTime(event.timestamp)}
    </span>
 

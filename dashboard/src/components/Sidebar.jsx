@@ -81,7 +81,7 @@ function SidebarNavItem({ active, onClick, icon: Icon, label, badge, badgeTone =
    {extraRight}
    {badge != null && badge > 0 && (
     <span
-     className={`ml-auto rounded-full px-1.5 py-0.5 text-xs leading-none ${
+     className={`ml-auto rounded-full px-1.5 py-0.5 text-[12px] leading-none ${
       badgeTone ==="danger"
        ?"bg-red-600/90 text-red-50"
        :"bg-primary text-primary-foreground"
@@ -151,9 +151,9 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
    {/* ── Top bar: brand ──────────────────────────────────────── */}
    <div className="flex items-center gap-2 px-5 h-[60px] shrink-0 border-b border-border">
     <div className="w-6 h-6 rounded-md shrink-0 bg-red-500/80 flex items-center justify-center">
-     <span className="text-white text-[10px] font-bold">MC</span>
+     <span className="text-white text-[11px] font-bold">MC</span>
     </div>
-    <span className="flex-1 text-sm font-semibold text-foreground truncate tracking-wide">
+    <span className="flex-1 text-[14px] font-semibold text-foreground truncate tracking-wide">
      Mission Control
     </span>
    </div>

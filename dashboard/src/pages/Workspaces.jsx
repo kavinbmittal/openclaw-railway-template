@@ -64,7 +64,7 @@ export default function Workspaces() {
    {/* Breadcrumb bar */}
    <div className="h-12 flex items-center justify-between">
     <h1 className="text-base font-semibold uppercase tracking-wider">Workspaces</h1>
-    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+    <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
      <span>{workspaces.length} runs</span>
      {runningCount > 0 && <span className="text-cyan-400">{runningCount} running</span>}
      <span className="text-green-400">{completedCount} completed</span>
@@ -73,7 +73,7 @@ export default function Workspaces() {
    </div>
 
    {error && (
-    <div className="text-sm text-destructive px-3 py-2 border border-destructive/30 bg-destructive/10">
+    <div className="text-[14px] text-destructive px-3 py-2 border border-destructive/30 bg-destructive/10">
      {error}
     </div>
    )}
@@ -81,7 +81,7 @@ export default function Workspaces() {
    {/* Filters */}
    <div className="flex items-center gap-3 flex-wrap">
     <select
-     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+     className="bg-transparent border border-border px-2 py-1.5 text-[12px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      value={filterProject}
      onChange={(e) => setFilterProject(e.target.value)}
     >
@@ -94,7 +94,7 @@ export default function Workspaces() {
     </select>
 
     <select
-     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+     className="bg-transparent border border-border px-2 py-1.5 text-[12px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      value={filterAgent}
      onChange={(e) => setFilterAgent(e.target.value)}
     >
@@ -107,7 +107,7 @@ export default function Workspaces() {
     </select>
 
     <select
-     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+     className="bg-transparent border border-border px-2 py-1.5 text-[12px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      value={filterStatus}
      onChange={(e) => setFilterStatus(e.target.value)}
     >
@@ -122,7 +122,7 @@ export default function Workspaces() {
     {(filterProject || filterAgent || filterStatus) && (
      <button
       onClick={() => { setFilterProject(""); setFilterAgent(""); setFilterStatus(""); }}
-      className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+      className="text-[12px] text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
      >
       Clear all
      </button>
