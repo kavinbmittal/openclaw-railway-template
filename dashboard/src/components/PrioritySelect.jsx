@@ -31,7 +31,7 @@ export function PrioritySelect({ value, onChange, className ="" }) {
     {priorityLabel(value)}
    </button>
    {open && (
-    <div className="absolute z-50 mt-1 w-40 border border-border bg-card p-1">
+    <div className="absolute z-50 mt-1 w-40 rounded-md border border-border bg-card p-1 shadow-lg">
      {ALL_PRIORITIES.map((p) => (
       <button
        key={p}

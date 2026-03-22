@@ -120,14 +120,14 @@ export default function ApprovalCard({
      >
       <button
        onClick={() => onApprove && onApprove(approval)}
-       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors"
       >
        <Check size={12} />
        Approve
       </button>
       <button
        onClick={() => onReject && onReject(approval)}
-       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
       >
        <X size={12} />
        Reject

@@ -344,7 +344,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        onChange={(e) => setComment(e.target.value)}
        placeholder="Decision note (required for rejections and revisions)"
        rows={3}
-       className="w-full px-3 py-2 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none rounded"
+       className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none"
       />
      )}
 
@@ -354,7 +354,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
       <button
        onClick={() => handleResolve("approved")}
        disabled={submitting}
-       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
       >
        {submitting ? (
         <Loader2 size={14} className="animate-spin" />
@@ -367,7 +367,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        <button
         onClick={() => handleResolve("revision_requested")}
         disabled={submitting || !comment.trim()}
-        className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
        >
         {submitting ? (
          <Loader2 size={14} className="animate-spin" />
@@ -380,7 +380,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
       <button
        onClick={() => handleResolve("rejected")}
        disabled={submitting || (!isIssue && !comment.trim())}
-       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
       >
        {submitting ? (
         <Loader2 size={14} className="animate-spin" />

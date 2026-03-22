@@ -91,7 +91,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose }) {
       value={description}
       onChange={(e) => setDescription(e.target.value)}
       placeholder="Add a description..."
-      className="w-full min-h-[100px] border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50 resize-y"
+      className="w-full min-h-[100px] rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50 resize-y"
      />
     </div>
 

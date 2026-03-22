@@ -151,14 +151,14 @@ export function InboxItem({ item, onApprove, onReject, onNavigate }) {
     <div className="hidden sm:flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
      <button
       onClick={(e) => { e.stopPropagation(); onApprove(item); }}
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-700 text-white hover:bg-green-600 transition-colors"
+      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-green-700 text-white hover:bg-green-600 transition-colors"
      >
       <Check size={12} />
       Approve
      </button>
      <button
       onClick={(e) => { e.stopPropagation(); onReject(item); }}
-      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-700 text-white hover:bg-red-600 transition-colors"
+      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-red-700 text-white hover:bg-red-600 transition-colors"
      >
       <X size={12} />
       Reject

@@ -89,7 +89,7 @@ export default function CreateProject({ navigate }) {
       onChange={(e) => setName(e.target.value)}
       placeholder="e.g., Lia Retrieval v2"
       required
-      className="w-full px-3 py-2 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors"
+      className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors"
      />
     </div>
 
@@ -104,7 +104,7 @@ export default function CreateProject({ navigate }) {
       placeholder="What should this project achieve?"
       required
       rows={3}
-      className="w-full px-3 py-2 text-sm bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none"
+      className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none"
      />
     </div>
 
@@ -116,7 +116,7 @@ export default function CreateProject({ navigate }) {
      <select
       value={lead}
       onChange={(e) => setLead(e.target.value)}
-      className="w-full px-3 py-2 text-sm bg-background border border-border text-foreground focus:outline-none focus:border-ring transition-colors"
+      className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground focus:outline-none focus:border-ring transition-colors"
      >
       {LEADS.map((l) => (
        <option key={l.id} value={l.id}>
@@ -139,7 +139,7 @@ export default function CreateProject({ navigate }) {
        onChange={(e) => setBudget(e.target.value)}
        min="0"
        step="50"
-       className="w-32 px-3 py-2 text-sm bg-background border border-border text-foreground font-mono tabular-nums focus:outline-none focus:border-ring transition-colors"
+       className="w-32 px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground font-mono tabular-nums focus:outline-none focus:border-ring transition-colors"
       />
       <span className="text-sm text-muted-foreground">/ week</span>
      </div>
@@ -183,7 +183,7 @@ export default function CreateProject({ navigate }) {
      <button
       type="submit"
       disabled={submitting || !name.trim() || !mission.trim()}
-      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-foreground text-background hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md bg-foreground text-background hover:bg-foreground/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
      >
       {submitting ? (
        <Loader2 size={14} className="animate-spin" />
