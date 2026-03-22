@@ -1,58 +1,29 @@
-import { Check, X, Clock, CheckCircle2, XCircle, CircleDot, FlaskConical, FileText, Compass } from"lucide-react";
+/**
+ * ApprovalCard — single approval item.
+ * UI ported from Aura HTML reference.
+ */
+import { Clock, CheckCircle2, XCircle, CircleDot, FlaskConical, FileText, Compass } from"lucide-react";
 import { formatTimeAgo } from"../utils/formatDate.js";
 
-function statusIcon(status) {
- if (status ==="approved")
-  return <CheckCircle2 size={14} className="text-green-400" />;
- if (status ==="rejected")
-  return <XCircle size={14} className="text-red-400" />;
- // pending or anything else
- return <Clock size={14} className="text-amber-400" />;
-}
-
-// Type badge — distinguishes proposed issues from gate requests
+/* Type badge — Aura bordered pill style */
 function TypeBadge({ type }) {
- if (type ==="proposed-issue") {
-  return (
-   <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-violet-900/50 text-violet-300">
-    <CircleDot size={10} />
-    Issue
-   </span>
-  );
- }
- if (type ==="experiment-start" || type ==="autoresearch-start") {
-  return (
-   <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-    <FlaskConical size={10} />
-    Experiment
-   </span>
-  );
- }
- if (type ==="proposed-theme" || type ==="theme") {
-  return (
-   <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-teal-900/50 text-teal-300">
-    <Compass size={10} />
-    Theme
-   </span>
-  );
- }
- if (type ==="deliverable-review") {
-  return (
-   <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-blue-900/50 text-blue-300">
-    <FileText size={10} />
-    Deliverable
-   </span>
-  );
- }
- // Fallback: show the gate name if present
- if (type) {
-  return (
-   <span className="shrink-0 inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-    {type}
-   </span>
-  );
- }
- return null;
+ const badges = {
+  "proposed-issue": { label:"Issue", cls:"border-violet-500/20 bg-violet-500/10 text-violet-400" },
+  "experiment-start": { label:"Experiment", cls:"border-cyan-500/20 bg-cyan-500/10 text-cyan-400" },
+  "autoresearch-start": { label:"Experiment", cls:"border-cyan-500/20 bg-cyan-500/10 text-cyan-400" },
+  "proposed-theme": { label:"Theme", cls:"border-teal-500/20 bg-teal-500/10 text-teal-400" },
+  theme: { label:"Theme", cls:"border-teal-500/20 bg-teal-500/10 text-teal-400" },
+  "deliverable-review": { label:"Deliverable", cls:"border-blue-500/20 bg-blue-500/10 text-blue-400" },
+ };
+
+ const badge = badges[type] || (type ? { label: type, cls:"border-amber-500/20 bg-amber-500/10 text-amber-400" } : null);
+ if (!badge) return null;
+
+ return (
+  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border ${badge.cls}`}>
+   {badge.label}
+  </span>
+ );
 }
 
 export default function ApprovalCard({
@@ -68,6 +39,7 @@ export default function ApprovalCard({
   !approval.status || approval.status ==="pending" || approval.status === "proposed" || approval.status === undefined;
  const status = approval.status ||"pending";
  const itemType = approval.type || approval.gate || null;
+ const isRejected = status === "rejected";
 
  const timeAgo = approval.created
   ? formatTimeAgo(approval.created)
@@ -77,82 +49,74 @@ export default function ApprovalCard({
 
  return (
   <div
-   className="flex items-center gap-3 px-4 py-3 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
+   className={`bg-card border border-border rounded-[2px] p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm ${
+    isRejected ?"opacity-60" :""
+   }`}
    onClick={() => {
     if (navigate) navigate("approval-detail", approval.id);
    }}
   >
-   {/* Status icon */}
-   <div className="shrink-0">{statusIcon(status)}</div>
-
-   {/* Type badge + title + project */}
-   <div className="flex items-center gap-2 flex-1 min-w-0">
+   {/* Left: type badge + description + metadata */}
+   <div className="space-y-2 cursor-pointer">
     <TypeBadge type={itemType} />
-    <span className="text-sm font-medium text-foreground truncate">
+    <p className={`text-[14px] text-foreground ${isRejected ?"line-through decoration-muted-foreground/40" :""}`}>
      {title}
-    </span>
-    {/* Theme tag — shows which theme this work is tagged to */}
+    </p>
+    <div className="text-[13px] text-muted-foreground flex items-center gap-2">
+     {approval.requester && <span>Requested by: {approval.requester}</span>}
+     {approval.requester && timeAgo && <span>·</span>}
+     {timeAgo && <span>{timeAgo}</span>}
+     {!hideProject && projectName && (
+      <>
+       <span>·</span>
+       <span
+        className="hover:text-foreground cursor-pointer"
+        onClick={(e) => {
+         e.stopPropagation();
+         navigate && navigate("project", projectName);
+        }}
+       >
+        {projectName}
+       </span>
+      </>
+     )}
+    </div>
+    {/* Theme tag */}
     {approval.theme_title && (
-     <span className="shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium bg-teal-900/40 text-teal-300">
-      <Compass size={9} />
+     <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-teal-500/20 bg-teal-500/10 text-teal-400">
+      <Compass size={10} />
       {approval.theme_title}
      </span>
     )}
-    {!hideProject && projectName && (
-     <span
-      className="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-accent text-accent-foreground cursor-pointer hover:underline"
-      onClick={(e) => {
-       e.stopPropagation();
-       navigate && navigate("project", projectName);
-      }}
-     >
-      {projectName}
-     </span>
+    {/* Rejection comment */}
+    {isRejected && approval.comment && (
+     <div className="text-[13px] text-red-400 flex items-center gap-1.5 mt-2 bg-red-500/10 px-3 py-1.5 rounded-[4px] border border-red-500/20 w-fit">
+      <XCircle size={14} />
+      Rejected: {approval.comment}
+     </div>
     )}
    </div>
 
-   {/* Right side: priority (issues only), requester, time, buttons */}
-   <div className="flex items-center gap-3 shrink-0">
-    {approval.priority && approval.priority !=="none" && (
-     <span className="text-[11px] text-muted-foreground/60 uppercase hidden sm:inline">
-      {approval.priority}
-     </span>
-    )}
-    {approval.requester && (
-     <span className="text-xs text-muted-foreground hidden sm:inline">
-      {approval.requester}
-     </span>
-    )}
-    {timeAgo && (
-     <span className="text-xs text-muted-foreground/60 hidden sm:inline">
-      {timeAgo}
-     </span>
-    )}
-    {isPending && (
-     <div
-      className="flex items-center gap-1.5"
-      onClick={(e) => e.stopPropagation()}
+   {/* Right: action buttons */}
+   {isPending && (
+    <div
+     className="flex items-center gap-2 shrink-0"
+     onClick={(e) => e.stopPropagation()}
+    >
+     <button
+      onClick={() => onReject && onReject(approval)}
+      className="px-4 py-1.5 rounded-[6px] border border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-colors text-[13px] font-medium focus:outline-none focus:ring-[3px] focus:ring-red-500/30"
      >
-      <button
-       onClick={() => onApprove && onApprove(approval)}
-       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors"
-      >
-       <Check size={12} />
-       Approve
-      </button>
-      <button
-       onClick={() => onReject && onReject(approval)}
-       className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
-      >
-       <X size={12} />
-       Reject
-      </button>
-     </div>
-    )}
-    {!isPending && (
-     <span className="text-xs text-muted-foreground capitalize">{status}</span>
-    )}
-   </div>
+      Reject
+     </button>
+     <button
+      onClick={() => onApprove && onApprove(approval)}
+      className="px-4 py-1.5 rounded-[6px] border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors text-[13px] font-medium focus:outline-none focus:ring-[3px] focus:ring-emerald-500/30"
+     >
+      Approve
+     </button>
+    </div>
+   )}
   </div>
  );
 }
