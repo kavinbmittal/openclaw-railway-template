@@ -14,8 +14,17 @@ import {
 } from"lucide-react";
 import { getApprovals, getProjects, getInbox } from"../api.js";
 
-/* ── Project dot color (neutral — no decorative color) ─────────────── */
-const PROJECT_DOT_COLOR = "oklch(0.556 0 0)"; // matches --ring, muted foreground
+/* ── Project dot colors — cycle through distinct colors ─────────────── */
+const PROJECT_DOT_COLORS = [
+ "#10b981", // emerald-500
+ "#6366f1", // indigo-500
+ "#f59e0b", // amber-500
+ "#06b6d4", // cyan-500
+ "#f43f5e", // rose-500
+ "#3b82f6", // blue-500
+ "#a855f7", // purple-500
+ "#14b8a6", // teal-500
+];
 
 /* ── Section header (Paperclip style) ──────────────────────────────── */
 function SidebarSection({ label, children, collapsible = false, defaultOpen = true, action }) {
@@ -132,7 +141,7 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
   () =>
    projects.map((p, i) => ({
     ...p,
-    color: PROJECT_DOT_COLOR,
+    color: PROJECT_DOT_COLORS[i % PROJECT_DOT_COLORS.length],
    })),
   [projects]
  );
@@ -217,8 +226,8 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
         }`}
        >
         <span
-         className="shrink-0 w-1.5 h-1.5 rounded-[2px]"
-         style={{ backgroundColor: project.color }}
+         className="shrink-0 w-1.5 h-1.5 rounded-[2px] bg-zinc-500"
+         style={project.color ? { backgroundColor: project.color } : undefined}
         />
         <span className="flex-1 truncate">{project.title || project.id}</span>
        </button>
