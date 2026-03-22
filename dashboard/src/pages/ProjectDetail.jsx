@@ -375,7 +375,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
     {/* ──────────────── EXPERIMENTS TAB ──────────────── */}
     <TabsContent value="experiments">
      <div className="mt-6">
-      <ExperimentsTab experiments={experiments} themes={themes.filter((t) => t.status === "approved")} projectSlug={projectId} />
+      <ExperimentsTab experiments={experiments} themes={themes.filter((t) => t.status === "approved")} projectSlug={projectId} onRefresh={() => getExperiments(projectId).then(setExperiments)} />
      </div>
     </TabsContent>
 
@@ -796,7 +796,7 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate }) {
 
 /* ──────────────── EXPERIMENTS TAB COMPONENT ──────────────── */
 /* Aura: grid-cols-2 cards with hypothesis + metrics */
-function ExperimentsTab({ experiments, themes = [], projectSlug }) {
+function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh }) {
  const [showCreate, setShowCreate] = useState(false);
 
  const totalRuns = experiments.reduce((sum, e) => sum + e.result_count, 0);
@@ -821,7 +821,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug }) {
     <CreateExperiment
      projectSlug={projectSlug}
      themes={themes}
-     onCreated={() => setShowCreate(false)}
+     onCreated={() => { setShowCreate(false); onRefresh?.(); }}
      onClose={() => setShowCreate(false)}
     />
    )}
@@ -836,28 +836,30 @@ function ExperimentsTab({ experiments, themes = [], projectSlug }) {
       {overallBest !== null && <MetricCard label="Best Metric" value={overallBest} mono />}
      </div>
 
-     {/* Experiment cards — Aura: grid-cols-2 */}
+     {/* Experiment cards — Aura: grid-cols-2, compact with hypothesis */}
      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {experiments.map((exp) => (
-       <div key={exp.dir} className="bg-card border border-border rounded-[2px] shadow-sm p-5 flex flex-col h-full">
+       <div key={exp.dir} className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5 flex flex-col h-full">
         <div className="flex justify-between items-start mb-3">
-         <h3 className="text-[14px] font-medium text-foreground">{exp.name}</h3>
+         <h3 className="text-sm font-medium text-zinc-100">{exp.name}</h3>
          <StatusBadge status={exp.status} />
         </div>
-        {exp.program_md && (
-         <div className="text-[13px] text-muted-foreground mb-4 flex-1">
-          <Markdown content={exp.program_md} />
-         </div>
+        {exp.hypothesis && (
+         <p className="text-[13px] text-zinc-400 mb-4 flex-1 line-clamp-2">
+          {exp.hypothesis}
+         </p>
         )}
-        {exp.best_metric !== null && (
-         <div className="grid grid-cols-2 gap-4 border-t border-border/50 pt-4 mt-auto">
+        {(exp.best_metric !== null || exp.result_count > 0) && (
+         <div className="grid grid-cols-2 gap-4 border-t border-zinc-800/50 pt-4 mt-auto">
+          {exp.best_metric !== null && (
+           <div>
+            <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-zinc-500 mb-1">Best Metric</div>
+            <div className="text-sm font-medium font-mono text-zinc-200">{exp.best_metric}</div>
+           </div>
+          )}
           <div>
-           <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-1">Best Metric</div>
-           <div className="text-[14px] font-medium font-mono text-foreground">{exp.best_metric}</div>
-          </div>
-          <div>
-           <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-1">Runs</div>
-           <div className="text-[14px] font-medium font-mono text-foreground">{exp.result_count}</div>
+           <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-zinc-500 mb-1">Runs</div>
+           <div className="text-sm font-medium font-mono text-zinc-200">{exp.result_count}</div>
           </div>
          </div>
         )}

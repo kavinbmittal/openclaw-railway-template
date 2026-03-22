@@ -1,6 +1,8 @@
 # SHIPPED.md
 
 ## 2026-03-22
+- **feat:** Create experiments from dashboard — POST endpoint, API client, wired form, auto-generates exp-NNN directories with program.md
+- **fix:** Experiment cards now show hypothesis instead of full program.md, with compact Aura-style layout and run counts
 - **style:** Use exact Aura HTML classes on CreateExperiment, IssueDetail, ApprovalDetail, CreateProject — replaced semantic tokens with literal Tailwind values from reference
 - **fix:** Strategy tree enforcement — theme/proxy_metrics persisted on issues, server validates tags against approved themes, theme drill-down shows tagged issues
 - **feat:** Strategy tree — projects now have NSM, themes, and proxy metrics. Agents propose themes for approval, all work tagged to themes

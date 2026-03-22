@@ -9,6 +9,7 @@
 - Create projects with mission, North Star Metric, lead, budget, and approval gates
 - Strategy tab per project: NSM at top, approved themes with proxy metrics, pending theme proposals
 - Agents propose themes (with up to 3 proxy metrics each) for individual approval
+- Create experiments from the dashboard with name, hypothesis, proxy metric, target value, theme, and program
 - Issues and experiments tagged to themes with target proxy metrics (server-validated)
 - Click any approved theme to see all issues tagged to it
 - Keyboard-navigable with visible focus rings on all interactive elements

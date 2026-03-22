@@ -2740,10 +2740,17 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       } catch { /* skip */ }
     }
 
+    let hypothesis = null;
+    if (programMd) {
+      const hypoMatch = programMd.match(/## Hypothesis\s*\n([\s\S]*?)(?=\n##|$)/);
+      if (hypoMatch) hypothesis = hypoMatch[1].trim();
+    }
+
     experiments.push({
       name,
       dir: entry.name,
       program_md: programMd,
+      hypothesis,
       results,
       result_count: results.length,
       best_metric: bestMetric,
@@ -2754,6 +2761,61 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
   // Sort by directory name (exp-001, exp-002, etc.)
   experiments.sort((a, b) => a.dir.localeCompare(b.dir));
   return res.json({ experiments });
+});
+
+// Create experiment
+app.post("/mc/api/experiments", requireSetupAuth, (req, res) => {
+  const { project, name, hypothesis, proxy_metric, target_value, program_md, theme } = req.body;
+  if (!project || !name) {
+    return res.status(400).json({ error: "Missing project or name" });
+  }
+
+  const expDir = path.join(STATE_DIR, "shared", "projects", project, "experiments");
+  // Ensure experiments directory exists
+  if (!fs.existsSync(expDir)) {
+    fs.mkdirSync(expDir, { recursive: true });
+  }
+
+  // Determine next experiment number by reading existing dirs
+  let maxNum = 0;
+  try {
+    const entries = fs.readdirSync(expDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const match = entry.name.match(/^exp-(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) maxNum = num;
+      }
+    }
+  } catch { /* empty dir is fine */ }
+
+  const nextNum = maxNum + 1;
+  const dirName = `exp-${String(nextNum).padStart(3, "0")}`;
+  const newExpDir = path.join(expDir, dirName);
+  fs.mkdirSync(newExpDir, { recursive: true });
+
+  // Build program.md content
+  const lines = [`# ${name}`, ""];
+  lines.push("## Status", "planned", "");
+  if (hypothesis) {
+    lines.push("## Hypothesis", hypothesis, "");
+  }
+  if (proxy_metric) {
+    const targetPart = target_value ? `: ${target_value}` : "";
+    lines.push("## Proxy Metric", `${proxy_metric}${targetPart}`, "");
+  }
+  if (theme) {
+    lines.push("## Theme", theme, "");
+  }
+  if (program_md) {
+    lines.push("## Program", program_md, "");
+  }
+
+  const programContent = lines.join("\n");
+  fs.writeFileSync(path.join(newExpDir, "program.md"), programContent, "utf8");
+
+  return res.json({ ok: true, dir: dirName, name });
 });
 
 // --- Budget Management API ---

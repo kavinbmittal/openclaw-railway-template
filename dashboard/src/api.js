@@ -254,6 +254,19 @@ export async function getExperiments(projectSlug) {
   return data.experiments || [];
 }
 
+export async function createExperiment({ project, name, hypothesis, proxy_metric, target_value, program_md, theme }) {
+  const res = await fetch(`${BASE}/experiments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project, name, hypothesis, proxy_metric, target_value, program_md, theme }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
 // --- Themes API ---
 
 export async function getThemes(projectSlug) {

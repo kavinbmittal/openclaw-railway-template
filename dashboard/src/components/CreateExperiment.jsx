@@ -4,6 +4,7 @@
  */
 import { useState } from"react";
 import { X } from"lucide-react";
+import { createExperiment } from"../api.js";
 
 export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose }) {
  const [name, setName] = useState("");
@@ -21,16 +22,16 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
   setSubmitting(true);
   setError(null);
   try {
-   // TODO: wire to createExperiment API when available
-   const experiment = {
+   const result = await createExperiment({
+    project: projectSlug,
     name: name.trim(),
     hypothesis: hypothesis.trim(),
-    primaryMetric: primaryMetric.trim() || null,
-    targetValue: targetValue.trim() || null,
-    programMd: programMd.trim() || null,
+    proxy_metric: primaryMetric || null,
+    target_value: targetValue.trim() || null,
+    program_md: programMd.trim() || null,
     theme: selectedTheme || null,
-   };
-   onCreated?.(experiment);
+   });
+   onCreated?.(result);
   } catch (err) {
    setError(err.message);
   } finally {
