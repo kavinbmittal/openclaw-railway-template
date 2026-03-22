@@ -34,24 +34,32 @@ const RESEARCH_PHASES = [
   { key: "synthesis", label: "Strategic Synthesis" },
 ];
 
+// Tier descriptions shown at the bottom of the page
+const TIER_DESCRIPTIONS = {
+  strategist: "Decides what the team should focus on across all projects",
+  analyst: "Decides how to approach work within their domain",
+  operator: "Executes multi-step tasks where the approach is already set",
+  runner: "Handles single-step mechanical tasks (fetch, format, classify)",
+};
+
 // Default config — used when creating from scratch
 const DEFAULT_CONFIG = {
   tiers: {
-    coordinator: { model: "anthropic/claude-opus-4-6", thinking: "adaptive" },
-    lead: { model: "anthropic/claude-sonnet-4-6", thinking: "high" },
-    complex: { model: "anthropic/claude-sonnet-4-6", thinking: "medium" },
-    simple: { model: "anthropic/claude-haiku-4-5", thinking: "off" },
+    strategist: { model: "anthropic/claude-opus-4-6", thinking: "adaptive" },
+    analyst: { model: "anthropic/claude-sonnet-4-6", thinking: "high" },
+    operator: { model: "anthropic/claude-sonnet-4-6", thinking: "medium" },
+    runner: { model: "anthropic/claude-haiku-4-5", thinking: "off" },
   },
   agents: {},
   research_phases: {
-    hypothesis: "coordinator",
-    execution: "complex",
-    analysis: "lead",
-    synthesis: "coordinator",
+    hypothesis: "strategist",
+    execution: "operator",
+    analysis: "analyst",
+    synthesis: "strategist",
   },
 };
 
-const TIER_ORDER = ["coordinator", "lead", "complex", "simple"];
+const TIER_ORDER = ["strategist", "analyst", "operator", "runner"];
 
 // Friendly label for a model string
 function modelLabel(modelStr) {
@@ -128,10 +136,10 @@ export default function ModelRouting({ navigate }) {
     for (const a of agentList) {
       const id = a.id || a.name?.toLowerCase();
       if (!id) continue;
-      // Sam is coordinator, known leads get lead, rest get complex
-      if (id === "sam" || id === "main") map[id] = "coordinator";
-      else if (["binny", "leslie", "ritam", "ej", "kiko"].includes(id)) map[id] = "lead";
-      else map[id] = "complex";
+      // Sam is strategist, known leads get analyst, rest get operator
+      if (id === "sam" || id === "main") map[id] = "strategist";
+      else if (["binny", "leslie", "ritam", "ej", "kiko"].includes(id)) map[id] = "analyst";
+      else map[id] = "operator";
     }
     return map;
   }
@@ -300,7 +308,7 @@ export default function ModelRouting({ navigate }) {
           <div className="space-y-2">
             {AGENTS.map((agent) => {
               const id = agent.id;
-              const currentTier = config.agents[id] || "complex";
+              const currentTier = config.agents[id] || "operator";
               return (
                 <div key={id} className="flex items-center gap-4 p-3 rounded-md border border-zinc-800 bg-[#09090b]">
                   <div className="flex items-center gap-2 w-40 shrink-0">
@@ -341,7 +349,7 @@ export default function ModelRouting({ navigate }) {
           </p>
           <div className="space-y-2">
             {RESEARCH_PHASES.map(({ key, label }) => {
-              const currentTier = config.research_phases[key] || "complex";
+              const currentTier = config.research_phases[key] || "operator";
               return (
                 <div key={key} className="flex items-center gap-4 p-3 rounded-md border border-zinc-800 bg-[#09090b]">
                   <span className="w-52 text-sm font-medium text-zinc-300 shrink-0">{label}</span>
@@ -358,6 +366,19 @@ export default function ModelRouting({ navigate }) {
               );
             })}
           </div>
+        </div>
+      </div>
+
+      {/* ── Tier Definitions Reference ───────────────────────────── */}
+      <div className="border-t border-zinc-800/50 pt-6">
+        <h3 className="text-[11px] font-mono uppercase tracking-[0.15em] text-zinc-500 mb-3">Tier Definitions</h3>
+        <div className="space-y-1.5">
+          {TIER_ORDER.map((tierName) => (
+            <div key={tierName} className="flex items-baseline gap-3">
+              <span className="text-sm font-medium text-zinc-300 capitalize w-24 shrink-0">{tierName}</span>
+              <span className="text-sm text-zinc-500">{TIER_DESCRIPTIONS[tierName]}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -48,27 +48,27 @@ Three-layer resolution: issue-level override (if set) beats lead agent heuristic
 ```json
 {
   "tiers": {
-    "coordinator": { "model": "anthropic/claude-opus-4-6", "thinking": "adaptive" },
-    "lead": { "model": "anthropic/claude-sonnet-4-6", "thinking": "high" },
-    "complex": { "model": "anthropic/claude-sonnet-4-6", "thinking": "medium" },
-    "simple": { "model": "anthropic/claude-haiku-4-5", "thinking": "off" }
+    "strategist": { "model": "anthropic/claude-opus-4-6", "thinking": "adaptive" },
+    "analyst": { "model": "anthropic/claude-sonnet-4-6", "thinking": "high" },
+    "operator": { "model": "anthropic/claude-sonnet-4-6", "thinking": "medium" },
+    "runner": { "model": "anthropic/claude-haiku-4-5", "thinking": "off" }
   },
   "agents": {
-    "sam": "coordinator",
-    "binny": "lead",
-    "leslie": "lead",
-    "ritam": "lead",
-    "ej": "lead",
-    "kiko": "lead",
-    "zara": "complex",
-    "jon": "complex",
-    "midas": "complex"
+    "sam": "strategist",
+    "binny": "analyst",
+    "leslie": "analyst",
+    "ritam": "analyst",
+    "ej": "analyst",
+    "kiko": "analyst",
+    "zara": "operator",
+    "jon": "operator",
+    "midas": "operator"
   },
   "research_phases": {
-    "hypothesis": "coordinator",
-    "execution": "complex",
-    "analysis": "lead",
-    "synthesis": "coordinator"
+    "hypothesis": "strategist",
+    "execution": "operator",
+    "analysis": "analyst",
+    "synthesis": "strategist"
   }
 }
 ```
@@ -81,14 +81,14 @@ Model strings use the gateway format (`anthropic/claude-opus-4-6`). Thinking lev
 {
   "model_override": null | "anthropic/claude-opus-4-6" | "anthropic/claude-sonnet-4-6" | "anthropic/claude-haiku-4-5",
   "thinking_override": null | "off" | "minimal" | "low" | "medium" | "high" | "xhigh" | "adaptive",
-  "complexity": "simple" | "complex" | "strategic",
+  "complexity": "runner" | "operator" | "strategic",
   "escalation_count": 0
 }
 ```
 
 - `model_override`: null means use routing defaults. When set, the lead agent passes this directly to `sessions_spawn(model: "...")`.
 - `thinking_override`: null means use the tier's default thinking level. When set, passed to `sessions_spawn(thinking: "...")`.
-- `complexity`: set by lead agent at issue creation, editable from dashboard. Drives sub-agent tier selection when no override is set. `simple` → simple tier, `complex` → complex tier, `strategic` → lead tier.
+- `complexity`: set by lead agent at issue creation, editable from dashboard. Drives sub-agent tier selection when no override is set. `simple` → runner tier, `complex` → operator tier, `strategic` → analyst tier.
 - `escalation_count`: incremented by lead agents when a sub-agent fails and retries at a higher tier. Read-only in dashboard.
 
 ### Cost entries (new field on existing schema)
@@ -111,12 +111,12 @@ The lead agent's spawn flow becomes:
      → sessions_spawn(model: model_override, thinking: thinking_override || tier default)
 3. Else:
      → Read shared/model-routing.json
-     → Map complexity to tier name (simple→simple, complex→complex, strategic→lead)
+     → Map complexity to tier name (simple→runner, complex→operator, strategic→analyst)
      → Resolve tier → get model + thinking
      → sessions_spawn(model: resolved_model, thinking: resolved_thinking)
 4. (v2) If sub-agent fails:
      → Increment escalation_count on issue JSON
-     → Retry at next tier up (simple→complex→lead→coordinator)
+     → Retry at next tier up (runner→operator→analyst→strategist)
      → Write updated escalation_count back to issue file
 ```
 
@@ -130,7 +130,7 @@ Three sections, all editable with dropdowns, single Save button at top.
 
 **Tier Definitions** — Four rows. Each row: tier name (read-only label), model dropdown (lists available models), thinking dropdown (off/minimal/low/medium/high/xhigh/adaptive). Changing a tier definition changes the resolved model for every agent and research phase assigned to that tier.
 
-**Agent Assignments** — List of all agents. Each has a tier dropdown (coordinator/lead/complex/simple). Shows resolved model + thinking next to the dropdown.
+**Agent Assignments** — List of all agents. Each has a tier dropdown (strategist/analyst/operator/runner). Shows resolved model + thinking next to the dropdown.
 
 **Research Phase Mapping** — Four rows (hypothesis, execution, analysis, synthesis). Each has a tier dropdown. Shows resolved model next to it.
 
@@ -183,7 +183,7 @@ When a lead agent picks up an issue and needs to decide which model to use for `
 1. issue.model_override (if not null) → use as sessions_spawn model parameter
 2. issue.thinking_override (if not null) → use as sessions_spawn thinking parameter
 3. If no overrides → read shared/model-routing.json:
-   a. Map issue.complexity to tier (simple→simple, complex→complex, strategic→lead)
+   a. Map issue.complexity to tier (simple→runner, complex→operator, strategic→analyst)
    b. Resolve tier → get model + thinking
    c. Use as sessions_spawn parameters
 4. If no complexity set → use agent's own tier assignment from routing config
