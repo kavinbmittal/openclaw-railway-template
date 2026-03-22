@@ -2550,10 +2550,42 @@ app.get("/mc/api/issues/:id", requireSetupAuth, (req, res) => {
 
 // Create issue
 app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
-  const { project, title, description, priority, assignee, labels } = req.body;
+  const { project, title, description, priority, assignee, labels, theme, proxy_metrics } = req.body;
   if (!project || !title) {
     return res.status(400).json({ error: "Missing project or title" });
   }
+
+  // Validate theme tagging — required when project has approved themes
+  const themesDir = path.join(STATE_DIR, "shared", "projects", project, "themes");
+  let approvedThemes = [];
+  if (fs.existsSync(themesDir)) {
+    const themeFiles = fs.readdirSync(themesDir).filter((f) => f.endsWith(".json"));
+    for (const file of themeFiles) {
+      try {
+        const t = JSON.parse(fs.readFileSync(path.join(themesDir, file), "utf8"));
+        if (t.status === "approved") approvedThemes.push(t);
+      } catch { /* skip malformed */ }
+    }
+  }
+
+  if (approvedThemes.length > 0) {
+    if (!theme) {
+      return res.status(400).json({ error: "Theme required — this project has approved themes" });
+    }
+    const matchedTheme = approvedThemes.find((t) => t.id === theme);
+    if (!matchedTheme) {
+      return res.status(400).json({ error: `Theme "${theme}" not found or not approved` });
+    }
+    // Validate proxy_metrics belong to the tagged theme
+    if (proxy_metrics && proxy_metrics.length > 0) {
+      const validMetricIds = (matchedTheme.proxy_metrics || []).map((pm) => pm.id);
+      const invalid = proxy_metrics.filter((id) => !validMetricIds.includes(id));
+      if (invalid.length > 0) {
+        return res.status(400).json({ error: `Proxy metrics [${invalid.join(", ")}] don't belong to theme "${theme}"` });
+      }
+    }
+  }
+
   const counter = readCounter(project) + 1;
   writeCounter(project, counter);
   const prefix = projectPrefix(project);
@@ -2569,6 +2601,8 @@ app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
     project,
     milestone: null,
     labels: labels || [],
+    theme: theme || null,
+    proxy_metrics: proxy_metrics || [],
     created: now,
     updated: now,
     created_by: "kavin",

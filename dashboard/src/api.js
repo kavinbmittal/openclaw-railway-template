@@ -127,13 +127,16 @@ export async function getIssue(id, projectSlug) {
   return fetchJSON(`${BASE}/issues/${encodeURIComponent(id)}?project=${encodeURIComponent(projectSlug)}`);
 }
 
-export async function createIssue({ project, title, description, priority, assignee, labels }) {
+export async function createIssue({ project, title, description, priority, assignee, labels, theme, proxy_metrics }) {
   const res = await fetch(`${BASE}/issues`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project, title, description, priority, assignee, labels }),
+    body: JSON.stringify({ project, title, description, priority, assignee, labels, theme, proxy_metrics }),
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `${res.status} ${res.statusText}`);
+  }
   return res.json();
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from"react";
-import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getApprovals, resolveApproval, updateIssue, deleteIssue, getExperiments, getThemes } from"../api.js";
+import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getApprovals, resolveApproval, updateIssue, deleteIssue, getExperiments, getThemes, getIssues } from"../api.js";
 import { formatDate as formatDateUtil, formatTimeAgo } from"../utils/formatDate.js";
 import {
  ArrowLeft, FileText, Activity, DollarSign, Clock,
@@ -389,6 +389,27 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
 function StrategyTab({ project, themes, projectId, navigate }) {
  const approvedThemes = themes.filter((t) => t.status === "approved");
  const pendingThemes = themes.filter((t) => t.status === "proposed");
+ const [expandedTheme, setExpandedTheme] = useState(null);
+ const [themeIssues, setThemeIssues] = useState({});
+ const [loadingIssues, setLoadingIssues] = useState(false);
+
+ // Load issues tagged to a theme when expanded
+ const toggleTheme = async (themeId) => {
+  if (expandedTheme === themeId) {
+   setExpandedTheme(null);
+   return;
+  }
+  setExpandedTheme(themeId);
+  if (!themeIssues[themeId]) {
+   setLoadingIssues(true);
+   try {
+    const data = await getIssues(projectId);
+    const tagged = (data.issues || []).filter((i) => i.theme === themeId);
+    setThemeIssues((prev) => ({ ...prev, [themeId]: tagged }));
+   } catch { setThemeIssues((prev) => ({ ...prev, [themeId]: [] })); }
+   setLoadingIssues(false);
+  }
+ };
 
  return (
   <div className="space-y-4">
@@ -447,37 +468,76 @@ function StrategyTab({ project, themes, projectId, navigate }) {
     </div>
    )}
 
-   {/* Approved themes */}
+   {/* Approved themes — clickable for drill-down */}
    {approvedThemes.length > 0 ? (
     <div>
      <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-2">
       Key Themes
      </h3>
      <div className="space-y-2">
-      {approvedThemes.map((theme) => (
-       <div key={theme.id} className="border border-border p-4">
-        <div className="flex items-center gap-2 mb-1">
-         <Compass size={14} className="text-teal-400 shrink-0" />
-         <h4 className="text-sm font-medium text-foreground">{theme.title}</h4>
-        </div>
-        {theme.description && (
-         <p className="text-xs text-muted-foreground mb-3 ml-[22px]">{theme.description}</p>
-        )}
-        <div className="space-y-2 ml-[22px]">
-         {(theme.proxy_metrics || []).map((pm) => (
-          <div key={pm.id} className="flex items-start gap-2">
-           <BarChart3 size={12} className="text-muted-foreground/50 mt-0.5 shrink-0" />
-           <div>
-            <span className="text-xs font-medium text-foreground/80">{pm.name}</span>
-            {pm.description && (
-             <p className="text-[11px] text-muted-foreground/60">{pm.description}</p>
-            )}
-           </div>
+      {approvedThemes.map((theme) => {
+       const isExpanded = expandedTheme === theme.id;
+       const issues = themeIssues[theme.id] || [];
+       return (
+        <div key={theme.id} className="border border-border">
+         <button
+          onClick={() => toggleTheme(theme.id)}
+          className="w-full text-left p-4 hover:bg-accent/30 transition-colors"
+         >
+          <div className="flex items-center gap-2 mb-1">
+           <Compass size={14} className="text-teal-400 shrink-0" />
+           <h4 className="text-sm font-medium text-foreground flex-1">{theme.title}</h4>
+           <span className="text-[11px] text-muted-foreground/50">
+            {isExpanded ? "collapse" : "click to see issues"}
+           </span>
           </div>
-         ))}
+          {theme.description && (
+           <p className="text-xs text-muted-foreground mb-3 ml-[22px]">{theme.description}</p>
+          )}
+          <div className="space-y-2 ml-[22px]">
+           {(theme.proxy_metrics || []).map((pm) => (
+            <div key={pm.id} className="flex items-start gap-2">
+             <BarChart3 size={12} className="text-muted-foreground/50 mt-0.5 shrink-0" />
+             <div>
+              <span className="text-xs font-medium text-foreground/80">{pm.name}</span>
+              {pm.description && (
+               <p className="text-[11px] text-muted-foreground/60">{pm.description}</p>
+              )}
+             </div>
+            </div>
+           ))}
+          </div>
+         </button>
+         {/* Drill-down: issues tagged to this theme */}
+         {isExpanded && (
+          <div className="border-t border-border px-4 py-3 bg-accent/10">
+           <h5 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-2">
+            Tagged Issues
+           </h5>
+           {loadingIssues ? (
+            <p className="text-xs text-muted-foreground/50">Loading...</p>
+           ) : issues.length === 0 ? (
+            <p className="text-xs text-muted-foreground/50 italic">No issues tagged to this theme yet.</p>
+           ) : (
+            <div className="space-y-1.5">
+             {issues.map((issue) => (
+              <button
+               key={issue.id}
+               onClick={(e) => { e.stopPropagation(); navigate("issue-detail", { slug: projectId, issueId: issue.id }); }}
+               className="flex items-center gap-2 w-full text-left px-2 py-1.5 hover:bg-accent/30 transition-colors"
+              >
+               <CircleDot size={12} className="text-muted-foreground/50 shrink-0" />
+               <span className="text-xs text-foreground/80 truncate flex-1">{issue.title}</span>
+               <StatusBadge status={issue.status} />
+              </button>
+             ))}
+            </div>
+           )}
+          </div>
+         )}
         </div>
-       </div>
-      ))}
+       );
+      })}
      </div>
     </div>
    ) : !pendingThemes.length && (
