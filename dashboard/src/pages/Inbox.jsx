@@ -23,6 +23,9 @@ const CATEGORIES = [
     key: "approvals",
     title: "Pending Approvals",
     icon: ShieldCheck,
+    iconBg: "bg-amber-500/10",
+    iconBorder: "border-amber-500/20",
+    iconText: "text-amber-400",
     filter: (item) => item.type === "approval" || item.type === "proposed_issue",
     alwaysShow: true,
     badgeColor: (item) =>
@@ -41,6 +44,9 @@ const CATEGORIES = [
     key: "budget",
     title: "Budget Alerts",
     icon: Wallet,
+    iconBg: "bg-red-500/10",
+    iconBorder: "border-red-500/20",
+    iconText: "text-red-400",
     filter: (item) => item.type === "budget",
     alwaysShow: false,
     badgeColor: (item) =>
@@ -59,6 +65,9 @@ const CATEGORIES = [
     key: "stale_tasks",
     title: "Stale Tasks",
     icon: Clock,
+    iconBg: "bg-cyan-500/10",
+    iconBorder: "border-cyan-500/20",
+    iconText: "text-cyan-400",
     filter: (item) => item.type === "stale_task",
     alwaysShow: false,
     isStaleRow: true,
@@ -72,6 +81,9 @@ const CATEGORIES = [
     key: "standups",
     title: "Standups",
     icon: MessageSquare,
+    iconBg: "bg-emerald-500/10",
+    iconBorder: "border-emerald-500/20",
+    iconText: "text-emerald-400",
     filter: (item) => item.type === "standup",
     alwaysShow: false,
     badgeColor: () => "border-blue-500/20 bg-blue-500/10 text-blue-400",
@@ -163,7 +175,12 @@ export default function Inbox({ navigate }) {
             <div key={cat.key} className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
               {/* Section header */}
               <div className="p-5 border-b border-border flex justify-between items-center">
-                <h2 className="text-[14px] font-semibold text-foreground tracking-tight">{cat.title}</h2>
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full ${cat.iconBg} border ${cat.iconBorder} flex items-center justify-center`}>
+                    <Icon className={`w-4 h-4 ${cat.iconText}`} />
+                  </div>
+                  <h2 className="text-[14px] font-semibold text-foreground tracking-tight">{cat.title}</h2>
+                </div>
                 <span className="text-[12px] font-mono bg-accent px-1.5 py-0.5 rounded-[2px] text-muted-foreground">
                   {items.length}
                 </span>
