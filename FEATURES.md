@@ -4,8 +4,9 @@
 - View project overview, issues, costs, and agent activity
 - Inbox aggregates approvals, budget warnings, standups, and proposed issues
 - Unified Approvals page: proposed issues, experiment gates, and deliverable reviews in one view, grouped by project
-- Approve or reject any pending item (proposed issue or gate request) from the Approvals page or per-project Approvals tab
-- Reject approvals with a reason via inline modal (no more browser prompt)
+- Approve, reject, or request revision on any pending item (proposed issue or gate request) from the Approvals page or per-project Approvals tab
+- Request revision on proposed issues with feedback — issue stays pending, agent gets notified to revise
+- Reject approvals with a required comment via inline modal
 - Create projects with mission, North Star Metric, lead, budget, and approval gates
 - Strategy tab per project: NSM at top, approved themes with proxy metrics, pending theme proposals
 - Agents propose themes (with up to 3 proxy metrics each) for individual approval

@@ -63,7 +63,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
  const isThemeProposal = approval?._source === "theme";
 
  async function handleResolve(decision) {
-  if (!isProposedIssue && !isThemeProposal && (decision ==="rejected" || decision ==="revision_requested") && !comment.trim()) {
+  if (!isThemeProposal && (decision ==="rejected" || decision ==="revision_requested") && !comment.trim()) {
    setError(decision ==="revision_requested"
     ?"Feedback is required when requesting a revision."
     :"A note is required when rejecting.");
@@ -81,6 +81,18 @@ export default function ApprovalDetail({ approvalId, navigate }) {
    } else if (isProposedIssue) {
     if (decision ==="approved") {
      await updateIssue(approval.id, projectName, { status:"todo" });
+    } else if (decision ==="revision_requested") {
+     await requestRevision({
+      project: projectName,
+      id: approval.id,
+      feedback: comment.trim(),
+      requester: approval.requester,
+      gate: "proposed-issue",
+      what: approval.what || approval.title,
+      why: approval.why,
+      created: approval.created,
+      isIssue: true,
+     });
     } else {
      await deleteIssue(approval.id, projectName);
     }
@@ -489,20 +501,18 @@ export default function ApprovalDetail({ approvalId, navigate }) {
           {isThemeProposal ? "Approve Theme" : isIssue ?"Approve Issue" :"Approve Request"}
          </button>
 
-         {!isIssue && (
-          <button
-           onClick={() => handleResolve("revision_requested")}
-           disabled={submitting || !comment.trim()}
-           className="w-full py-2.5 rounded-[6px] border border-amber-500/30 bg-amber-500/10 text-[14px] font-medium text-amber-400 hover:bg-amber-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500/50 disabled:opacity-50"
-          >
-           {submitting ? <Loader2 size={18} className="animate-spin" /> : <RotateCcw size={18} />}
-           Request Revision
-          </button>
-         )}
+         <button
+          onClick={() => handleResolve("revision_requested")}
+          disabled={submitting || !comment.trim()}
+          className="w-full py-2.5 rounded-[6px] border border-amber-500/30 bg-amber-500/10 text-[14px] font-medium text-amber-400 hover:bg-amber-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500/50 disabled:opacity-50"
+         >
+          {submitting ? <Loader2 size={18} className="animate-spin" /> : <RotateCcw size={18} />}
+          Request Revision
+         </button>
 
          <button
           onClick={() => handleResolve("rejected")}
-          disabled={submitting || (!isIssue && !isThemeProposal && !comment.trim())}
+          disabled={submitting || (!isThemeProposal && !comment.trim())}
           className="w-full py-2.5 rounded-[6px] border border-red-500/30 bg-red-500/10 text-[14px] font-medium text-red-400 hover:bg-red-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/50 disabled:opacity-50"
          >
           {submitting ? <Loader2 size={18} className="animate-spin" /> : <XCircle size={18} />}
@@ -510,20 +520,18 @@ export default function ApprovalDetail({ approvalId, navigate }) {
          </button>
 
          {/* Comment textarea — Aura style */}
-         {!isIssue && (
-          <div className="pt-4 mt-2 border-t border-border/60 flex flex-col gap-3">
-           <label className="text-[12px] font-medium text-zinc-500 flex items-center justify-between">
-            {isThemeProposal ?"Feedback" :"Rejection Comment"}
-            <span className="text-zinc-600 font-normal text-[11px]">{isIssue ?"" : isThemeProposal ?"Optional" :"Required"}</span>
-           </label>
-           <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="w-full rounded-[6px] border border-border bg-background text-[14px] text-zinc-200 p-3 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-none h-20"
-            placeholder="Provide context..."
-           />
-          </div>
-         )}
+         <div className="pt-4 mt-2 border-t border-border/60 flex flex-col gap-3">
+          <label className="text-[12px] font-medium text-zinc-500 flex items-center justify-between">
+           Feedback
+           <span className="text-zinc-600 font-normal text-[11px]">{isThemeProposal ?"Optional" :"Required"}</span>
+          </label>
+          <textarea
+           value={comment}
+           onChange={(e) => setComment(e.target.value)}
+           className="w-full rounded-[6px] border border-border bg-background text-[14px] text-zinc-200 p-3 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-none h-20"
+           placeholder="Provide context..."
+          />
+         </div>
 
          {error && <p className="text-[15px] text-red-400 mt-2">{error}</p>}
         </div>
