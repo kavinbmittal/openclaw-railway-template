@@ -1,7 +1,7 @@
 function Card({ className ="", children, ...props }) {
  return (
   <div
-   className={`bg-card text-card-foreground flex flex-col gap-6 border py-6 shadow-sm ${className}`}
+   className={`bg-card text-card-foreground flex flex-col gap-6 border py-6 ${className}`}
    {...props}
   >
    {children}

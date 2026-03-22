@@ -22,7 +22,7 @@ export function OrgChartNode({ node, onClick }) {
 
  return (
   <div
-   className={`bg-background border ${borderAccent} px-4 py-3 min-w-[160px] max-w-[200px] cursor-pointer hover:bg-accent/30 hover:border-foreground/20 transition-all shadow-sm hover:shadow-md select-none`}
+   className={`bg-background border ${borderAccent} px-4 py-3 min-w-[160px] max-w-[200px] cursor-pointer hover:bg-accent/30 hover:border-foreground/20 transition-all select-none`}
    onClick={onClick}
   >
    <div className="flex items-center gap-2.5">
