@@ -30,7 +30,7 @@ export default function OrgChart({ navigate }) {
 
  if (loading) {
   return (
-   <div className="space-y-6">
+   <div className="max-w-[1400px] mx-auto space-y-6">
     <div className="h-12" />
     <Skeleton className="h-8 w-32" />
     <Skeleton className="h-96 w-full" />
@@ -40,7 +40,7 @@ export default function OrgChart({ navigate }) {
 
  if (error) {
   return (
-   <div className="space-y-6">
+   <div className="max-w-[1400px] mx-auto space-y-6">
     <div className="h-12 flex items-center">
      <h1 className="text-base font-semibold uppercase tracking-wider">Org Chart</h1>
     </div>
@@ -56,7 +56,7 @@ export default function OrgChart({ navigate }) {
  const totalAgents = nodes.filter((n) => n.type !=="human").length;
 
  return (
-  <div className="space-y-6">
+  <div className="max-w-[1400px] mx-auto space-y-6">
    {/* Breadcrumb bar */}
    <div className="h-12 flex items-center justify-between">
     <h1 className="text-base font-semibold uppercase tracking-wider">Org Chart</h1>

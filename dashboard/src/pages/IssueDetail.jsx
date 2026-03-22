@@ -207,7 +207,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
     return (
      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
       {issueTheme && (
-       <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-5 flex items-start gap-4">
+       <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-[20px] flex items-start gap-4">
         <div className={`w-10 h-10 rounded-full ${colors.iconBg} border ${colors.iconBorder} flex items-center justify-center shrink-0`}>
          <span className={`text-lg font-mono font-medium ${colors.iconText}`}>{issueTheme.order ?? themeIdx + 1}</span>
         </div>
@@ -221,7 +221,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
        </div>
       )}
       {issuePms.length > 0 && (
-       <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-5">
+       <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-[20px]">
         <h3 className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-3">Proxy Metrics</h3>
         <div className="space-y-2">
          {issuePms.map((pm, i) => {
@@ -256,7 +256,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
        </div>
        <div className="text-[15px] font-medium text-indigo-100">Description</div>
       </div>
-      <div className="p-5 text-sm text-zinc-300 leading-relaxed prose">
+      <div className="p-[20px] text-sm text-zinc-300 leading-relaxed prose">
        {issue.description ? (
         <Markdown content={issue.description} />
        ) : (
@@ -310,7 +310,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
       )}
 
       {/* Add comment area — Aura: bg-zinc-900/30 border-t */}
-      <div className="p-5 bg-zinc-900/30 border-t border-zinc-800">
+      <div className="p-[20px] bg-zinc-900/30 border-t border-zinc-800">
        <textarea
         value={commentText}
         onChange={(e) => setCommentText(e.target.value)}
@@ -335,7 +335,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
     <div className="xl:col-span-1 space-y-6">
      {/* Details Card — Aura: p-5 space-y-5 with flex-col gap-1.5 */}
      <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm">
-      <div className="p-5 space-y-5">
+      <div className="p-[20px] space-y-5">
        <div className="flex flex-col gap-1.5">
         <label className="text-xs uppercase font-mono tracking-widest text-zinc-500">Status</label>
         <div className="p-2 rounded-sm border border-zinc-800/50 hover:border-zinc-700 bg-zinc-900/50">
@@ -391,7 +391,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
      </div>
 
      {/* Actions Card — Aura: p-4 with edit + delete buttons */}
-     <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-4 space-y-2">
+     <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-[20px] space-y-2">
       <button
        onClick={() => navigate("edit-issue", { slug: projectSlug, issueId })}
        className="w-full py-2 rounded-sm border border-zinc-700 bg-zinc-800 text-sm font-medium text-zinc-200 hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"

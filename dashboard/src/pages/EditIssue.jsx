@@ -170,7 +170,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
   if (loading) {
     return (
       <div className="flex flex-col h-full">
-        <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-[#09090b] flex flex-col gap-4">
+        <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-background/80 backdrop-blur-sm flex flex-col gap-4">
           <div className="text-sm text-zinc-400 tracking-wide flex items-center flex-wrap">
             <span className="text-zinc-500">Loading...</span>
           </div>
@@ -179,7 +179,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           </div>
         </header>
         <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-[800px] mx-auto w-full bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+          <div className="max-w-[800px] mx-auto w-full bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px]">
             <div className="animate-pulse space-y-4">
               <div className="h-4 bg-zinc-800 rounded w-1/3"></div>
               <div className="h-10 bg-zinc-800 rounded"></div>
@@ -200,7 +200,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
   return (
     <div className="flex flex-col h-full">
       {/* Sticky Page Header */}
-      <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-[#09090b] flex flex-col gap-4">
+      <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-background/80 backdrop-blur-sm flex flex-col gap-4">
         {/* Breadcrumb */}
         <div className="text-sm text-zinc-400 tracking-wide flex items-center flex-wrap">
           <a
@@ -268,7 +268,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           </div>
 
           {/* Form Body */}
-          <div className="p-5 space-y-6">
+          <div className="p-[20px] space-y-6">
             {/* Title Field */}
             <div>
               <label className="block text-xs font-medium text-zinc-400 mb-2">Title</label>
@@ -447,7 +447,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           </div>
 
           {/* Card Footer */}
-          <div className="p-5 border-t border-zinc-800 bg-[#121214] flex justify-between items-center">
+          <div className="p-[20px] border-t border-zinc-800 bg-[#121214] flex justify-between items-center">
             <span className="text-xs text-zinc-500">
               {originalRef.current?.updated
                 ? `Last updated ${formatTimeAgo(originalRef.current.updated)}`

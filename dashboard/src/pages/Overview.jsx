@@ -157,7 +157,7 @@ export default function Overview({ navigate }) {
     </div>
 
     {displayProjects.length === 0 ? (
-     <div className="p-5">
+     <div className="p-[20px]">
       <EmptyState
        icon={FolderKanban}
        text="No projects yet"

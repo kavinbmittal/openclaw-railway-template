@@ -51,7 +51,7 @@ export default function Workspaces() {
 
  if (loading && workspaces.length === 0) {
   return (
-   <div className="space-y-6">
+   <div className="max-w-[1400px] mx-auto space-y-6">
     <div className="h-12" />
     <Skeleton className="h-8 w-32" />
     <Skeleton className="h-64 w-full" />
@@ -60,7 +60,7 @@ export default function Workspaces() {
  }
 
  return (
-  <div className="space-y-6">
+  <div className="max-w-[1400px] mx-auto space-y-6">
    {/* Breadcrumb bar */}
    <div className="h-12 flex items-center justify-between">
     <h1 className="text-base font-semibold uppercase tracking-wider">Workspaces</h1>

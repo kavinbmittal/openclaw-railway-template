@@ -62,7 +62,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
 
    {/* Form Body — Aura */}
    <form onSubmit={handleSubmit}>
-    <div className="p-5 space-y-6">
+    <div className="p-[20px] space-y-6">
 
      {/* 1. Experiment Name */}
      <div>
@@ -198,7 +198,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
     )}
 
     {/* Card Footer — Aura: cyan tint for experiments */}
-    <div className="p-5 border-t border-zinc-800 bg-[#121214] flex justify-end gap-3">
+    <div className="p-[20px] border-t border-zinc-800 bg-[#121214] flex justify-end gap-3">
      {onClose && (
       <button
        type="button"

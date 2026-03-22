@@ -89,7 +89,7 @@ export default function Activity({ navigate }) {
 
  if (loading) {
   return (
-   <div className="space-y-6">
+   <div className="max-w-[1400px] mx-auto space-y-6">
     <div className="h-12 flex items-center">
      <h1 className="text-base font-semibold uppercase tracking-wider">Activity</h1>
     </div>
@@ -106,7 +106,7 @@ export default function Activity({ navigate }) {
  }
 
  return (
-  <div className="space-y-6">
+  <div className="max-w-[1400px] mx-auto space-y-6">
    {/* Header */}
    <div className="h-12 flex items-center justify-between">
     <h1 className="text-base font-semibold uppercase tracking-wider">Activity</h1>

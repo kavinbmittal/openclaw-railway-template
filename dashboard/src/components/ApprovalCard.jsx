@@ -49,7 +49,7 @@ export default function ApprovalCard({
 
  return (
   <div
-   className={`bg-card border border-border rounded-[2px] p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm ${
+   className={`bg-card border border-border rounded-[2px] p-[20px] flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm ${
     isRejected ?"opacity-60" :""
    }`}
    onClick={() => {

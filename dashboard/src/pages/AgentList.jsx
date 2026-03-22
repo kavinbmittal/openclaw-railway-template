@@ -83,7 +83,7 @@ export default function AgentList({ navigate }) {
  const specialists = AGENTS.filter((a) => !a.canLead);
 
  return (
-  <div className="space-y-6">
+  <div className="max-w-[1400px] mx-auto space-y-6">
    <div className="h-12 flex items-center">
     <h1 className="text-base font-semibold uppercase tracking-wider">Agents</h1>
    </div>

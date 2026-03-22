@@ -242,7 +242,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
      return (
       <div className="max-w-[1200px] grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
        {approvalTheme && (
-        <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-5 flex items-start gap-4">
+        <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-[20px] flex items-start gap-4">
          <div className={`w-10 h-10 rounded-full ${colors.iconBg} border ${colors.iconBorder} flex items-center justify-center shrink-0`}>
           <span className={`text-lg font-mono font-medium ${colors.iconText}`}>{approvalTheme.order ?? themeIdx + 1}</span>
          </div>
@@ -256,7 +256,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
         </div>
        )}
        {approvalPms.length > 0 && (
-        <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-5">
+        <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-[20px]">
          <h3 className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-3">Proxy Metrics</h3>
          <div className="space-y-2">
           {approvalPms.map((pm, i) => {

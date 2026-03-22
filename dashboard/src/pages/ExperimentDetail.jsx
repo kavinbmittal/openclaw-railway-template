@@ -60,7 +60,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
  if (loading) {
   return (
    <div className="flex flex-col h-full">
-    <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-[#09090b]">
+    <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-background/80 backdrop-blur-sm">
      <Skeleton className="h-4 w-48 mb-4" />
      <Skeleton className="h-8 w-72" />
     </header>
@@ -83,7 +83,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
  if (error) {
   return (
    <div className="flex flex-col h-full">
-    <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-[#09090b]">
+    <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-background/80 backdrop-blur-sm">
      <div className="text-sm text-zinc-400 tracking-wide">
       <a href="#/overview" onClick={(e) => { e.preventDefault(); navigate("overview"); }} className="hover:text-zinc-200 transition-colors cursor-pointer">Projects</a>
       <span className="mx-2 text-zinc-600">&rsaquo;</span>
@@ -119,7 +119,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
  return (
   <div className="flex flex-col h-full">
    {/* ── Sticky Header ── */}
-   <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-[#09090b] flex flex-col gap-4">
+   <header className="sticky top-0 z-10 px-8 py-8 border-b border-zinc-800 shrink-0 bg-background/80 backdrop-blur-sm flex flex-col gap-4">
     {/* Breadcrumb */}
     <div className="text-sm text-zinc-400 tracking-wide">
      <a href="#/overview" onClick={(e) => { e.preventDefault(); navigate("overview"); }} className="hover:text-zinc-200 transition-colors cursor-pointer">Projects</a>
@@ -163,7 +163,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
      <div className="xl:col-span-2 flex flex-col gap-6">
 
       {/* Created box */}
-      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px]">
        <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Created</div>
        <div className="text-sm text-zinc-200">{data.created || "Unknown"}</div>
       </div>
@@ -172,7 +172,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
       {(theme || proxy_metric) && (
        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {theme && (
-         <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+         <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px]">
           <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Theme</div>
           <div className="text-sm text-zinc-200 flex items-center gap-2">
            <ThemeDot theme={theme} />
@@ -181,7 +181,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
          </div>
         )}
         {(proxy_metrics?.length > 0 || proxy_metric) && (
-         <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+         <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px]">
           <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Proxy Metrics</div>
           {proxy_metrics?.length > 0 ? (
            <div className="space-y-2">
@@ -209,7 +209,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
          </div>
          <div className="text-[15px] font-medium text-cyan-100">Hypothesis</div>
         </div>
-        <div className="p-5">
+        <div className="p-[20px]">
          <div className="border-l-2 border-zinc-700 pl-4 py-1 text-sm text-zinc-300 leading-relaxed italic">
           {hypothesis}
          </div>
@@ -227,7 +227,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
          <div className="text-[15px] font-medium text-cyan-100 flex-1">Program</div>
          <button className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors">Edit</button>
         </div>
-        <div className="p-5 text-sm text-zinc-300 leading-relaxed space-y-4">
+        <div className="p-[20px] text-sm text-zinc-300 leading-relaxed space-y-4">
          <Markdown content={program || program_md} />
         </div>
        </div>
@@ -291,7 +291,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
      <div className="xl:col-span-1 sticky top-0 flex flex-col gap-6">
 
       {/* Metrics card */}
-      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5 space-y-6">
+      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px] space-y-6">
        {target_value && (
         <div>
          <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Target Value</div>
@@ -318,13 +318,13 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
       </div>
 
       {/* Last Run card */}
-      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px]">
        <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Last Run</div>
        <div className="text-sm text-zinc-200">{results.length > 0 ? "Just now" : "No runs yet"}</div>
       </div>
 
       {/* Actions card */}
-      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-4 flex flex-col gap-2">
+      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-[20px] flex flex-col gap-2">
        <button className="w-full py-2 px-3 rounded-md border border-cyan-500/30 bg-cyan-500/10 text-sm text-cyan-400 hover:bg-cyan-500/20 transition-colors">
         Re-run Experiment
        </button>

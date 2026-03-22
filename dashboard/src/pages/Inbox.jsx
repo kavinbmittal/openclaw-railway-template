@@ -146,13 +146,13 @@ export default function Inbox({ navigate }) {
 
   if (loading && !data) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-[1400px] mx-auto space-y-6">
         <div className="flex justify-between items-center mb-1">
           <h1 className="text-[16px] font-semibold uppercase tracking-[0.2em] text-foreground">Inbox</h1>
         </div>
         <div className="space-y-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-card border border-border rounded-[2px] shadow-sm p-5">
+            <div key={i} className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
               <Skeleton className="h-4 w-64 mb-2" />
               <Skeleton className="h-3 w-40" />
             </div>
@@ -163,7 +163,7 @@ export default function Inbox({ navigate }) {
   }
 
   return (
-    <div>
+    <div className="max-w-[1400px] mx-auto">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-1">
         <h1 className="text-[16px] font-semibold uppercase tracking-[0.2em] text-foreground">Inbox</h1>

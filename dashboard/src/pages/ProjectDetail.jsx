@@ -183,14 +183,14 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
     <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6 pb-12">
      {/* Left Column Skeleton */}
      <div className="xl:col-span-2 space-y-6">
-      <div className="h-32 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col justify-between">
+      <div className="h-32 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-[20px] flex flex-col justify-between">
        <div className="h-4 w-20 bg-zinc-800/60 rounded-[4px]"></div>
        <div className="space-y-2.5">
         <div className="h-3 w-full bg-zinc-800/40 rounded-[4px]"></div>
         <div className="h-3 w-3/4 bg-zinc-800/40 rounded-[4px]"></div>
        </div>
       </div>
-      <div className="h-32 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col justify-between">
+      <div className="h-32 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-[20px] flex flex-col justify-between">
        <div className="h-4 w-40 bg-zinc-800/60 rounded-[4px]"></div>
        <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-full bg-zinc-800/50"></div>
@@ -204,14 +204,14 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
      </div>
      {/* Right Column Skeleton */}
      <div className="space-y-6">
-      <div className="h-48 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col gap-4">
+      <div className="h-48 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-[20px] flex flex-col gap-4">
        <div className="h-4 w-20 bg-zinc-800/60 rounded-[4px] mb-2"></div>
        <div className="flex justify-between"><div className="h-3 w-16 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-24 bg-zinc-800/60 rounded-[4px]"></div></div>
        <div className="flex justify-between"><div className="h-3 w-12 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-20 bg-zinc-800/60 rounded-[4px]"></div></div>
        <div className="flex justify-between"><div className="h-3 w-14 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-16 bg-zinc-800/60 rounded-[4px]"></div></div>
        <div className="flex justify-between"><div className="h-3 w-20 bg-zinc-800/40 rounded-[4px]"></div><div className="h-3 w-24 bg-zinc-800/60 rounded-[4px]"></div></div>
       </div>
-      <div className="h-64 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-5 flex flex-col gap-3">
+      <div className="h-64 bg-[#121214] border border-zinc-800/60 rounded-[2px] p-[20px] flex flex-col gap-3">
        <div className="h-4 w-24 bg-zinc-800/60 rounded-[4px] mb-2"></div>
        <div className="h-10 bg-zinc-800/40 rounded-[4px]"></div>
        <div className="h-10 bg-zinc-800/40 rounded-[4px]"></div>
@@ -309,7 +309,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
            </div>
            <div className="text-[15px] font-medium text-indigo-100">Mission</div>
           </div>
-          <div className="p-5 text-sm text-zinc-300 space-y-4">
+          <div className="p-[20px] text-sm text-zinc-300 space-y-4">
            <p>{project.mission || "No mission defined."}</p>
           </div>
          </div>
@@ -322,7 +322,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
            </div>
            <div className="text-[15px] font-medium text-indigo-100">North Star Metric (NSM)</div>
           </div>
-          <div className="p-5 flex items-center gap-4">
+          <div className="p-[20px] flex items-center gap-4">
            <div className="w-12 h-12 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
             <Target size={24} />
            </div>
@@ -379,7 +379,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
           <div className="px-5 py-4 border-b border-zinc-800">
            <h2 className="text-sm font-medium text-zinc-100">Details</h2>
           </div>
-          <div className="p-5 flex flex-col gap-4">
+          <div className="p-[20px] flex flex-col gap-4">
            <div className="flex justify-between items-center">
             <span className="text-xs font-mono uppercase tracking-widest text-zinc-500">Status</span>
             <span className="text-sm text-zinc-200 capitalize">{project.status || "Unknown"}</span>
@@ -413,7 +413,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
             </div>
             <div className="text-[15px] font-medium text-cyan-100">Sub-agents</div>
            </div>
-           <div className="p-5">
+           <div className="p-[20px]">
             <Markdown content={project.subagents} />
            </div>
           </div>
@@ -428,7 +428,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
             </div>
             <div className="text-[15px] font-medium text-amber-100">Approval Gates</div>
            </div>
-           <div className="p-5 text-sm text-zinc-400 space-y-3">
+           <div className="p-[20px] text-sm text-zinc-400 space-y-3">
             {project.gates
              .split("\n")
              .filter(Boolean)
@@ -486,7 +486,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
             </div>
             <div className="text-[15px] font-medium text-emerald-100">{displayDate}</div>
            </div>
-           <div className="p-5">
+           <div className="p-[20px]">
             <Markdown content={s.content} />
            </div>
           </div>
@@ -596,7 +596,7 @@ function ProjectCostsTab({ costs, costSummary, budgetPolicy, totalCost, projectI
 
    {/* Budget utilization bar — Aura card */}
    {budget > 0 && (
-    <div className="bg-card border border-border rounded-[2px] p-5 shadow-sm">
+    <div className="bg-card border border-border rounded-[2px] p-[20px] shadow-sm">
      <div className="flex justify-between items-end mb-3">
       <div>
        <h3 className="text-[14px] font-medium text-foreground mb-1">Budget Utilization</h3>
@@ -683,7 +683,7 @@ function ProjectCostsTab({ costs, costSummary, budgetPolicy, totalCost, projectI
       </div>
       <div className="text-[15px] font-medium text-amber-100">Cost Timeline</div>
      </div>
-     <div className="p-5">
+     <div className="p-[20px]">
       <CostTimeline entries={entries.slice(0, 50)} />
      </div>
     </div>
@@ -806,7 +806,7 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate, theme
     return (
      <div
       key={approval.id || approval._file}
-      className={`bg-[#121214] border border-zinc-800 rounded-[2px] p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm ${isRejected ? "opacity-60" : ""}`}
+      className={`bg-[#121214] border border-zinc-800 rounded-[2px] p-[20px] flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm ${isRejected ? "opacity-60" : ""}`}
       onClick={() => navigate && navigate("approval-detail", approval.id)}
      >
       <div className="space-y-2.5 cursor-pointer">
@@ -920,7 +920,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
      <button
       onClick={() => setShowCreate(true)}
-      className="border border-dashed border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
+      className="border border-dashed border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-[20px] flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
      >
       <Plus size={24} className="mb-2" />
       <span className="text-sm font-medium">Propose New Experiment</span>
@@ -944,7 +944,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
        const pmIdx = proxyMetric && expTheme?.proxy_metrics ? expTheme.proxy_metrics.sort((a, b) => (a.order ?? 999) - (b.order ?? 999)).indexOf(proxyMetric) : -1;
 
        return (
-       <div key={exp.dir} onClick={() => navigate("experiment-detail", { slug: projectSlug, dir: exp.dir })} className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm p-5 flex flex-col h-full gap-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
+       <div key={exp.dir} onClick={() => navigate("experiment-detail", { slug: projectSlug, dir: exp.dir })} className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm p-[20px] flex flex-col h-full gap-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
         <div className="space-y-2.5">
          {exp.status && exp.status !== "unknown" && (
           <div>
@@ -1002,7 +1002,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
       {/* Propose New Experiment card */}
       <button
        onClick={() => setShowCreate(true)}
-       className="border border-dashed border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-5 flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
+       className="border border-dashed border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/20 transition-colors rounded-[2px] p-[20px] flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-400 min-h-[160px] h-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:col-span-2"
       >
        <Plus size={24} className="mb-2" />
        <span className="text-sm font-medium">Propose New Experiment</span>
