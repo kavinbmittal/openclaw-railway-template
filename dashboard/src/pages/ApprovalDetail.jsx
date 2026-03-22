@@ -324,17 +324,26 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        </section>
       )}
 
-      {/* Experiment Plan */}
-      {isExperiment && approval.programMd && (
-       <section className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm flex flex-col">
-        <header className="p-[20px] border-b border-zinc-800">
-         <h2 className="text-[14px] font-semibold text-zinc-100">Experiment Plan</h2>
-        </header>
-        <div className="p-[20px] mc-prose">
-         <Markdown content={approval.programMd} />
-        </div>
-       </section>
-      )}
+      {/* Experiment Plan — strip sections shown in their own cards */}
+      {isExperiment && approval.programMd && (() => {
+       const stripped = approval.programMd
+        .replace(/^#[^\n]*\n/m, "") // Remove title line
+        .replace(/## Theme\s*\n[\s\S]*?(?=\n##|$)/, "")
+        .replace(/## Proxy Metrics\s*\n[\s\S]*?(?=\n##|$)/, "")
+        .replace(/## Hypothesis\s*\n[\s\S]*?(?=\n##|$)/, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+       return stripped ? (
+        <section className="bg-[#121214] border border-zinc-800 rounded-[2px] shadow-sm flex flex-col">
+         <header className="p-[20px] border-b border-zinc-800">
+          <h2 className="text-[14px] font-semibold text-zinc-100">Experiment Plan</h2>
+         </header>
+         <div className="p-[20px] mc-prose">
+          <Markdown content={stripped} />
+         </div>
+        </section>
+       ) : null;
+      })()}
 
       {/* Theme tag on non-theme items */}
       {!isTheme && approval.theme_title && (

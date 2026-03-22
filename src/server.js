@@ -1523,6 +1523,30 @@ app.delete("/mc/api/files", requireSetupAuth, (req, res) => {
   return res.json({ ok: true, deleted: normalized });
 });
 
+// Helper: parse theme and proxy metrics from program.md content
+// Used when the approval gate JSON is thin (just title + pointer)
+function parseExperimentMeta(programMd) {
+  const meta = {};
+  // Extract theme ID from "## Theme\ntheme-xxx" or "## Theme\ntheme-xxx (Title)"
+  const themeMatch = programMd.match(/## Theme\s*\n\s*(theme-[\w-]+)/);
+  if (themeMatch) meta.theme = themeMatch[1];
+  // Extract hypothesis
+  const hypoMatch = programMd.match(/## Hypothesis\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (hypoMatch) meta.hypothesis = hypoMatch[1].trim();
+  // Extract proxy metrics: "- pm-xxx — target: value"
+  const pmSection = programMd.match(/## Proxy Metrics\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (pmSection) {
+    const lines = pmSection[1].trim().split("\n").filter((l) => l.startsWith("- "));
+    meta.proxy_metrics = lines.map((line) => {
+      const match = line.match(/^- (pm-[\w-]+)\s*[—–-]\s*target:\s*(.+)/i);
+      if (match) return { id: match[1], target: match[2].trim() };
+      const idOnly = line.match(/^- (pm-[\w-]+)/);
+      return idOnly ? { id: idOnly[1], target: null } : null;
+    }).filter(Boolean);
+  }
+  return meta;
+}
+
 // Helper: find program.md for an experiment-start approval
 function findExperimentProgram(projectsDir, projectName, approvalData) {
   const expDir = path.join(projectsDir, projectName, "experiments");
@@ -1579,8 +1603,17 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
           // If experiment gate, attach program.md content and resolve theme/metric names
           if (data.gate === "experiment-start" || data.gate === "autoresearch-start") {
             const programMd = findExperimentProgram(projectsDir, proj.name, data);
-            if (programMd) enriched.programMd = programMd;
-            // Resolve theme title and proxy metric names for new-format experiments
+            if (programMd) {
+              enriched.programMd = programMd;
+              // Parse theme/hypothesis/proxy_metrics from program.md when gate is thin
+              if (!data.hypothesis || !data.theme) {
+                const meta = parseExperimentMeta(programMd);
+                if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
+                if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
+                if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
+              }
+            }
+            // Resolve theme title and proxy metric names
             if (data.theme) {
               const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
               if (fs.existsSync(themePath)) {
@@ -1614,7 +1647,15 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
           const enriched = { ...data, _project: proj.name };
           if (data.gate === "experiment-start" || data.gate === "autoresearch-start") {
             const programMd = findExperimentProgram(projectsDir, proj.name, data);
-            if (programMd) enriched.programMd = programMd;
+            if (programMd) {
+              enriched.programMd = programMd;
+              if (!data.hypothesis || !data.theme) {
+                const meta = parseExperimentMeta(programMd);
+                if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
+                if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
+                if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
+              }
+            }
             if (data.theme) {
               const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
               if (fs.existsSync(themePath)) {
@@ -2781,10 +2822,33 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       } catch { /* skip */ }
     }
 
-    let hypothesis = null;
+    let hypothesis = null, theme = null, proxyMetric = null, targetValue = null;
     if (programMd) {
       const hypoMatch = programMd.match(/## Hypothesis\s*\n([\s\S]*?)(?=\n##|$)/);
       if (hypoMatch) hypothesis = hypoMatch[1].trim();
+      const themeMatch = programMd.match(/## Theme\s*\n\s*(.+)/);
+      if (themeMatch) theme = themeMatch[1].trim();
+      const pmSection = programMd.match(/## Proxy Metrics\s*\n([\s\S]*?)(?=\n##|$)/);
+      if (pmSection) {
+        const pmLines = pmSection[1].trim().split("\n").filter((l) => l.startsWith("- "));
+        const m = pmLines[0] && pmLines[0].match(/^- (pm-[\w-]+)\s*[—–-]\s*target:\s*(.+)/i);
+        if (m) { proxyMetric = m[1]; targetValue = m[2].trim(); }
+      }
+    }
+    // Resolve theme title and proxy metric name
+    let themeTitle = theme;
+    if (theme) {
+      const themePath = path.join(projectsDir, slug, "themes", `${theme}.json`);
+      if (fs.existsSync(themePath)) {
+        try {
+          const td = JSON.parse(fs.readFileSync(themePath, "utf8"));
+          themeTitle = td.title || theme;
+          if (proxyMetric && Array.isArray(td.proxy_metrics)) {
+            const found = td.proxy_metrics.find((t) => t.id === proxyMetric);
+            if (found) proxyMetric = found.name;
+          }
+        } catch { /* skip */ }
+      }
     }
 
     experiments.push({
@@ -2792,6 +2856,9 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       dir: entry.name,
       program_md: programMd,
       hypothesis,
+      theme: themeTitle,
+      proxy_metric: proxyMetric,
+      target_value: targetValue,
       results,
       result_count: results.length,
       best_metric: bestMetric,
@@ -2836,7 +2903,39 @@ app.get("/mc/api/experiments/:dir", requireSetupAuth, (req, res) => {
       }
       const themeMatch = programMd.match(/## Theme\s*\n\s*(.+)/);
       if (themeMatch) theme = themeMatch[1].trim();
+      // Parse proxy metrics list: "- pm-xxx — target: value"
+      const pmSection = programMd.match(/## Proxy Metrics\s*\n([\s\S]*?)(?=\n##|$)/);
+      if (pmSection) {
+        const pmLines = pmSection[1].trim().split("\n").filter((l) => l.startsWith("- "));
+        const parsedPMs = pmLines.map((line) => {
+          const m = line.match(/^- (pm-[\w-]+)\s*[—–-]\s*target:\s*(.+)/i);
+          if (m) return { id: m[1], target: m[2].trim() };
+          const idOnly = line.match(/^- (pm-[\w-]+)/);
+          return idOnly ? { id: idOnly[1], target: null } : null;
+        }).filter(Boolean);
+        if (parsedPMs.length > 0) {
+          // Use first metric for backward-compat single fields
+          proxyMetric = parsedPMs[0].id;
+          targetValue = parsedPMs[0].target;
+        }
+      }
     } catch {}
+  }
+
+  // Resolve theme ID to title and proxy metric names
+  let themeTitle = theme;
+  if (theme && slug) {
+    const themePath = path.join(STATE_DIR, "shared", "projects", slug, "themes", `${theme}.json`);
+    if (fs.existsSync(themePath)) {
+      try {
+        const themeData = JSON.parse(fs.readFileSync(themePath, "utf8"));
+        themeTitle = themeData.title || theme;
+        if (proxyMetric && Array.isArray(themeData.proxy_metrics)) {
+          const found = themeData.proxy_metrics.find((t) => t.id === proxyMetric);
+          if (found) proxyMetric = found.name;
+        }
+      } catch { /* skip */ }
+    }
   }
 
   let results = [], bestMetric = null;
@@ -2861,7 +2960,7 @@ app.get("/mc/api/experiments/:dir", requireSetupAuth, (req, res) => {
     } catch {}
   }
 
-  res.json({ name, dir, status, hypothesis, proxy_metric: proxyMetric, target_value: targetValue, theme, program_md: programMd, results, result_count: results.length, best_metric: bestMetric });
+  res.json({ name, dir, status, hypothesis, proxy_metric: proxyMetric, target_value: targetValue, theme: themeTitle, program_md: programMd, results, result_count: results.length, best_metric: bestMetric });
 });
 
 // Create experiment
