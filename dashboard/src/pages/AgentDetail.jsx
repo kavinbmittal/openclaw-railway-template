@@ -1,5 +1,5 @@
 import { useState, useEffect } from"react";
-import { getAgent, getAgentActivity, getAgentRuns } from"../api.js";
+import { getAgent, getAgentActivity, getAgentRuns, getModelRouting } from"../api.js";
 import { AgentHeader } from"../components/AgentHeader.jsx";
 import { TaskList } from"../components/TaskList.jsx";
 import { RunHistory } from"../components/RunHistory.jsx";
@@ -31,12 +31,26 @@ export default function AgentDetail({ agentId, navigate }) {
  const [runs, setRuns] = useState(null);
  const [loading, setLoading] = useState(true);
  const [tab, setTab] = useState("overview");
+ const [tierInfo, setTierInfo] = useState(null);
 
  useEffect(() => {
   setLoading(true);
-  getAgent(agentId)
-   .then((data) => {
+  Promise.all([
+   getAgent(agentId),
+   getModelRouting().catch(() => ({ exists: false, config: null })),
+  ])
+   .then(([data, routingData]) => {
     setAgent(data);
+    if (routingData.exists && routingData.config) {
+     const cfg = routingData.config;
+     const tierName = cfg.agents[agentId];
+     if (tierName && cfg.tiers[tierName]) {
+      const tier = cfg.tiers[tierName];
+      const modelShort = tier.model?.split("/")[1]?.replace("claude-", "") || tier.model;
+      const thinkingLabel = tier.thinking && tier.thinking !== "off" ? ` (${tier.thinking})` : "";
+      setTierInfo({ name: tierName, display: `${modelShort}${thinkingLabel}` });
+     }
+    }
     setLoading(false);
    })
    .catch(() => setLoading(false));
@@ -96,6 +110,11 @@ export default function AgentDetail({ agentId, navigate }) {
       {agent.emoji || agent.name?.charAt(0)?.toUpperCase()}
      </div>
      <h1 className="text-[30px] font-semibold text-zinc-100 leading-none tracking-tight">{agent.name}</h1>
+     {tierInfo && (
+      <span className="px-2.5 py-1 rounded-full text-[11px] font-mono uppercase tracking-wider border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 shrink-0">
+       {tierInfo.name} · {tierInfo.display}
+      </span>
+     )}
      <span className="relative flex h-2.5 w-2.5 shrink-0">
       {agent.status === "active" ? (
        <>

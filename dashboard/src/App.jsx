@@ -15,6 +15,7 @@ import OrgChart from"./pages/OrgChart.jsx";
 import Workspaces from"./pages/Workspaces.jsx";
 import ExperimentDetail from"./pages/ExperimentDetail.jsx";
 import EditIssue from"./pages/EditIssue.jsx";
+import ModelRouting from"./pages/ModelRouting.jsx";
 
 /* ── Hash → state parser ──────────────────────────────────────────── */
 function parseHash(hash) {
@@ -41,6 +42,8 @@ function parseHash(hash) {
    return { page:"org-chart" };
   case"workspaces":
    return { page:"workspaces" };
+  case"model-routing":
+   return { page:"model-routing" };
   case"create-project":
    return { page:"create-project" };
   case"approvals":
@@ -119,6 +122,8 @@ function buildHash(target, data) {
    return"#/org-chart";
   case"workspaces":
    return"#/workspaces";
+  case"model-routing":
+   return"#/model-routing";
   case"create-project":
    return"#/create-project";
   case"approvals":
@@ -223,6 +228,7 @@ export default function App() {
        {page ==="costs" && <Costs navigate={navigate} />}
        {page ==="org-chart" && <OrgChart navigate={navigate} />}
        {page ==="workspaces" && <Workspaces navigate={navigate} />}
+       {page ==="model-routing" && <ModelRouting navigate={navigate} />}
       </main>
      )}
     </div>

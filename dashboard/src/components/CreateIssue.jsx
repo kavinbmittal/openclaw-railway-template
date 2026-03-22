@@ -24,6 +24,9 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
  const [labelInput, setLabelInput] = useState("");
  const [selectedTheme, setSelectedTheme] = useState("");
  const [selectedProxyMetrics, setSelectedProxyMetrics] = useState([]);
+ const [complexity, setComplexity] = useState("complex");
+ const [modelOverride, setModelOverride] = useState("");
+ const [thinkingOverride, setThinkingOverride] = useState("");
  const [submitting, setSubmitting] = useState(false);
  const [error, setError] = useState(null);
 
@@ -45,6 +48,9 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
     labels,
     theme: selectedTheme || null,
     proxy_metrics: selectedProxyMetrics.length > 0 ? selectedProxyMetrics : null,
+    complexity,
+    model_override: modelOverride || null,
+    thinking_override: thinkingOverride || null,
    });
    onCreated?.(issue);
   } catch (err) {
@@ -202,6 +208,83 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
        className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
       />
       <p className="text-[12px] text-muted-foreground mt-1.5">Optional tags for categorization</p>
+     </div>
+
+     {/* Model Routing */}
+     <div>
+      <label className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-2 block">Model Routing</label>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+       {/* Complexity */}
+       <div>
+        <label className="text-[11px] text-zinc-500 mb-1.5 block">Complexity</label>
+        <div className="relative group">
+         <select
+          value={complexity}
+          onChange={(e) => setComplexity(e.target.value)}
+          className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
+         >
+          <option value="simple">Simple</option>
+          <option value="complex">Complex</option>
+          <option value="strategic">Strategic</option>
+         </select>
+         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+         </div>
+        </div>
+       </div>
+
+       {/* Model Override */}
+       <div>
+        <label className="text-[11px] text-zinc-500 mb-1.5 block">Model Override</label>
+        <div className="relative group">
+         <select
+          value={modelOverride}
+          onChange={(e) => { setModelOverride(e.target.value); if (!e.target.value) setThinkingOverride(""); }}
+          className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
+         >
+          <option value="">Auto</option>
+          <option value="anthropic/claude-opus-4-6">Opus 4.6</option>
+          <option value="anthropic/claude-sonnet-4-6">Sonnet 4.6</option>
+          <option value="anthropic/claude-haiku-4-5">Haiku 4.5</option>
+         </select>
+         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+         </div>
+        </div>
+       </div>
+
+       {/* Thinking Override — only when model override is set */}
+       {modelOverride && (
+        <div>
+         <label className="text-[11px] text-zinc-500 mb-1.5 block">Thinking</label>
+         <div className="relative group">
+          <select
+           value={thinkingOverride}
+           onChange={(e) => setThinkingOverride(e.target.value)}
+           className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
+          >
+           <option value="">Auto</option>
+           <option value="off">Off</option>
+           <option value="minimal">Minimal</option>
+           <option value="low">Low</option>
+           <option value="medium">Medium</option>
+           <option value="high">High</option>
+           <option value="xhigh">Extra High</option>
+           <option value="adaptive">Adaptive</option>
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
+           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+         </div>
+        </div>
+       )}
+      </div>
+      {modelOverride && (
+       <p className="text-[12px] text-amber-400/80 mt-2">This issue will run on {modelOverride.split("/")[1]?.replace(/-/g, " ") || modelOverride} regardless of routing defaults.</p>
+      )}
+      {!modelOverride && (
+       <p className="text-[12px] text-muted-foreground mt-1.5">Complexity drives the default model tier. Override to force a specific model.</p>
+      )}
      </div>
     </div>
 

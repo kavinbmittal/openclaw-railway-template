@@ -43,6 +43,10 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
   const [selectedMetrics, setSelectedMetrics] = useState(new Set());
   const [labels, setLabels] = useState("");
   const [status, setStatus] = useState("");
+  const [complexity, setComplexity] = useState("complex");
+  const [modelOverride, setModelOverride] = useState("");
+  const [thinkingOverride, setThinkingOverride] = useState("");
+  const [escalationCount, setEscalationCount] = useState(0);
 
   // Data state
   const [themes, setThemes] = useState([]);
@@ -68,6 +72,10 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
         setTheme(issue.theme || "");
         setStatus(issue.status || "");
         setLabels((issue.labels || []).join(", "));
+        setComplexity(issue.complexity || "complex");
+        setModelOverride(issue.model_override || "");
+        setThinkingOverride(issue.thinking_override || "");
+        setEscalationCount(issue.escalation_count || 0);
         const metricIds = (issue.proxy_metrics || []).map((pm) =>
           typeof pm === "string" ? pm : pm.id
         );
@@ -81,6 +89,9 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           assignee: issue.assignee || "",
           theme: issue.theme || "",
           labels: (issue.labels || []).join(", "),
+          complexity: issue.complexity || "complex",
+          modelOverride: issue.model_override || "",
+          thinkingOverride: issue.thinking_override || "",
           metrics: new Set(metricIds),
           updated: issue.updated,
         };
@@ -103,9 +114,12 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
       assignee !== o.assignee ||
       theme !== o.theme ||
       labels !== o.labels ||
+      complexity !== o.complexity ||
+      modelOverride !== o.modelOverride ||
+      thinkingOverride !== o.thinkingOverride ||
       metricsChanged;
     setHasChanges(changed);
-  }, [title, description, priority, assignee, theme, selectedMetrics, labels]);
+  }, [title, description, priority, assignee, theme, selectedMetrics, labels, complexity, modelOverride, thinkingOverride]);
 
   // Get proxy metrics for the currently selected theme
   const currentTheme = themes.find((t) => t.id === theme || t.title === theme);
@@ -145,6 +159,9 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean),
+        complexity,
+        model_override: modelOverride || null,
+        thinking_override: thinkingOverride || null,
       });
       navigate("issue-detail", { projectSlug, issueId });
     } catch (err) {
@@ -429,6 +446,89 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 placeholder="e.g. infra, database, scaling"
               />
               <p className="text-[12px] text-zinc-500 mt-2">Optional tags for categorization</p>
+            </div>
+
+            {/* Model Routing */}
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-3">Model Routing</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Complexity */}
+                <div>
+                  <label className="text-[11px] text-zinc-500 mb-1.5 block">Complexity</label>
+                  <div className="relative">
+                    <select
+                      value={complexity}
+                      onChange={(e) => setComplexity(e.target.value)}
+                      className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                    >
+                      <option value="simple">Simple</option>
+                      <option value="complex">Complex</option>
+                      <option value="strategic">Strategic</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                      <ChevronDown size={16} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Model Override */}
+                <div>
+                  <label className="text-[11px] text-zinc-500 mb-1.5 block">Model Override</label>
+                  <div className="relative">
+                    <select
+                      value={modelOverride}
+                      onChange={(e) => { setModelOverride(e.target.value); if (!e.target.value) setThinkingOverride(""); }}
+                      className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                    >
+                      <option value="">Auto</option>
+                      <option value="anthropic/claude-opus-4-6">Opus 4.6</option>
+                      <option value="anthropic/claude-sonnet-4-6">Sonnet 4.6</option>
+                      <option value="anthropic/claude-haiku-4-5">Haiku 4.5</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                      <ChevronDown size={16} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Thinking Override — only when model override is set */}
+                {modelOverride && (
+                  <div>
+                    <label className="text-[11px] text-zinc-500 mb-1.5 block">Thinking</label>
+                    <div className="relative">
+                      <select
+                        value={thinkingOverride}
+                        onChange={(e) => setThinkingOverride(e.target.value)}
+                        className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                      >
+                        <option value="">Auto</option>
+                        <option value="off">Off</option>
+                        <option value="minimal">Minimal</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="xhigh">Extra High</option>
+                        <option value="adaptive">Adaptive</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
+                        <ChevronDown size={16} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {modelOverride && (
+                <p className="text-xs text-amber-400/80 mt-2">This issue will run on {modelOverride.split("/")[1]?.replace(/-/g, " ") || modelOverride} regardless of routing defaults.</p>
+              )}
+              {!modelOverride && (
+                <p className="text-xs text-zinc-500 mt-2">Complexity drives the default model tier. Override to force a specific model.</p>
+              )}
+              {escalationCount > 0 && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-[11px] uppercase font-mono tracking-[0.15em] text-zinc-500">Escalation Count</span>
+                  <span className="text-sm font-mono text-amber-400">{escalationCount}</span>
+                </div>
+              )}
             </div>
 
             {/* Danger Zone */}

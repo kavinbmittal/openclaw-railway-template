@@ -1,6 +1,7 @@
 # SHIPPED.md
 
 ## 2026-03-23
+- **feat:** Agent model routing — Routing Config page to manage model tiers, agent assignments, and research phase mapping; model/thinking/complexity override on issues; tier badge on agent detail
 - **style:** Rewrite Inbox page to Aura grouped cards layout — items grouped by category (Pending Approvals, Budget Alerts, Stale Tasks, Standups) with section cards, compact rows, short timestamps, empty states; removed tabs and inline approve/reject buttons
 
 ## 2026-03-22

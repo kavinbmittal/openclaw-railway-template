@@ -2675,9 +2675,21 @@ app.get("/mc/api/issues/:id", requireSetupAuth, (req, res) => {
 
 // Create issue
 app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
-  const { project, title, description, priority, assignee, labels, theme, proxy_metrics } = req.body;
+  const { project, title, description, priority, assignee, labels, theme, proxy_metrics, model_override, thinking_override, complexity } = req.body;
   if (!project || !title) {
     return res.status(400).json({ error: "Missing project or title" });
+  }
+
+  // Validate model routing fields
+  const validComplexity = ["simple", "complex", "strategic"];
+  if (complexity && !validComplexity.includes(complexity)) {
+    return res.status(400).json({ error: `Invalid complexity "${complexity}" — must be one of: ${validComplexity.join(", ")}` });
+  }
+  if (model_override && (typeof model_override !== "string" || !model_override.includes("/"))) {
+    return res.status(400).json({ error: "model_override must be in provider/model format (e.g. anthropic/claude-opus-4-6)" });
+  }
+  if (thinking_override && !VALID_THINKING_LEVELS.includes(thinking_override)) {
+    return res.status(400).json({ error: `Invalid thinking_override "${thinking_override}" — must be one of: ${VALID_THINKING_LEVELS.join(", ")}` });
   }
 
   // Validate theme tagging — required when project has approved themes
@@ -2728,6 +2740,10 @@ app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
     labels: labels || [],
     theme: theme || null,
     proxy_metrics: proxy_metrics || [],
+    model_override: model_override || null,
+    thinking_override: thinking_override || null,
+    complexity: complexity || "complex",
+    escalation_count: 0,
     created: now,
     updated: now,
     created_by: "kavin",
@@ -3311,6 +3327,73 @@ app.put("/mc/api/budget-policy", requireSetupAuth, (req, res) => {
   try { fs.unlinkSync(budgetExceededFlag); } catch { /* ignore if not present */ }
 
   return res.json({ ok: true, policy });
+});
+
+// --- Model Routing API ---
+
+const VALID_THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh", "adaptive"];
+const MODEL_ROUTING_PATH = path.join(STATE_DIR, "shared", "model-routing.json");
+
+// GET /mc/api/model-routing — read routing config
+app.get("/mc/api/model-routing", requireSetupAuth, (_req, res) => {
+  if (!fs.existsSync(MODEL_ROUTING_PATH)) {
+    return res.status(404).json({ exists: false, config: null });
+  }
+  try {
+    const config = JSON.parse(fs.readFileSync(MODEL_ROUTING_PATH, "utf8"));
+    return res.json({ exists: true, config });
+  } catch {
+    return res.status(500).json({ error: "Failed to read model-routing.json" });
+  }
+});
+
+// PUT /mc/api/model-routing — write routing config (full replace)
+app.put("/mc/api/model-routing", requireSetupAuth, (req, res) => {
+  const { tiers, agents, research_phases } = req.body;
+
+  // Validate required top-level keys
+  if (!tiers || typeof tiers !== "object") {
+    return res.status(400).json({ error: "Missing or invalid 'tiers'" });
+  }
+  if (!agents || typeof agents !== "object") {
+    return res.status(400).json({ error: "Missing or invalid 'agents'" });
+  }
+  if (!research_phases || typeof research_phases !== "object") {
+    return res.status(400).json({ error: "Missing or invalid 'research_phases'" });
+  }
+
+  // Validate tier definitions
+  for (const [tierName, tierDef] of Object.entries(tiers)) {
+    if (!tierDef.model || typeof tierDef.model !== "string" || !tierDef.model.includes("/")) {
+      return res.status(400).json({ error: `Tier "${tierName}": model must be in provider/model format` });
+    }
+    if (tierDef.thinking && !VALID_THINKING_LEVELS.includes(tierDef.thinking)) {
+      return res.status(400).json({ error: `Tier "${tierName}": invalid thinking level "${tierDef.thinking}"` });
+    }
+  }
+
+  // Validate agent assignments reference existing tiers
+  for (const [agentId, tierName] of Object.entries(agents)) {
+    if (!tiers[tierName]) {
+      return res.status(400).json({ error: `Agent "${agentId}" references non-existent tier "${tierName}"` });
+    }
+  }
+
+  // Validate research phase assignments reference existing tiers
+  for (const [phase, tierName] of Object.entries(research_phases)) {
+    if (!tiers[tierName]) {
+      return res.status(400).json({ error: `Research phase "${phase}" references non-existent tier "${tierName}"` });
+    }
+  }
+
+  const config = { tiers, agents, research_phases };
+
+  // Ensure shared/ directory exists
+  const sharedDir = path.join(STATE_DIR, "shared");
+  fs.mkdirSync(sharedDir, { recursive: true });
+
+  fs.writeFileSync(MODEL_ROUTING_PATH, JSON.stringify(config, null, 2), "utf8");
+  return res.json({ ok: true, config });
 });
 
 // --- Projects Summary API ---

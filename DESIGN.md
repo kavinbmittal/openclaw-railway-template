@@ -171,13 +171,41 @@ Every card section header uses a colored tinted pattern — icon in a circle bad
 - Text: `text-[14px] text-muted-foreground`
 - Sub-text: `text-[12px] text-muted-foreground/60`
 
-### Approval Rows (Aura pattern)
-- Container: `flex flex-col gap-3 px-[20px] py-4 border-b border-border/50 hover:bg-accent/40`
-- Type badge: `rounded-full px-2.5 py-0.5 text-[11px] font-normal border` with semantic colors
-- Description: `text-[14px] text-foreground flex-1 truncate`
-- Timestamp: `text-[12px] font-mono text-muted-foreground`
-- Approve button: `rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-[15px] text-emerald-400`
-- Reject button: `rounded-[6px] border border-red-500/30 bg-red-500/10 text-[15px] text-red-400`
+### Approval Cards
+- **Project group card:** `bg-card border border-border rounded-[2px] shadow-[0_2px_8px_rgba(0,0,0,0.3)]` — wraps all approvals for one project
+- **Group header:** `flex items-center gap-3 px-5 py-3 border-b border-border` — ShieldCheck icon in amber circle badge, project name as link, item count
+- **Card container:** `p-4 space-y-3` inside the group card
+- **Individual approval card:** `bg-zinc-900/50 border border-zinc-800/60 rounded-[2px] p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4` — subtly lighter than parent
+- Type badge: `rounded-full px-2.5 py-0.5 text-xs font-medium border` with semantic colors
+- Title: `text-sm font-medium text-zinc-100`
+- Approve button: `rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-sm font-medium text-emerald-400 focus:ring-[3px] focus:ring-emerald-500/30`
+- Reject button: `rounded-[6px] border border-red-500/30 bg-red-500/10 text-sm font-medium text-red-400 focus:ring-[3px] focus:ring-red-500/30`
+
+### Theme & Proxy Metric Pills (Approval Cards)
+Used on both project-level and global approval cards to show which theme and proxy metric an item targets.
+```
+<div class="flex flex-wrap items-center gap-2">
+  <!-- Theme pill -->
+  <div class="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+    <div class="w-3.5 h-3.5 rounded-full bg-{color}-500/10 border border-{color}-500/20 flex items-center justify-center text-[9px] font-mono font-medium text-{color}-400">
+      {order}
+    </div>
+    <span class="text-xs text-zinc-300">{theme title}</span>
+  </div>
+  <!-- Separator -->
+  <span class="text-zinc-600 text-sm">›</span>
+  <!-- Proxy metric pill -->
+  <div class="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+    <div class="w-3.5 h-3.5 rounded bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[9px] font-mono text-zinc-500">
+      {letter}
+    </div>
+    <span class="text-xs text-zinc-400">{metric name}</span>
+  </div>
+</div>
+```
+- Theme color is derived from theme order using the THEME_COLORS array (indigo, emerald, amber, cyan, rose)
+- Letter badge uses `String.fromCharCode(97 + index)` for a, b, c ordering
+- Pills sit between title and metadata ("Requested by") line
 
 ### Detail Page Headers
 - Entity name: `text-[30px] font-semibold text-foreground leading-none tracking-tight`
@@ -225,3 +253,5 @@ Every card section header uses a colored tinted pattern — icon in a circle bad
 | 2026-03-23 | Removed `html { zoom: 1.2 }`, set `body { font-size: 19.2px }` | CSS zoom broke scroll calculations on detail pages, clipping bottom content |
 | 2026-03-23 | Bumped all `text-[13px]` to `text-[15px]` | Sidebar, breadcrumbs, buttons, tabs, metadata, secondary text — all up 2px for readability |
 | 2026-03-23 | Colored tinted card section headers | Every card header gets a semantic color: icon circle + tinted bg + colored title. Inspired by Issues tab theme groups. Adds visual identity without decoration |
+| 2026-03-23 | Approval cards nested inside project group card | Cards sit inside a parent project card with drop shadow. Inner cards use `bg-zinc-900/50` to differentiate from `bg-card` parent. Creates visual hierarchy |
+| 2026-03-23 | Theme/proxy pills use `rounded-[4px]` box style | Colored number badge for theme, letter badge for proxy metric, `›` separator. Consistent across project and global approvals pages |

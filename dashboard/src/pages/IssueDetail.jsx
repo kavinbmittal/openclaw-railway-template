@@ -390,6 +390,39 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
       </div>
      </div>
 
+     {/* Model Routing Card */}
+     {(issue.model_override || issue.complexity || issue.escalation_count > 0) && (
+      <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-5 space-y-3">
+       <h3 className="text-xs uppercase font-mono tracking-widest text-zinc-500">Model Routing</h3>
+       <div className="space-y-2.5">
+        {issue.complexity && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Complexity</span>
+          <span className="text-sm text-zinc-300 capitalize">{issue.complexity}</span>
+         </div>
+        )}
+        {issue.model_override && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Model Override</span>
+          <span className="text-sm text-amber-400 font-mono">{issue.model_override.split("/")[1]?.replace("claude-", "") || issue.model_override}</span>
+         </div>
+        )}
+        {issue.thinking_override && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Thinking</span>
+          <span className="text-sm text-zinc-300 capitalize">{issue.thinking_override}</span>
+         </div>
+        )}
+        {issue.escalation_count > 0 && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Escalations</span>
+          <span className="text-sm text-amber-400 font-mono">{issue.escalation_count}</span>
+         </div>
+        )}
+       </div>
+      </div>
+     )}
+
      {/* Actions Card — Aura: p-4 with edit + delete buttons */}
      <div className="bg-app-card border border-border rounded-[2px] shadow-sm p-[20px] space-y-2">
       <button

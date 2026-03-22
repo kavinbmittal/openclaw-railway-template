@@ -11,6 +11,7 @@ import {
  Network,
  Terminal,
  Plus,
+ Cpu,
 } from"lucide-react";
 import { getApprovals, getProjects, getInbox } from"../api.js";
 
@@ -270,6 +271,12 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
       onClick={() => navigate("workspaces")}
       icon={Terminal}
       label="Workspaces"
+     />
+     <SidebarNavItem
+      active={page ==="model-routing"}
+      onClick={() => navigate("model-routing")}
+      icon={Cpu}
+      label="Model Routing"
      />
     </SidebarSection>
    </nav>

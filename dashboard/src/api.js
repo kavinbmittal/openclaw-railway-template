@@ -127,11 +127,11 @@ export async function getIssue(id, projectSlug) {
   return fetchJSON(`${BASE}/issues/${encodeURIComponent(id)}?project=${encodeURIComponent(projectSlug)}`);
 }
 
-export async function createIssue({ project, title, description, priority, assignee, labels, theme, proxy_metrics }) {
+export async function createIssue({ project, title, description, priority, assignee, labels, theme, proxy_metrics, model_override, thinking_override, complexity }) {
   const res = await fetch(`${BASE}/issues`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project, title, description, priority, assignee, labels, theme, proxy_metrics }),
+    body: JSON.stringify({ project, title, description, priority, assignee, labels, theme, proxy_metrics, model_override, thinking_override, complexity }),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -219,6 +219,25 @@ export async function updateBudgetPolicy({ project, weekly_budget_usd, warn_thre
     body: JSON.stringify({ project, weekly_budget_usd, warn_threshold, stop_threshold, per_agent_limits }),
   });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+// --- Model Routing API ---
+
+export async function getModelRouting() {
+  return fetchJSON(`${BASE}/model-routing`);
+}
+
+export async function updateModelRouting({ tiers, agents, research_phases }) {
+  const res = await fetch(`${BASE}/model-routing`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tiers, agents, research_phases }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `${res.status} ${res.statusText}`);
+  }
   return res.json();
 }
 

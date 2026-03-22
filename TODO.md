@@ -32,9 +32,9 @@
 - [x] Write protocols/projects.md agent instructions
 
 ### Deferred
-- [ ] Proxy metric tracking/visualization (time-series, charts) — effort M
-- [ ] Port lia-ship-ready to themes — effort S
-- [ ] v2: Proxy metric targets on themes — themes define target values for each proxy metric (e.g. "Weekly signups: 200/week"), issues and experiments aim to hit or beat those targets across multiple instances. Aggregated view on Strategy tab shows progress toward theme-level targets. — effort M
+- [ ] Proxy metric visualization — progress bars, summing contributions vs targets on Strategy tab — effort M
+- [x] Port lia-ship-ready to themes — deleted (project completed)
+- [x] Proxy metric targets on themes + contribution values on issues/experiments
 
 ## 2026-03-22-nsm-proxy-upgrade
 
@@ -50,6 +50,36 @@
 - [x] Fallback: old experiments with `why` field still render
 - [x] Server: resolve theme/metric names on experiment gates
 - [x] Build dist
+
+## 2026-03-23-agent-model-routing
+
+### Phase 1: Backend
+- [x] API: GET/PUT `/mc/api/model-routing` — read/write `shared/model-routing.json`
+- [x] API: Issue POST/PATCH accept `model_override`, `thinking_override`, `complexity`, `escalation_count`
+
+### Phase 2: Routing Config page
+- [x] New `ModelRouting.jsx` page — tier definitions, agent assignments, research phase mapping
+- [x] Add route in App.jsx + sidebar nav item
+
+### Phase 3: Issue forms
+- [x] CreateIssue: add complexity, model override, thinking override dropdowns
+- [x] EditIssue: add same fields + read-only escalation count
+- [x] IssueDetail: display model/complexity info
+- [x] API client: add `getModelRouting`, `updateModelRouting` functions
+
+### Phase 4: Agent detail + costs
+- [x] AgentDetail: tier badge next to agent name
+- [~] Costs: model tier breakdown — blocked, depends on agents logging `model` field in cost entries (v2)
+
+### Phase 5: Build + verify
+- [x] Build dist
+
+## v2: Agent Model Routing
+
+- [ ] Escalation logic — agents increment `escalation_count` on issue JSON, retry at next tier up (simple→complex→lead→coordinator). Requires agent protocol update. — effort M
+- [ ] Agent protocol update — teach agents to read `shared/model-routing.json` and issue model/thinking fields at spawn time. Separate OpenClaw workspace deliverable. — effort M
+- [ ] Experiment-level model override — override model for an entire research loop, not just per-issue. — effort S
+- [ ] Escalation pattern insights — surface patterns like "26% of Leslie's research tasks escalate from Haiku". Depends on escalation data existing first. — effort L
 
 ## v2: One-tap model switch from Telegram
 
