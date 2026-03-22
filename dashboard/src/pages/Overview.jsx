@@ -287,7 +287,7 @@ export default function Overview({ navigate }) {
        >
         <PriorityDot priority={issue.priority} />
         <StatusCircle status={issue.status} />
-        <span className="text-[12px] font-mono text-muted-foreground w-16 shrink-0">{issue.id}</span>
+        <span className="text-[12px] font-mono text-muted-foreground shrink-0 whitespace-nowrap">{issue.id}</span>
         <span className="text-[14px] text-foreground flex-1 truncate">{issue.title}</span>
         <StatusBadge status={issue.status} />
         {issue.assignee && (

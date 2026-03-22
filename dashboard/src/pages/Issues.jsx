@@ -176,7 +176,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
        >
         <PriorityDot priority={issue.priority} />
         <StatusCircle status={issue.status} />
-        <span className="text-[12px] font-mono text-muted-foreground w-16 shrink-0">{issue.id}</span>
+        <span className="text-[12px] font-mono text-muted-foreground shrink-0 whitespace-nowrap">{issue.id}</span>
         <span className={`text-[14px] flex-1 truncate ${isDone ?"text-muted-foreground line-through decoration-muted-foreground/40" :"text-foreground"}`}>
          {issue.title}
         </span>
