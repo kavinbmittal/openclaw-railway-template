@@ -33,6 +33,23 @@
 
 ### Deferred
 - [ ] Proxy metric tracking/visualization (time-series, charts) — effort M
+- [ ] Port lia-ship-ready to themes — effort S
+- [ ] v2: Proxy metric targets on themes — themes define target values for each proxy metric (e.g. "Weekly signups: 200/week"), issues and experiments aim to hit or beat those targets across multiple instances. Aggregated view on Strategy tab shows progress toward theme-level targets. — effort M
+
+## 2026-03-22-nsm-proxy-upgrade
+
+### Protocol updates (Railway SSH)
+- [x] Update projects.md — 7 changes (milestones → themes, strategy tree section, experiment format, etc.)
+- [x] Update experiments.md — add theme/proxy_metrics to program.md template
+- [x] Update claude-code.md — milestones → themes reference
+- [x] Update all 10 AGENTS.md files — approval tip line ("what"/"why" → "title")
+- [x] No existing experiment gates to port (clean slate)
+
+### Dashboard
+- [x] ApprovalDetail: render experiment hypothesis, program, theme, proxy metric targets
+- [x] Fallback: old experiments with `why` field still render
+- [x] Server: resolve theme/metric names on experiment gates
+- [x] Build dist
 
 ## v2: One-tap model switch from Telegram
 

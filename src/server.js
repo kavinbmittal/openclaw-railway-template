@@ -1576,10 +1576,31 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
             }
           }
           const enriched = { ...data, _project: proj.name };
-          // If experiment gate, attach program.md content
+          // If experiment gate, attach program.md content and resolve theme/metric names
           if (data.gate === "experiment-start" || data.gate === "autoresearch-start") {
             const programMd = findExperimentProgram(projectsDir, proj.name, data);
             if (programMd) enriched.programMd = programMd;
+            // Resolve theme title and proxy metric names for new-format experiments
+            if (data.theme) {
+              const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
+              if (fs.existsSync(themePath)) {
+                try {
+                  const theme = JSON.parse(fs.readFileSync(themePath, "utf8"));
+                  enriched.theme_title = theme.title || data.theme;
+                  if (Array.isArray(data.proxy_metrics) && Array.isArray(theme.proxy_metrics)) {
+                    enriched.proxy_metrics = data.proxy_metrics.map((pm) => {
+                      const pmId = typeof pm === "string" ? pm : pm.id;
+                      const found = theme.proxy_metrics.find((t) => t.id === pmId);
+                      return {
+                        id: pmId,
+                        name: found ? found.name : pmId,
+                        target: typeof pm === "object" ? pm.target : null,
+                      };
+                    });
+                  }
+                } catch { /* skip theme resolution */ }
+              }
+            }
           }
           return res.json(enriched);
         } catch { /* skip */ }
@@ -1594,6 +1615,26 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
           if (data.gate === "experiment-start" || data.gate === "autoresearch-start") {
             const programMd = findExperimentProgram(projectsDir, proj.name, data);
             if (programMd) enriched.programMd = programMd;
+            if (data.theme) {
+              const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
+              if (fs.existsSync(themePath)) {
+                try {
+                  const theme = JSON.parse(fs.readFileSync(themePath, "utf8"));
+                  enriched.theme_title = theme.title || data.theme;
+                  if (Array.isArray(data.proxy_metrics) && Array.isArray(theme.proxy_metrics)) {
+                    enriched.proxy_metrics = data.proxy_metrics.map((pm) => {
+                      const pmId = typeof pm === "string" ? pm : pm.id;
+                      const found = theme.proxy_metrics.find((t) => t.id === pmId);
+                      return {
+                        id: pmId,
+                        name: found ? found.name : pmId,
+                        target: typeof pm === "object" ? pm.target : null,
+                      };
+                    });
+                  }
+                } catch { /* skip theme resolution */ }
+              }
+            }
           }
           return res.json(enriched);
         } catch { /* skip */ }

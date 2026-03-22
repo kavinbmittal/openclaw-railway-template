@@ -1,6 +1,7 @@
 # SHIPPED.md
 
 ## 2026-03-22
+- **feat:** NSM/proxy upgrade — agent protocols replaced milestones with strategy tree (themes + proxy metrics), structured experiment format (hypothesis/program/targets), dashboard renders new experiment fields
 - **feat:** Create experiments from dashboard — POST endpoint, API client, wired form, auto-generates exp-NNN directories with program.md
 - **fix:** Experiment cards now show hypothesis instead of full program.md, with compact Aura-style layout and run counts
 - **style:** Use exact Aura HTML classes on CreateExperiment, IssueDetail, ApprovalDetail, CreateProject — replaced semantic tokens with literal Tailwind values from reference
