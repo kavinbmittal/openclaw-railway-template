@@ -23,7 +23,7 @@ function SidebarSection({ label, children, collapsible = false, defaultOpen = tr
 
  return (
   <div>
-   <div className="group flex items-center px-3 py-1.5">
+   <div className="group flex items-center mb-2 px-2">
     {collapsible ? (
      <button
       onClick={() => setOpen(!open)}
@@ -34,12 +34,12 @@ function SidebarSection({ label, children, collapsible = false, defaultOpen = tr
         open ?"rotate-90" :""
        }`}
       />
-      <span className="text-[11px] font-medium uppercase tracking-widest font-mono text-muted-foreground/80">
+      <span className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
        {label}
       </span>
      </button>
     ) : (
-     <span className="flex-1 text-[11px] font-medium uppercase tracking-widest font-mono text-muted-foreground/60">
+     <span className="flex-1 text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
       {label}
      </span>
     )}
@@ -57,10 +57,10 @@ function SidebarNavItem({ active, onClick, icon: Icon, label, badge, badgeTone =
  return (
   <button
    onClick={onClick}
-   className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors w-full text-left ${
+   className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[13px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
     active
-     ?"bg-accent text-foreground"
-     :"text-foreground/80 hover:bg-accent/50 hover:text-foreground"
+     ?"bg-accent/60 text-foreground"
+     :"text-muted-foreground hover:bg-accent/40 hover:text-foreground"
    }`}
   >
    {Icon && (
@@ -150,7 +150,7 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
    </div>
 
    {/* ── Scrollable nav ───────────────────────────────────────── */}
-   <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-auto-hide flex flex-col gap-4 px-3 py-2">
+   <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-auto-hide p-4 space-y-6">
     {/* Top actions + navigation (no section label, like Paperclip) */}
     <div className="flex flex-col gap-0.5">
      <SidebarNavItem
@@ -210,14 +210,14 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
        <button
         key={slug}
         onClick={() => navigate("project", slug)}
-        className={`flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors w-full text-left ${
+        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[13px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
          isActive
-          ?"bg-accent text-foreground"
-          :"text-foreground/80 hover:bg-accent/50 hover:text-foreground"
+          ?"bg-accent/60 text-foreground"
+          :"text-muted-foreground hover:bg-accent/40 hover:text-foreground"
         }`}
        >
         <span
-         className="shrink-0 h-3.5 w-3.5 rounded-sm"
+         className="shrink-0 w-1.5 h-1.5 rounded-[2px]"
          style={{ backgroundColor: project.color }}
         />
         <span className="flex-1 truncate">{project.title || project.id}</span>
@@ -266,10 +266,16 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
    </nav>
 
    {/* ── Footer ───────────────────────────────────────────────── */}
-   <div className="px-4 py-3 border-t border-border">
-    <p className="text-[11px] font-mono text-muted-foreground/60">
-     OpenClaw v2026.3.13
-    </p>
+   <div className="p-4 border-t border-border">
+    <div className="flex items-center gap-3 px-2 py-1.5 rounded-[6px] hover:bg-accent/40 transition-colors cursor-default">
+     <div className="w-8 h-8 rounded-[6px] bg-secondary border border-border flex items-center justify-center text-[12px] font-semibold text-muted-foreground shrink-0">
+      KM
+     </div>
+     <div className="flex-1 overflow-hidden">
+      <div className="text-[13px] font-medium text-foreground truncate">Kavin</div>
+      <div className="text-[11px] text-muted-foreground truncate">OpenClaw v2026.3.13</div>
+     </div>
+    </div>
    </div>
   </aside>
  );

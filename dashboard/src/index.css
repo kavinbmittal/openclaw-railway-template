@@ -62,23 +62,23 @@ a, button, [role="button"], input, select, textarea, label {
   box-shadow: 0 0 0 3px oklch(0.556 0 0 / 0.5);
 }
 
-/* ── Dark mode scrollbars (Paperclip style) ────────────────────────── */
+/* ── Dark mode scrollbars (Aura style) ─────────────────────────────── */
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 *::-webkit-scrollbar-track {
-  background: oklch(0.205 0 0);
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: oklch(0.4 0 0);
-  border-radius: 0;
+  background: oklch(0.35 0 0);
+  border-radius: 3px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.5 0 0);
+  background: oklch(0.45 0 0);
 }
 
 /* ── Auto-hide scrollbar (sidebar) ─────────────────────────────────── */

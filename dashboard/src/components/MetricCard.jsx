@@ -1,6 +1,6 @@
 /**
  * MetricCard — large-number stat card.
- * Ported from Paperclip's MetricCard, simplified (no router Link).
+ * Styling ported directly from Aura reference HTML.
  */
 
 export function MetricCard({ icon: Icon, value, label, description, mono, onClick, className ="" }) {
@@ -8,29 +8,27 @@ export function MetricCard({ icon: Icon, value, label, description, mono, onClic
 
  return (
   <div
-   className={`bg-card rounded-sm border border-border shadow-sm px-4 py-4 sm:px-5 sm:py-5 transition-colors ${isClickable ?"hover:bg-accent/50 cursor-pointer" :""} ${className}`}
+   className={`bg-card border border-border rounded-[2px] p-[20px] shadow-sm hover:bg-accent/30 transition-colors cursor-default group ${isClickable ?"!cursor-pointer" :""} ${className}`}
    onClick={onClick}
   >
-   <div className="flex items-start justify-between gap-3">
-    <div className="flex-1 min-w-0">
-     <p
-      className={`text-2xl sm:text-3xl font-semibold tracking-tight tabular-nums ${mono ?"font-mono" :""}`}
-     >
-      {value}
-     </p>
-     <p className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mt-1">
-      {label}
-     </p>
-     {description && (
-      <div className="text-xs text-muted-foreground/70 mt-1.5 hidden sm:block">
-       {description}
-      </div>
-     )}
+   <div className="flex justify-between items-start mb-2">
+    <div
+     className={`text-[30px] font-semibold text-foreground leading-none tracking-tight ${mono ?"font-mono" :""} tabular-nums`}
+    >
+     {value}
     </div>
     {Icon && (
-     <Icon className="h-4 w-4 text-muted-foreground/50 shrink-0 mt-1.5" />
+     <Icon className="text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" size={20} />
     )}
    </div>
+   <div className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+    {label}
+   </div>
+   {description && (
+    <div className="text-xs text-muted-foreground/70 mt-1.5 hidden sm:block">
+     {description}
+    </div>
+   )}
   </div>
  );
 }

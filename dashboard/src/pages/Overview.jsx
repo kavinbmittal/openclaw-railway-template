@@ -74,13 +74,13 @@ export default function Overview({ navigate }) {
 
  if (loading) {
   return (
-   <div className="space-y-6">
-    <div className="h-12" />
-    <div className="grid grid-cols-2 xl:grid-cols-4 gap-1">
+   <div className="max-w-[1400px] mx-auto space-y-6">
+    <div className="h-10" />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
      {[1, 2, 3, 4].map((i) => (
-      <div key={i} className="bg-card rounded-sm border border-border shadow-sm p-5">
-       <Skeleton className="h-4 w-20 mb-3" />
-       <Skeleton className="h-8 w-16" />
+      <div key={i} className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
+       <Skeleton className="h-8 w-16 mb-2" />
+       <Skeleton className="h-3 w-20" />
       </div>
      ))}
     </div>
@@ -105,35 +105,34 @@ export default function Overview({ navigate }) {
  const displayProjects = projectSummaries.length > 0 ? projectSummaries : projects;
 
  return (
-  <div className="space-y-6">
-   {/* Breadcrumb bar */}
-   <div className="h-12 flex items-center">
-    <h1 className="text-base font-semibold uppercase tracking-wider">Dashboard</h1>
+  <div className="max-w-[1400px] mx-auto space-y-6">
+   {/* Header */}
+   <div className="flex items-center justify-between">
+    <h1 className="text-[16px] font-semibold uppercase tracking-[0.2em] text-foreground">DASHBOARD</h1>
    </div>
 
    {/* Needs Attention banner */}
    {inboxCount !== null && (
     <div
      onClick={() => navigate("inbox")}
-     className={`flex items-center gap-3 px-5 py-3 rounded-sm border shadow-sm cursor-pointer transition-colors ${
+     className={`flex items-center gap-3 px-[20px] py-3 rounded-[2px] border shadow-sm cursor-pointer transition-colors ${
       inboxCount > 0
-       ?"border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/15"
-       :"border-green-500/30 bg-green-500/10 hover:bg-green-500/15"
+       ?"border-amber-500/20 bg-amber-500/5"
+       :"border-emerald-500/20 bg-emerald-500/5"
      }`}
     >
      {inboxCount > 0 ? (
       <>
-       <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
-       <span className="text-sm font-medium text-amber-300 flex-1">
+       <AlertTriangle className="text-amber-500 shrink-0" size={18} />
+       <span className="text-[14px] text-amber-200/80 flex-1">
         {inboxCount} {inboxCount === 1 ?"item needs" :"items need"} your attention
        </span>
-       <ArrowUpRight className="h-4 w-4 text-amber-400/60 shrink-0" />
       </>
      ) : (
       <>
-       <CheckCircle className="h-4 w-4 text-green-400 shrink-0" />
-       <span className="text-sm font-medium text-green-300 flex-1">
-        All clear
+       <CheckCircle className="text-emerald-500 shrink-0" size={18} />
+       <span className="text-[14px] text-emerald-200/80 flex-1">
+        System stable. All clear — no pending approvals or alerts.
        </span>
       </>
      )}
@@ -141,7 +140,7 @@ export default function Overview({ navigate }) {
    )}
 
    {/* Metric cards */}
-   <div className="grid grid-cols-2 xl:grid-cols-4 gap-1 sm:gap-2">
+   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
     <MetricCard label="Projects" value={projects.length} />
     <MetricCard label="Active" value={activeCount} />
     <MetricCard label="Weekly Budget" value={`$${totalBudget}`} mono />
@@ -149,9 +148,9 @@ export default function Overview({ navigate }) {
    </div>
 
    {/* Project Progress section */}
-   <div className="bg-card rounded-sm border border-border shadow-sm">
-    <div className="px-5 py-4 border-b border-border">
-     <h3 className="text-sm font-semibold text-foreground">Project Progress</h3>
+   <div className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+    <div className="p-[20px] border-b border-border flex items-center justify-between">
+     <h2 className="text-[14px] font-semibold text-foreground">Project Progress</h2>
     </div>
 
     {displayProjects.length === 0 ? (
@@ -164,18 +163,18 @@ export default function Overview({ navigate }) {
      </div>
     ) : (
      <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-left border-collapse whitespace-nowrap">
        <thead>
-        <tr className="border-b border-border text-left">
-         <th className="px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground/60 font-normal">Project</th>
-         <th className="px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground/60 font-normal hidden lg:table-cell">Mission / Goal</th>
-         <th className="px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground/60 font-normal hidden sm:table-cell">Lead</th>
-         <th className="px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground/60 font-normal hidden md:table-cell">Milestone</th>
-         <th className="px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground/60 font-normal">Issues</th>
-         <th className="px-5 py-3 text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground/60 font-normal hidden sm:table-cell min-w-[140px]">Budget</th>
+        <tr>
+         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[25%]">Project</th>
+         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[20%] hidden lg:table-cell">Mission / Goal</th>
+         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[15%] hidden sm:table-cell">Lead</th>
+         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[15%] hidden md:table-cell">Milestone</th>
+         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[10%]">Issues</th>
+         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[15%] hidden sm:table-cell">Budget</th>
         </tr>
        </thead>
-       <tbody className="divide-y divide-border">
+       <tbody>
         {displayProjects.map((project) => {
          const slug = project.id || project.slug;
          const budgetNum = parseBudgetNumber(project.budget);
@@ -186,31 +185,30 @@ export default function Overview({ navigate }) {
           <tr
            key={slug}
            onClick={() => navigate("project", slug)}
-           className="cursor-pointer hover:bg-accent/50 transition-colors"
+           className="border-b border-border/50 hover:bg-accent/40 transition-colors cursor-pointer"
+           tabIndex="0"
           >
            {/* Project name + status */}
-           <td className="px-5 py-3.5">
+           <td className="px-[20px] py-3.5">
             <div className="flex items-center gap-2.5">
              <span
               className={`w-2 h-2 rounded-full shrink-0 ${
                STATUS_DOT[project.status] || STATUS_DOT.unknown
               }`}
              />
-             <span className="text-sm font-medium text-foreground truncate max-w-[200px]">
+             <span className="text-[14px] font-medium text-foreground truncate max-w-[200px]">
               {project.title || slug}
              </span>
             </div>
            </td>
 
            {/* Mission / Goal */}
-           <td className="px-5 py-3.5 hidden lg:table-cell">
-            <span className="text-sm text-muted-foreground truncate block max-w-[240px]">
-             {truncate(project.mission ||"", 60) ||"--"}
-            </span>
+           <td className="px-[20px] py-3.5 hidden lg:table-cell text-[14px] text-muted-foreground">
+            {truncate(project.mission ||"", 60) ||"--"}
            </td>
 
            {/* Lead */}
-           <td className="px-5 py-3.5 hidden sm:table-cell">
+           <td className="px-[20px] py-3.5 hidden sm:table-cell">
             {project.lead && project.lead !=="unassigned" ? (
              <span
               className="text-[13px] text-muted-foreground capitalize cursor-pointer hover:text-foreground transition-colors"
@@ -229,17 +227,15 @@ export default function Overview({ navigate }) {
            </td>
 
            {/* Milestone */}
-           <td className="px-5 py-3.5 hidden md:table-cell">
-            <span className="text-[13px] text-muted-foreground truncate block max-w-[200px]">
-             {project.currentMilestone
-              ? truncate(project.currentMilestone, 40)
-              : <span className="text-muted-foreground/40 italic">No milestones yet</span>}
-            </span>
+           <td className="px-[20px] py-3.5 hidden md:table-cell text-[13px] text-muted-foreground">
+            {project.currentMilestone
+             ? truncate(project.currentMilestone, 40)
+             : <span className="text-muted-foreground/40 italic">No milestones yet</span>}
            </td>
 
            {/* Issues */}
-           <td className="px-5 py-3.5">
-            <span className="text-xs font-mono tabular-nums text-muted-foreground">
+           <td className="px-[20px] py-3.5">
+            <span className="text-[12px] font-mono text-muted-foreground">
              {project.issuesDone != null
               ? `${project.issuesDone}/${project.issuesTotal}`
               :"--"}
@@ -247,15 +243,18 @@ export default function Overview({ navigate }) {
            </td>
 
            {/* Budget */}
-           <td className="px-5 py-3.5 hidden sm:table-cell">
+           <td className="px-[20px] py-3.5 hidden sm:table-cell">
             {budgetNum > 0 ? (
-             <div className="min-w-[120px]">
-              <QuotaBar
-               label=""
-               percentUsed={utilizationPct}
-               leftLabel={`$${spend.toFixed(0)}/$${budgetNum}`}
-               rightLabel={`${utilizationPct}%`}
-              />
+             <div className="flex items-center gap-3">
+              <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+               <div
+                className={`h-full rounded-full ${utilizationPct > 80 ?"bg-amber-500" :"bg-emerald-500"}`}
+                style={{ width: `${Math.min(utilizationPct, 100)}%` }}
+               />
+              </div>
+              <span className="text-[11px] font-mono text-muted-foreground w-8 text-right">
+               {utilizationPct}%
+              </span>
              </div>
             ) : (
              <span className="text-xs text-muted-foreground/40">No budget</span>
@@ -272,37 +271,34 @@ export default function Overview({ navigate }) {
 
    {/* Recent Issues section */}
    {recentIssues.length > 0 && (
-    <div className="bg-card rounded-sm border border-border shadow-sm">
-     <div className="px-5 py-4 border-b border-border">
-      <h3 className="text-sm font-semibold text-foreground">Recent Issues</h3>
+    <div className="bg-card border border-border rounded-[2px] shadow-sm">
+     <div className="p-[20px] border-b border-border flex justify-between items-center">
+      <h2 className="text-[14px] font-semibold text-foreground">Recent Issues</h2>
      </div>
-     <div className="divide-y divide-border">
-      {recentIssues.map((issue) => (
-       <EntityRow
+     <div className="flex flex-col">
+      {recentIssues.map((issue, i) => (
+       <div
         key={issue.id}
         onClick={() => navigate("issue-detail", { projectSlug: issue.project, issueId: issue.id })}
-        leading={
-         <div className="flex items-center gap-2">
-          <PriorityDot priority={issue.priority} />
-          <StatusCircle status={issue.status} />
-         </div>
-        }
-        identifier={issue.id}
-        title={issue.title}
-        trailing={
-         <>
-          <StatusBadge status={issue.status} />
-          {issue.assignee && (
-           <span className="text-xs text-muted-foreground shrink-0 capitalize">
-            {issue.assignee}
-           </span>
-          )}
-          <span className="text-xs text-muted-foreground tabular-nums shrink-0 hidden sm:inline font-mono">
-           {timeAgo(issue.updated)}
-          </span>
-         </>
-        }
-       />
+        className={`flex items-center gap-4 px-[20px] py-3 hover:bg-accent/40 transition-colors cursor-pointer ${
+         i < recentIssues.length - 1 ?"border-b border-border/50" :""
+        }`}
+        tabIndex="0"
+       >
+        <PriorityDot priority={issue.priority} />
+        <StatusCircle status={issue.status} />
+        <span className="text-[12px] font-mono text-muted-foreground w-16 shrink-0">{issue.id}</span>
+        <span className="text-[14px] text-foreground flex-1 truncate">{issue.title}</span>
+        <StatusBadge status={issue.status} />
+        {issue.assignee && (
+         <span className="text-[12px] text-muted-foreground shrink-0 capitalize hidden sm:inline">
+          {issue.assignee}
+         </span>
+        )}
+        <span className="text-[12px] text-muted-foreground w-16 text-right font-mono shrink-0 hidden sm:inline">
+         {timeAgo(issue.updated)}
+        </span>
+       </div>
       ))}
      </div>
     </div>

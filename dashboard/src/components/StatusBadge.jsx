@@ -5,50 +5,50 @@
 
 const STATUS_BADGE = {
  // Agent / project statuses
- active:"bg-green-900/50 text-green-300",
- running:"bg-cyan-900/50 text-cyan-300",
- paused:"bg-orange-900/50 text-orange-300",
- idle:"bg-yellow-900/50 text-yellow-300",
- archived:"bg-muted text-muted-foreground",
+ active:"border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+ running:"border border-cyan-500/20 bg-cyan-500/10 text-cyan-400",
+ paused:"border border-orange-500/20 bg-orange-500/10 text-orange-400",
+ idle:"border border-yellow-500/20 bg-yellow-500/10 text-yellow-400",
+ archived:"border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground",
 
  // Goal / completion
- planned:"bg-muted text-muted-foreground",
- achieved:"bg-green-900/50 text-green-300",
- completed:"bg-blue-900/50 text-blue-300",
+ planned:"border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground",
+ achieved:"border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+ completed:"border border-blue-500/20 bg-blue-500/10 text-blue-400",
 
  // Run statuses
- failed:"bg-red-900/50 text-red-300",
- timed_out:"bg-orange-900/50 text-orange-300",
- succeeded:"bg-green-900/50 text-green-300",
- error:"bg-red-900/50 text-red-300",
- terminated:"bg-red-900/50 text-red-300",
- pending:"bg-yellow-900/50 text-yellow-300",
+ failed:"border border-red-500/20 bg-red-500/10 text-red-400",
+ timed_out:"border border-orange-500/20 bg-orange-500/10 text-orange-400",
+ succeeded:"border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+ error:"border border-red-500/20 bg-red-500/10 text-red-400",
+ terminated:"border border-red-500/20 bg-red-500/10 text-red-400",
+ pending:"border border-yellow-500/20 bg-yellow-500/10 text-yellow-400",
 
  // Approval
- pending_approval:"bg-amber-900/50 text-amber-300",
- revision_requested:"bg-amber-900/50 text-amber-300",
- approved:"bg-green-900/50 text-green-300",
- rejected:"bg-red-900/50 text-red-300",
+ pending_approval:"border border-amber-500/20 bg-amber-500/10 text-amber-400",
+ revision_requested:"border border-amber-500/20 bg-amber-500/10 text-amber-400",
+ approved:"border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+ rejected:"border border-red-500/20 bg-red-500/10 text-red-400",
 
  // Issue statuses
- proposed:"bg-violet-900/50 text-violet-300",
- backlog:"bg-muted text-muted-foreground",
- todo:"bg-blue-900/50 text-blue-300",
- in_progress:"bg-yellow-900/50 text-yellow-300",
- in_review:"bg-violet-900/50 text-violet-300",
- blocked:"bg-red-900/50 text-red-300",
- done:"bg-green-900/50 text-green-300",
- cancelled:"bg-muted text-muted-foreground",
+ proposed:"border border-violet-500/20 bg-violet-500/10 text-violet-400",
+ backlog:"border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground",
+ todo:"border border-blue-500/20 bg-blue-500/10 text-blue-400",
+ in_progress:"border border-indigo-500/20 bg-indigo-500/10 text-indigo-400",
+ in_review:"border border-violet-500/20 bg-violet-500/10 text-violet-400",
+ blocked:"border border-red-500/20 bg-red-500/10 text-red-400",
+ done:"border border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+ cancelled:"border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground",
 
  // Goal statuses
- not_started:"bg-muted text-muted-foreground",
- at_risk:"bg-red-900/50 text-red-300",
+ not_started:"border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground",
+ at_risk:"border border-red-500/20 bg-red-500/10 text-red-400",
 
  // Fallback alias used by existing pages
- unknown:"bg-muted text-muted-foreground",
+ unknown:"border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground",
 };
 
-const STATUS_BADGE_DEFAULT ="bg-muted text-muted-foreground";
+const STATUS_BADGE_DEFAULT ="border border-zinc-700/50 bg-zinc-800/50 text-muted-foreground";
 
 /** Status dot colors (solid bg for small indicators). */
 export const STATUS_DOT = {
@@ -67,7 +67,7 @@ export const STATUS_DOT_DEFAULT ="bg-muted-foreground";
 export function StatusBadge({ status, className ="" }) {
  return (
   <span
-   className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap shrink-0 ${STATUS_BADGE[status] || STATUS_BADGE_DEFAULT} ${className}`}
+   className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium whitespace-nowrap shrink-0 ${STATUS_BADGE[status] || STATUS_BADGE_DEFAULT} ${className}`}
   >
    {(status ||"unknown").replace(/_/g,"")}
   </span>
