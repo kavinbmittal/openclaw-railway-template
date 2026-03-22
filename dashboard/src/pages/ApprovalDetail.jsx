@@ -213,7 +213,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
    )}
 
    {/* Header card */}
-   <div className="bg-card/50 rounded-sm border border-border p-6 space-y-4">
+   <div className="bg-card rounded-sm border border-border shadow-sm p-6 space-y-4">
     {/* Type + Status + Title */}
     <div className="flex items-start justify-between gap-3">
      <div className="flex items-center gap-2 flex-wrap">
@@ -286,7 +286,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
    {/* Proposed issue description */}
    {isIssue && approval.why && (
-    <div className="bg-card/50 rounded-sm border border-border p-6">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
       Proposed Issue
      </h3>
@@ -298,7 +298,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
    {/* Why / Body — for experiments, this is the agent's case */}
    {approval.why && !isDeliverable && (
-    <div className="bg-card/50 rounded-sm border border-border p-6">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
       {isExperiment ?"Approval Request" :"Details"}
      </h3>
@@ -310,7 +310,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
    {/* Experiment Plan — rendered from program.md (single source of truth) */}
    {isExperiment && approval.programMd && (
-    <div className="bg-card/50 rounded-sm border border-border p-6">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
       Experiment Plan
      </h3>
@@ -322,7 +322,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
    {/* Deliverable content */}
    {isDeliverable && approval.why && (
-    <div className="bg-card/50 rounded-sm border border-border p-6">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
      <h3 className="text-sm font-semibold text-muted-foreground mb-3">
       Deliverable
      </h3>
@@ -334,7 +334,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
    {/* Decision note / Actions */}
    {isPending && !resolved && (
-    <div className="bg-card/50 rounded-sm border border-border p-6 space-y-4">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-6 space-y-4">
      <h3 className="text-sm font-semibold text-muted-foreground">
       Decision
      </h3>
@@ -395,7 +395,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
    {/* Already resolved info */}
    {!isPending && !isRevisionRequested && !resolved && (
-    <div className="bg-card/50 rounded-sm border border-border p-6">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
      <div className="flex items-center gap-2">
       {status ==="approved" ? (
        <CheckCircle2 size={16} className="text-green-400" />

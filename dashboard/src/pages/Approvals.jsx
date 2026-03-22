@@ -119,7 +119,7 @@ export default function Approvals({ navigate }) {
       Approvals
      </h1>
     </div>
-    <div className="bg-card/50 rounded-sm border border-border p-5">
+    <div className="bg-card rounded-sm border border-border shadow-sm p-5">
      <div className="bg-accent/75 h-4 w-48 mb-3" />
      <div className="bg-accent/75 h-4 w-32" />
     </div>

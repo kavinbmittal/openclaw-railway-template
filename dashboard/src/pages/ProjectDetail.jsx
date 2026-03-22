@@ -227,7 +227,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
     <TabsContent value="overview">
      <div className="space-y-4">
       {project.mission && (
-       <div className="bg-card/50 rounded-sm border border-border p-5">
+       <div className="bg-card rounded-sm border border-border shadow-sm p-5">
         <div className="flex items-center gap-2 mb-3">
          <Target size={14} className="text-muted-foreground/50" />
          <h3 className="text-sm font-semibold text-muted-foreground">
@@ -239,7 +239,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
       )}
 
       {milestones && (
-       <div className="bg-card/50 rounded-sm border border-border p-5">
+       <div className="bg-card rounded-sm border border-border shadow-sm p-5">
         <h3 className="text-sm font-semibold text-muted-foreground mb-3">
          Milestones
         </h3>
@@ -248,7 +248,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
       )}
 
       {project.gates && (
-       <div className="bg-card/50 rounded-sm border border-border p-5">
+       <div className="bg-card rounded-sm border border-border shadow-sm p-5">
         <div className="flex items-center gap-2 mb-3">
          <ShieldCheck size={14} className="text-muted-foreground/50" />
          <h3 className="text-sm font-semibold text-muted-foreground">
@@ -278,7 +278,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
       )}
 
       {project.subagents && !project.subagents.includes("(none") && (
-       <div className="bg-card/50 rounded-sm border border-border p-5">
+       <div className="bg-card rounded-sm border border-border shadow-sm p-5">
         <div className="flex items-center gap-2 mb-3">
          <Bot size={14} className="text-muted-foreground/50" />
          <h3 className="text-sm font-semibold text-muted-foreground">
@@ -425,7 +425,7 @@ function ProjectCostsTab({ costs, costSummary, budgetPolicy, totalCost, projectI
  return (
   <div className="space-y-4">
    {/* Budget policy card */}
-   <div className="bg-card/50 rounded-sm border border-border p-5 space-y-3">
+   <div className="bg-card rounded-sm border border-border shadow-sm p-5 space-y-3">
     <div className="flex items-center justify-between">
      <div className="flex items-center gap-2">
       <Wallet size={14} className="text-muted-foreground/50" />
@@ -716,7 +716,7 @@ function ExperimentsTab({ experiments }) {
      <div className="space-y-3">
       {/* Program definition */}
       {exp.program_md && (
-       <div className="bg-card/50 rounded-sm border border-border p-5">
+       <div className="bg-card rounded-sm border border-border shadow-sm p-5">
         <Markdown content={exp.program_md} />
        </div>
       )}

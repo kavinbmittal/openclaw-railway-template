@@ -173,7 +173,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
 
      {/* Description */}
      {issue.description ? (
-      <div className="bg-card/50 rounded-sm border border-border p-5">
+      <div className="bg-card rounded-sm border border-border shadow-sm p-5">
        <Markdown content={issue.description} />
       </div>
      ) : (
@@ -205,7 +205,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
 
     {/* Right sidebar: metadata */}
     <div className="lg:w-64 shrink-0 space-y-4">
-     <div className="bg-card/50 rounded-sm border border-border p-5 space-y-1">
+     <div className="bg-card rounded-sm border border-border shadow-sm p-5 space-y-1">
       <PropertyRow label="Status">
        <StatusSelect
         value={issue.status}
