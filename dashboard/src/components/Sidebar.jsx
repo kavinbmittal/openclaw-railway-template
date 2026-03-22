@@ -10,6 +10,7 @@ import {
  DollarSign,
  Network,
  Terminal,
+ Plus,
 } from"lucide-react";
 import { getApprovals, getProjects, getInbox } from"../api.js";
 
@@ -190,6 +191,15 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
     <SidebarSection
      label="Projects"
      collapsible
+     action={
+      <button
+       onClick={() => navigate("create-project")}
+       className="p-0.5 text-muted-foreground/60 hover:text-foreground transition-colors opacity-0 group-hover:opacity-100"
+       title="New project"
+      >
+       <Plus size={14} />
+      </button>
+     }
     >
      {coloredProjects.map((project) => {
       const slug = project.id || project.slug;
