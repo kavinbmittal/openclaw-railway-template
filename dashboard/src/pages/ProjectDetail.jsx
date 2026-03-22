@@ -472,8 +472,8 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
 
 /* ──────────────── STRATEGY TAB COMPONENT ──────────────── */
 function StrategyTab({ project, themes, projectId, navigate }) {
- const approvedThemes = themes.filter((t) => t.status === "approved");
- const pendingThemes = themes.filter((t) => t.status === "proposed");
+ const approvedThemes = themes.filter((t) => t.status === "approved").sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+ const pendingThemes = themes.filter((t) => t.status === "proposed").sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
  return (
   <div className="space-y-6">
@@ -514,7 +514,7 @@ function StrategyTab({ project, themes, projectId, navigate }) {
          <p className="text-[13px] text-muted-foreground mb-3">{theme.description}</p>
         )}
         <div className="space-y-1.5">
-         {(theme.proxy_metrics || []).map((pm) => (
+         {(theme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999)).map((pm) => (
           <div key={pm.id} className="flex items-center gap-2 text-[13px]">
            <BarChart3 size={14} className="text-muted-foreground/50 shrink-0" />
            <span className="text-foreground/80">{pm.name}</span>
@@ -547,7 +547,7 @@ function StrategyTab({ project, themes, projectId, navigate }) {
          <p className="text-[13px] text-muted-foreground mb-3 ml-[24px]">{theme.description}</p>
         )}
         <div className="space-y-2 ml-[24px]">
-         {(theme.proxy_metrics || []).map((pm) => (
+         {(theme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999)).map((pm) => (
           <div key={pm.id} className="flex items-start gap-2">
            <BarChart3 size={14} className="text-muted-foreground/50 mt-0.5 shrink-0" />
            <div>
