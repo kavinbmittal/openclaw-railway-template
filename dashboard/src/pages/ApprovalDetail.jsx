@@ -1,32 +1,38 @@
+/**
+ * ApprovalDetail — single approval view with two-panel layout.
+ * UI ported from Aura HTML reference.
+ */
 import { useState, useEffect } from"react";
-import { Clock, CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3 } from"lucide-react";
+import { CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3, Clock } from"lucide-react";
 import { getApprovalDetail, resolveApproval, requestRevision, updateIssue, deleteIssue, resolveTheme } from"../api.js";
 import { formatTimeAgo } from"../utils/formatDate.js";
 import Markdown from"../components/Markdown.jsx";
 import { StatusBadge } from"../components/StatusBadge.jsx";
 
+/* Status badge — Aura bordered pill */
 function StatusBadgeInline({ status }) {
- if (status ==="approved")
-  return (
-   <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-900/50 text-green-300">
-    <CheckCircle2 size={12} /> Approved
-   </span>
-  );
- if (status ==="rejected")
-  return (
-   <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-900/50 text-red-300">
-    <XCircle size={12} /> Rejected
-   </span>
-  );
- if (status ==="revision_requested")
-  return (
-   <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-    <RotateCcw size={12} /> Revision Requested
-   </span>
-  );
+ const map = {
+  approved: { label:"Approved", cls:"border-emerald-500/30 bg-emerald-500/10 text-emerald-400", dot:"bg-emerald-400" },
+  rejected: { label:"Rejected", cls:"border-red-500/30 bg-red-500/10 text-red-400", dot:"bg-red-400" },
+  revision_requested: { label:"Revision Requested", cls:"border-amber-500/30 bg-amber-500/10 text-amber-400", dot:"bg-amber-400 animate-pulse" },
+ };
+ const def = { label:"Pending Review", cls:"border-amber-500/30 bg-amber-500/10 text-amber-400", dot:"bg-amber-400 animate-pulse" };
+ const badge = map[status] || def;
+
  return (
-  <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-   <Clock size={12} /> Pending
+  <span className={`px-3 py-1 rounded-full text-[12px] font-medium border flex items-center gap-1.5 ${badge.cls}`}>
+   <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+   {badge.label}
+  </span>
+ );
+}
+
+/* Type label — mono code style like Aura */
+function TypeLabel({ type }) {
+ if (!type) return null;
+ return (
+  <span className="px-1.5 py-0.5 rounded-[2px] border border-border bg-secondary text-foreground/80 text-[11px] font-mono tracking-wide leading-tight">
+   {type.toUpperCase().replace(/-/g,"_")}
   </span>
  );
 }
@@ -37,7 +43,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
  const [error, setError] = useState(null);
  const [comment, setComment] = useState("");
  const [submitting, setSubmitting] = useState(false);
- const [resolved, setResolved] = useState(null); // { decision, comment }
+ const [resolved, setResolved] = useState(null);
 
  useEffect(() => {
   setLoading(true);
@@ -49,7 +55,6 @@ export default function ApprovalDetail({ approvalId, navigate }) {
  }, [approvalId]);
 
  const isProposedIssue = approval?._source ==="issue";
-
  const isThemeProposal = approval?._source === "theme";
 
  async function handleResolve(decision) {
@@ -67,10 +72,8 @@ export default function ApprovalDetail({ approvalId, navigate }) {
    const projectName = approval._project || approval.project;
 
    if (isThemeProposal) {
-    // Theme proposals: approve/reject/revise via resolveTheme
     await resolveTheme(projectName, approval.id, decision, comment.trim() || null);
    } else if (isProposedIssue) {
-    // Proposed issues: approve → move to todo, reject → delete
     if (decision ==="approved") {
      await updateIssue(approval.id, projectName, { status:"todo" });
     } else {
@@ -101,7 +104,6 @@ export default function ApprovalDetail({ approvalId, navigate }) {
     });
    }
    setResolved({ decision, comment: comment.trim() || null });
-   // Refresh approval data (skip for deleted items)
    if (!(isProposedIssue && decision ==="rejected") && !(isThemeProposal && decision ==="rejected")) {
     const updated = await getApprovalDetail(approvalId).catch(() => null);
     if (updated) setApproval(updated);
@@ -115,20 +117,19 @@ export default function ApprovalDetail({ approvalId, navigate }) {
 
  if (loading) {
   return (
-   <div className="max-w-3xl mx-auto space-y-4 p-4">
-    <div className="bg-accent/75 h-6 w-48 rounded" />
-    <div className="bg-accent/75 h-4 w-32 rounded" />
-    <div className="bg-accent/75 h-32 w-full rounded" />
+   <div className="max-w-[1200px] mx-auto space-y-4">
+    <div className="bg-accent/50 h-4 w-48 rounded-[2px]" />
+    <div className="bg-accent/50 h-8 w-96 rounded-[2px]" />
+    <div className="bg-accent/50 h-4 w-64 rounded-[2px]" />
+    <div className="bg-accent/50 h-64 w-full rounded-[2px] mt-4" />
    </div>
   );
  }
 
  if (!approval) {
   return (
-   <div className="max-w-3xl mx-auto p-4">
-    <p className="text-sm text-muted-foreground">
-     {error ||"Approval not found."}
-    </p>
+   <div className="max-w-[1200px] mx-auto">
+    <p className="text-[14px] text-muted-foreground">{error ||"Approval not found."}</p>
    </div>
   );
  }
@@ -138,13 +139,11 @@ export default function ApprovalDetail({ approvalId, navigate }) {
  const status = resolved ? resolved.decision : (approval.status ||"pending");
  const isPending = status ==="pending" || status === "proposed";
  const isRevisionRequested = status ==="revision_requested";
- const isDeliverable =
-  approval._source ==="deliverables" ||
-  approval.gate ==="deliverable" ||
-  approval.gate ==="deliverable-review";
+ const isDeliverable = approval._source ==="deliverables" || approval.gate ==="deliverable" || approval.gate ==="deliverable-review";
  const isExperiment = approval.gate ==="experiment-start" || approval.gate ==="autoresearch-start";
  const isIssue = approval._source ==="issue";
  const isTheme = approval._source ==="theme";
+ const itemType = approval.type || approval.gate || null;
 
  const timeAgo = approval.created
   ? formatTimeAgo(approval.created)
@@ -153,351 +152,298 @@ export default function ApprovalDetail({ approvalId, navigate }) {
    :"";
 
  return (
-  <div className="max-w-3xl mx-auto space-y-6">
-   {/* Breadcrumb */}
-   <div className="h-12 flex items-center gap-2">
-    <button
-     onClick={() => navigate("overview")}
-     className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-    >
-     Overview
-    </button>
-    <span className="text-muted-foreground/40">›</span>
-    <button
-     onClick={() => navigate("approvals")}
-     className="text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-    >
-     Approvals
-    </button>
-    <span className="text-muted-foreground/40">›</span>
-    <span className="text-[13px] font-semibold text-foreground truncate">
-     {title}
-    </span>
-   </div>
-
-   {/* Success banner after resolution */}
-   {resolved && (
-    <div
-     className={`border px-4 py-3 ${
-      resolved.decision ==="approved"
-       ?"border-green-700/40 bg-green-900/20"
-       : resolved.decision ==="revision_requested"
-        ?"border-amber-700/40 bg-amber-900/20"
-        :"border-red-700/40 bg-red-900/20"
-     }`}
-    >
-     <div className="flex items-center gap-2">
-      {resolved.decision ==="approved" ? (
-       <CheckCircle2 size={16} className="text-green-300" />
-      ) : resolved.decision ==="revision_requested" ? (
-       <RotateCcw size={16} className="text-amber-300" />
-      ) : (
-       <XCircle size={16} className="text-red-300" />
-      )}
-      <p
-       className={`text-sm font-medium ${
-        resolved.decision ==="approved"
-         ?"text-green-100"
-         : resolved.decision ==="revision_requested"
-          ?"text-amber-100"
-          :"text-red-100"
-       }`}
-      >
-       {resolved.decision ==="approved"
-        ? (isThemeProposal ? "Theme approved" : isIssue ?"Issue approved — moved to todo" :"Approved")
-        : resolved.decision ==="revision_requested"
-         ?"Revision Requested"
-         : (isThemeProposal ? "Theme rejected — removed" : isIssue ?"Issue rejected — removed" :"Rejected")}
-       {resolved.comment && (
-        <span className="font-normal text-xs ml-2 opacity-80">
-         — {resolved.comment}
-        </span>
-       )}
-      </p>
-     </div>
-    </div>
-   )}
-
-   {/* Header card */}
-   <div className="bg-card rounded-sm border border-border shadow-sm p-6 space-y-4">
-    {/* Type + Status + Title */}
-    <div className="flex items-start justify-between gap-3">
-     <div className="flex items-center gap-2 flex-wrap">
-      {isTheme ? (
-       <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-teal-900/50 text-teal-300">
-        <Compass size={12} /> Theme
-       </span>
-      ) : isIssue ? (
-       <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-violet-900/50 text-violet-300">
-        <CircleDot size={12} /> Issue
-       </span>
-      ) : isExperiment ? (
-       <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-        <FlaskConical size={12} /> Experiment
-       </span>
-      ) : isDeliverable ? (
-       <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-blue-900/50 text-blue-300">
-        <FileText size={12} /> Deliverable
-       </span>
-      ) : approval.gate ? (
-       <span className="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-        {approval.gate}
-       </span>
-      ) : null}
-      <StatusBadgeInline status={status} />
-     </div>
-    </div>
-    <h1 className="text-lg font-semibold text-foreground">{title}</h1>
-
-    {/* Metadata */}
-    <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+  <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+   {/* Page Header — Aura: px-8 py-8 border-b, sticky */}
+   <header className="px-0 pb-8 border-b border-border shrink-0">
+    {/* Breadcrumb */}
+    <nav className="flex items-center text-[13px] text-muted-foreground mb-5 tracking-wide">
+     <button onClick={() => navigate("approvals")} className="hover:text-foreground transition-colors">Approvals</button>
      {projectName && (
-      <span>
-       Project:{""}
-       <button
-        onClick={() => navigate("project", projectName)}
-        className="text-primary hover:underline"
-       >
-        {projectName}
-       </button>
-      </span>
+      <>
+       <span className="mx-2 text-muted-foreground/30">›</span>
+       <button onClick={() => navigate("project", projectName)} className="hover:text-foreground transition-colors capitalize">{projectName}</button>
+      </>
      )}
+     <span className="mx-2 text-muted-foreground/30">›</span>
+     <span className="text-foreground font-semibold truncate">{title}</span>
+    </nav>
+
+    {/* Title + Status Badge — Aura: text-[30px] + bordered pill */}
+    <div className="flex items-center gap-4 mb-4">
+     <h1 className="text-[30px] font-semibold text-foreground leading-none tracking-tight">{title}</h1>
+     <StatusBadgeInline status={status} />
+    </div>
+
+    {/* Metadata — Aura: text-[13px] with type label + dot separators */}
+    <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
+     <TypeLabel type={itemType} />
      {approval.requester && (
-      <span>
-       Requested by{""}
-       <button
-        className="hover:underline hover:text-foreground transition-colors"
-        onClick={() => {
-         const name = (approval.requester ||"").toLowerCase();
-         const workspaceId =
-          name ==="sam" ?"workspace" : `workspace-${name}`;
-         navigate("agent-detail", workspaceId);
-        }}
-       >
-        {approval.requester}
-       </button>
-      </span>
+      <>
+       <span className="text-muted-foreground/30">·</span>
+       <span>Requested by{" "}
+        <button
+         className="text-foreground font-medium hover:underline capitalize"
+         onClick={() => {
+          const name = (approval.requester ||"").toLowerCase();
+          const workspaceId = name ==="sam" ?"workspace" : `workspace-${name}`;
+          navigate("agent-detail", workspaceId);
+         }}
+        >
+         {approval.requester}
+        </button>
+       </span>
+      </>
      )}
-     {timeAgo && <span>{timeAgo}</span>}
-     {isIssue && approval.priority && approval.priority !=="none" && (
-      <span className="uppercase">{approval.priority} priority</span>
+     {timeAgo && (
+      <>
+       <span className="text-muted-foreground/30">·</span>
+       <span>{timeAgo}</span>
+      </>
      )}
     </div>
-    {isIssue && approval.labels && approval.labels.length > 0 && (
-     <div className="flex flex-wrap gap-1.5 mt-2">
-      {approval.labels.map((label) => (
-       <span key={label} className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium bg-accent text-accent-foreground">
-        {label}
-       </span>
-      ))}
-     </div>
-    )}
-   </div>
+   </header>
 
-   {/* Theme proposal — structured proxy metrics display */}
-   {isTheme && (
-    <div className="border border-border p-6 space-y-4">
-     {approval.description && (
-      <div>
-       <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-2">
-        Description
-       </h3>
-       <p className="text-sm text-foreground/80">{approval.description}</p>
-      </div>
-     )}
-     {approval.proxy_metrics && approval.proxy_metrics.length > 0 && (
-      <div>
-       <h3 className="text-[11px] uppercase tracking-[0.16em] font-mono text-muted-foreground mb-3">
-        Proxy Metrics
-       </h3>
-       <div className="space-y-3">
-        {approval.proxy_metrics.map((pm, i) => (
-         <div key={pm.id || i} className="flex items-start gap-3 p-3 border border-border/60 bg-accent/10">
-          <BarChart3 size={14} className="text-teal-400 mt-0.5 shrink-0" />
-          <div>
-           <p className="text-sm font-medium text-foreground">{pm.name}</p>
-           {pm.description && (
-            <p className="text-xs text-muted-foreground mt-0.5">{pm.description}</p>
-           )}
-          </div>
-         </div>
-        ))}
+   {/* Scrollable Content — Aura: grid-cols-3 */}
+   <div className="flex-1 overflow-y-auto pt-6">
+    <div className="max-w-[1200px] grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+     {/* Left Column — 2/3 */}
+     <div className="xl:col-span-2 space-y-6">
+
+      {/* Success/rejection banner */}
+      {resolved && (
+       <div className={`border rounded-[2px] px-5 py-3 ${
+        resolved.decision ==="approved"
+         ?"border-emerald-500/20 bg-emerald-500/5"
+         : resolved.decision ==="revision_requested"
+          ?"border-amber-500/20 bg-amber-500/5"
+          :"border-red-500/20 bg-red-500/5"
+       }`}>
+        <div className="flex items-center gap-2">
+         {resolved.decision ==="approved" ? <CheckCircle2 size={16} className="text-emerald-400" /> :
+          resolved.decision ==="revision_requested" ? <RotateCcw size={16} className="text-amber-400" /> :
+          <XCircle size={16} className="text-red-400" />}
+         <span className="text-[14px] font-medium text-foreground">
+          {resolved.decision ==="approved"
+           ? (isThemeProposal ? "Theme approved" : isIssue ?"Issue approved — moved to todo" :"Approved")
+           : resolved.decision ==="revision_requested" ?"Revision Requested"
+           : (isThemeProposal ? "Theme rejected" : isIssue ?"Issue rejected — removed" :"Rejected")}
+         </span>
+         {resolved.comment && (
+          <span className="text-[13px] text-muted-foreground ml-2">— {resolved.comment}</span>
+         )}
+        </div>
        </div>
-      </div>
-     )}
-    </div>
-   )}
+      )}
 
-   {/* Theme tag on issue/experiment — shows which theme this work targets */}
-   {!isTheme && approval.theme_title && (
-    <div className="border border-teal-700/30 bg-teal-900/10 px-4 py-3">
-     <div className="flex items-center gap-2">
-      <Compass size={14} className="text-teal-400" />
-      <span className="text-xs text-teal-300 font-medium">Theme: {approval.theme_title}</span>
-      {approval.proxy_metric_names && approval.proxy_metric_names.length > 0 && (
-       <span className="text-xs text-muted-foreground">
-        — targeting: {approval.proxy_metric_names.join(", ")}
-       </span>
+      {/* Details Card — Aura card */}
+      {approval.why && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="p-[20px] border-b border-border">
+         <h2 className="text-[14px] font-semibold text-foreground">
+          {isExperiment ?"Approval Request" : isDeliverable ?"Deliverable" : isIssue ?"Proposed Issue" :"Details"}
+         </h2>
+        </header>
+        <div className="p-[20px] text-[14px] text-foreground/80 leading-relaxed mc-prose">
+         <Markdown content={approval.why} />
+        </div>
+       </section>
+      )}
+
+      {/* Theme proposal — proxy metrics */}
+      {isTheme && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="p-[20px] border-b border-border">
+         <h2 className="text-[14px] font-semibold text-foreground">Theme Details</h2>
+        </header>
+        <div className="p-[20px] space-y-5">
+         {approval.description && (
+          <p className="text-[14px] text-foreground/80">{approval.description}</p>
+         )}
+         {approval.proxy_metrics && approval.proxy_metrics.length > 0 && (
+          <div>
+           <h3 className="text-[11px] uppercase tracking-[0.15em] font-mono text-muted-foreground mb-3">
+            Proxy Metrics
+           </h3>
+           <div className="space-y-3">
+            {approval.proxy_metrics.map((pm, i) => (
+             <div key={pm.id || i} className="flex items-start gap-3 p-3 border border-border/60 bg-accent/10 rounded-[2px]">
+              <BarChart3 size={14} className="text-teal-400 mt-0.5 shrink-0" />
+              <div>
+               <p className="text-[14px] font-medium text-foreground">{pm.name}</p>
+               {pm.description && <p className="text-[13px] text-muted-foreground mt-0.5">{pm.description}</p>}
+              </div>
+             </div>
+            ))}
+           </div>
+          </div>
+         )}
+        </div>
+       </section>
+      )}
+
+      {/* Experiment Plan */}
+      {isExperiment && approval.programMd && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="p-[20px] border-b border-border">
+         <h2 className="text-[14px] font-semibold text-foreground">Experiment Plan</h2>
+        </header>
+        <div className="p-[20px] mc-prose">
+         <Markdown content={approval.programMd} />
+        </div>
+       </section>
+      )}
+
+      {/* Theme tag on non-theme items */}
+      {!isTheme && approval.theme_title && (
+       <div className="border border-teal-500/20 bg-teal-500/5 rounded-[2px] px-5 py-3">
+        <div className="flex items-center gap-2">
+         <Compass size={14} className="text-teal-400" />
+         <span className="text-[13px] text-teal-400 font-medium">Theme: {approval.theme_title}</span>
+         {approval.proxy_metric_names && approval.proxy_metric_names.length > 0 && (
+          <span className="text-[13px] text-muted-foreground">— targeting: {approval.proxy_metric_names.join(", ")}</span>
+         )}
+        </div>
+       </div>
+      )}
+
+      {/* Already resolved info */}
+      {!isPending && !isRevisionRequested && !resolved && (
+       <div className="bg-card border border-border rounded-[2px] shadow-sm p-[20px]">
+        <div className="flex items-center gap-2">
+         {status ==="approved" ? <CheckCircle2 size={16} className="text-emerald-400" /> : <XCircle size={16} className="text-red-400" />}
+         <span className="text-[14px] font-medium capitalize">{status}</span>
+         {approval.resolved_at && <span className="text-[13px] text-muted-foreground ml-2">{formatTimeAgo(approval.resolved_at)}</span>}
+        </div>
+        {approval.comment && <p className="text-[14px] text-muted-foreground mt-2">Note: {approval.comment}</p>}
+       </div>
+      )}
+
+      {/* Revision requested */}
+      {isRevisionRequested && !resolved && (
+       <div className="border border-amber-500/20 bg-amber-500/5 rounded-[2px] p-[20px]">
+        <div className="flex items-center gap-2">
+         <RotateCcw size={16} className="text-amber-400" />
+         <span className="text-[14px] font-medium text-amber-300">Revision Requested</span>
+         {approval.revision_requested_at && <span className="text-[13px] text-muted-foreground ml-2">{formatTimeAgo(approval.revision_requested_at)}</span>}
+        </div>
+        {approval.revision_feedback && <p className="text-[14px] text-muted-foreground mt-2">Feedback: {approval.revision_feedback}</p>}
+        <p className="text-[13px] text-muted-foreground mt-3">Waiting for {approval.requester ||"agent"} to resubmit.</p>
+       </div>
       )}
      </div>
-    </div>
-   )}
 
-   {/* Proposed issue description */}
-   {isIssue && approval.why && (
-    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
-     <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-      Proposed Issue
-     </h3>
-     <div className="mc-prose">
-      <Markdown content={approval.why} className="text-sm" />
-     </div>
-    </div>
-   )}
+     {/* Right Column — 1/3 */}
+     <div className="xl:col-span-1 space-y-6">
 
-   {/* Why / Body — for experiments, this is the agent's case */}
-   {approval.why && !isDeliverable && (
-    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
-     <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-      {isExperiment ?"Approval Request" :"Details"}
-     </h3>
-     <div className="mc-prose">
-      <Markdown content={approval.why} className="text-sm" />
-     </div>
-    </div>
-   )}
+      {/* Actions Card — Aura: sticky, approve/reject buttons */}
+      {isPending && !resolved && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col sticky top-0">
+        <header className="p-[20px] border-b border-border">
+         <h2 className="text-[14px] font-semibold text-foreground">Actions</h2>
+        </header>
+        <div className="p-[20px] space-y-3">
+         <button
+          onClick={() => handleResolve("approved")}
+          disabled={submitting}
+          className="w-full py-2.5 rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-[14px] font-medium text-emerald-400 hover:bg-emerald-500/20 transition-all flex justify-center items-center gap-2 focus:ring-2 focus:ring-emerald-500/50 outline-none disabled:opacity-50"
+         >
+          {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+          {isThemeProposal ? "Approve Theme" : isIssue ?"Approve Issue" :"Approve Request"}
+         </button>
 
-   {/* Experiment Plan — rendered from program.md (single source of truth) */}
-   {isExperiment && approval.programMd && (
-    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
-     <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-      Experiment Plan
-     </h3>
-     <div className="border border-border/60 rounded p-4 bg-background max-h-[calc(100vh-400px)] overflow-y-auto mc-prose">
-      <Markdown content={approval.programMd} className="text-sm" />
-     </div>
-    </div>
-   )}
+         {!isIssue && (
+          <button
+           onClick={() => handleResolve("revision_requested")}
+           disabled={submitting || !comment.trim()}
+           className="w-full py-2.5 rounded-[6px] border border-amber-500/30 bg-amber-500/10 text-[14px] font-medium text-amber-400 hover:bg-amber-500/20 transition-all flex justify-center items-center gap-2 focus:ring-2 focus:ring-amber-500/50 outline-none disabled:opacity-50"
+          >
+           {submitting ? <Loader2 size={18} className="animate-spin" /> : <RotateCcw size={18} />}
+           Request Revision
+          </button>
+         )}
 
-   {/* Deliverable content */}
-   {isDeliverable && approval.why && (
-    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
-     <h3 className="text-sm font-semibold text-muted-foreground mb-3">
-      Deliverable
-     </h3>
-     <div className="border border-border/60 rounded p-4 bg-background max-h-[calc(100vh-400px)] overflow-y-auto mc-prose">
-      <Markdown content={approval.why} className="text-sm" />
-     </div>
-    </div>
-   )}
+         <button
+          onClick={() => handleResolve("rejected")}
+          disabled={submitting || (!isIssue && !isThemeProposal && !comment.trim())}
+          className="w-full py-2.5 rounded-[6px] border border-red-500/30 bg-red-500/10 text-[14px] font-medium text-red-400 hover:bg-red-500/20 transition-all flex justify-center items-center gap-2 focus:ring-2 focus:ring-red-500/50 outline-none disabled:opacity-50"
+         >
+          {submitting ? <Loader2 size={18} className="animate-spin" /> : <XCircle size={18} />}
+          {isThemeProposal ? "Reject Theme" : isIssue ?"Reject Issue" :"Reject Request"}
+         </button>
 
-   {/* Decision note / Actions */}
-   {isPending && !resolved && (
-    <div className="bg-card rounded-sm border border-border shadow-sm p-6 space-y-4">
-     <h3 className="text-sm font-semibold text-muted-foreground">
-      Decision
-     </h3>
-     {!isIssue && (
-      <textarea
-       value={comment}
-       onChange={(e) => setComment(e.target.value)}
-       placeholder={isThemeProposal ? "Feedback (optional)" : "Decision note (required for rejections and revisions)"}
-       rows={3}
-       className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors resize-none"
-      />
-     )}
+         {/* Comment textarea — Aura style */}
+         {!isIssue && (
+          <div className="pt-4 mt-2 border-t border-border/60 flex flex-col gap-3">
+           <label className="text-[12px] font-medium text-muted-foreground flex items-center justify-between">
+            {isThemeProposal ?"Feedback" :"Rejection Comment"}
+            <span className="text-muted-foreground/50 font-normal text-[11px]">{isIssue ?"" : isThemeProposal ?"Optional" :"Required"}</span>
+           </label>
+           <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground p-3 placeholder:text-muted-foreground/40 focus:outline-none focus:border-ring/50 focus:ring-1 focus:ring-ring/50 transition-all resize-none h-20"
+            placeholder="Provide context..."
+           />
+          </div>
+         )}
 
-     {error && <p className="text-xs text-red-400">{error}</p>}
+         {error && <p className="text-[13px] text-red-400 mt-2">{error}</p>}
+        </div>
+       </section>
+      )}
 
-     <div className="flex items-center gap-2">
-      <button
-       onClick={() => handleResolve("approved")}
-       disabled={submitting}
-       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
-      >
-       {submitting ? (
-        <Loader2 size={14} className="animate-spin" />
-       ) : (
-        <CheckCircle2 size={14} />
-       )}
-       {isThemeProposal ? "Approve Theme" : isIssue ?"Approve Issue" :"Approve"}
-      </button>
-      {(!isIssue) && (
-       <button
-        onClick={() => handleResolve("revision_requested")}
-        disabled={submitting || !comment.trim()}
-        className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-amber-600 text-white hover:bg-amber-700 transition-colors disabled:opacity-50"
-       >
-        {submitting ? (
-         <Loader2 size={14} className="animate-spin" />
-        ) : (
-         <RotateCcw size={14} />
+      {/* Info Card — Aura: p-[20px] space-y-5 with mono labels */}
+      <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+       <div className="p-[20px] space-y-5">
+        <div>
+         <div className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-1.5">Type</div>
+         <div className="text-[14px] text-foreground capitalize">{itemType ? itemType.replace(/-/g," ") :"Approval"}</div>
+        </div>
+        {projectName && (
+         <div>
+          <div className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-1.5">Project</div>
+          <button
+           onClick={() => navigate("project", projectName)}
+           className="text-[14px] text-foreground hover:underline capitalize"
+          >
+           {projectName}
+          </button>
+         </div>
         )}
-        Request Revision
-       </button>
-      )}
-      <button
-       onClick={() => handleResolve("rejected")}
-       disabled={submitting || (!isIssue && !isThemeProposal && !comment.trim())}
-       className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
-      >
-       {submitting ? (
-        <Loader2 size={14} className="animate-spin" />
-       ) : (
-        <XCircle size={14} />
-       )}
-       {isThemeProposal ? "Reject Theme" : isIssue ?"Reject Issue" :"Reject"}
-      </button>
+        {approval.requester && (
+         <div>
+          <div className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-1.5">Requested By</div>
+          <div className="text-[14px] text-foreground capitalize">{approval.requester}</div>
+         </div>
+        )}
+        {timeAgo && (
+         <div>
+          <div className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-1.5">Requested At</div>
+          <div className="text-[14px] text-foreground">{timeAgo}</div>
+         </div>
+        )}
+        <div>
+         <div className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-1.5">Status</div>
+         <div className="text-[14px] text-foreground font-medium capitalize flex items-center gap-1.5">
+          <span className={`w-1.5 h-1.5 rounded-full ${
+           status ==="approved" ?"bg-emerald-400" :
+           status ==="rejected" ?"bg-red-400" :"bg-amber-400"
+          }`} />
+          {status === "proposed" ? "Pending Review" : status.replace(/_/g," ")}
+         </div>
+        </div>
+        {isIssue && approval.priority && approval.priority !== "none" && (
+         <div>
+          <div className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-1.5">Priority</div>
+          <div className="text-[14px] text-foreground capitalize">{approval.priority}</div>
+         </div>
+        )}
+       </div>
+      </section>
      </div>
     </div>
-   )}
-
-   {/* Already resolved info */}
-   {!isPending && !isRevisionRequested && !resolved && (
-    <div className="bg-card rounded-sm border border-border shadow-sm p-6">
-     <div className="flex items-center gap-2">
-      {status ==="approved" ? (
-       <CheckCircle2 size={16} className="text-green-400" />
-      ) : (
-       <XCircle size={16} className="text-red-400" />
-      )}
-      <span className="text-sm font-medium capitalize">{status}</span>
-      {approval.resolved_at && (
-       <span className="text-xs text-muted-foreground ml-2">
-        {formatTimeAgo(approval.resolved_at)}
-       </span>
-      )}
-     </div>
-     {approval.comment && (
-      <p className="text-sm text-muted-foreground mt-2">
-       Note: {approval.comment}
-      </p>
-     )}
-    </div>
-   )}
-
-   {/* Revision requested — waiting on agent */}
-   {isRevisionRequested && !resolved && (
-    <div className="border border-amber-700/40 p-6 bg-amber-900/10">
-     <div className="flex items-center gap-2">
-      <RotateCcw size={16} className="text-amber-400" />
-      <span className="text-sm font-medium text-amber-200">Revision Requested</span>
-      {approval.revision_requested_at && (
-       <span className="text-xs text-muted-foreground ml-2">
-        {formatTimeAgo(approval.revision_requested_at)}
-       </span>
-      )}
-     </div>
-     {approval.revision_feedback && (
-      <p className="text-sm text-muted-foreground mt-2">
-       Feedback: {approval.revision_feedback}
-      </p>
-     )}
-     <p className="text-xs text-muted-foreground mt-3">
-      Waiting for {approval.requester ||"agent"} to resubmit.
-     </p>
-    </div>
-   )}
-  </div>
+   </div>
+  </main>
  );
 }
