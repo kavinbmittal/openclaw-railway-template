@@ -102,7 +102,7 @@ export default function Inbox({ navigate }) {
     </div>
     <div className="space-y-2">
      {[1, 2, 3].map((i) => (
-      <div key={i} className="border border-border p-4">
+      <div key={i} className="bg-card/50 rounded-sm border border-border p-4">
        <Skeleton className="h-4 w-64 mb-2" />
        <Skeleton className="h-3 w-40" />
       </div>

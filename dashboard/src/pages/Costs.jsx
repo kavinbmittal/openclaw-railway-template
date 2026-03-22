@@ -30,7 +30,7 @@ export default function Costs({ navigate }) {
     <div className="h-12" />
     <div className="grid grid-cols-2 xl:grid-cols-4 gap-1">
      {[1, 2, 3, 4].map((i) => (
-      <div key={i} className="border border-border p-4">
+      <div key={i} className="bg-card/50 rounded-sm border border-border p-4">
        <Skeleton className="h-4 w-20 mb-3" />
        <Skeleton className="h-8 w-16" />
       </div>

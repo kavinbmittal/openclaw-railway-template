@@ -117,7 +117,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* Waiting on */}
       {agent.waitingOn && agent.waitingOn.length > 0 && (
-       <div className="border border-border p-4">
+       <div className="bg-card/50 rounded-sm border border-border p-4">
         <div className="flex items-center gap-2 mb-3">
          <Clock size={14} className="text-amber-400" />
          <h3 className="text-sm font-semibold text-muted-foreground">
@@ -137,7 +137,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* Projects */}
       {agent.projects && agent.projects.length > 0 && (
-       <div className="border border-border p-4">
+       <div className="bg-card/50 rounded-sm border border-border p-4">
         <div className="flex items-center gap-2 mb-3">
          <Briefcase size={14} className="text-muted-foreground/50" />
          <h3 className="text-sm font-semibold text-muted-foreground">
@@ -161,7 +161,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* SOUL summary */}
       {agent.soulSummary && (
-       <div className="border border-border p-4">
+       <div className="bg-card/50 rounded-sm border border-border p-4">
         <div className="flex items-center gap-2 mb-3">
          <Brain size={14} className="text-muted-foreground/50" />
          <h3 className="text-sm font-semibold text-muted-foreground">
