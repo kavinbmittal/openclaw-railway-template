@@ -176,7 +176,7 @@ export default function AgentDetail({ agentId, navigate }) {
 
       {/* Idle state */}
       {agent.status ==="idle" && (!agent.inProgress || agent.inProgress.length === 0) && (
-       <div className="border border-border p-6 text-center">
+       <div className="bg-card rounded-sm border border-border shadow-sm p-6 text-center">
         <p className="text-sm text-muted-foreground/60">
          {agent.name} is currently idle with no active tasks.
         </p>

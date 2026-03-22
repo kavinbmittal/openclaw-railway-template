@@ -8,7 +8,7 @@ export function MetricCard({ icon: Icon, value, label, description, mono, onClic
 
  return (
   <div
-   className={`border border-border px-4 py-4 sm:px-5 sm:py-5 transition-colors ${isClickable ?"hover:bg-accent/50 cursor-pointer" :""} ${className}`}
+   className={`bg-card rounded-sm border border-border shadow-sm px-4 py-4 sm:px-5 sm:py-5 transition-colors ${isClickable ?"hover:bg-accent/50 cursor-pointer" :""} ${className}`}
    onClick={onClick}
   >
    <div className="flex items-start justify-between gap-3">
