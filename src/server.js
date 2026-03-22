@@ -1633,63 +1633,134 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
     } catch { /* skip */ }
   }
 
-  return res.status(404).json({ error: "Approval not found" });
-});
-
-// List pending approvals across all projects
-app.get("/mc/api/approvals", requireSetupAuth, (_req, res) => {
-  const approvals = [];
-
-  // Source 1: Project-format approvals (shared/projects/*/approvals/pending/*.json)
-  const projectsDir = path.join(STATE_DIR, "shared", "projects");
+  // Check proposed issues (shared/projects/*/issues/*.json with status "proposed")
   if (fs.existsSync(projectsDir)) {
     const projects = fs.readdirSync(projectsDir, { withFileTypes: true }).filter((e) => e.isDirectory());
     for (const proj of projects) {
-      const pendingDir = path.join(projectsDir, proj.name, "approvals", "pending");
-      if (!fs.existsSync(pendingDir)) continue;
-      const files = fs.readdirSync(pendingDir).filter((f) => f.endsWith(".json"));
-      for (const file of files) {
+      const issuesDir = path.join(projectsDir, proj.name, "issues");
+      if (!fs.existsSync(issuesDir)) continue;
+      const issueFiles = fs.readdirSync(issuesDir).filter((f) => f.endsWith(".json") && f !== ".counter");
+      for (const file of issueFiles) {
         try {
-          const raw = fs.readFileSync(path.join(pendingDir, file), "utf8");
-          const data = JSON.parse(raw);
-          if (data.status === "resolved") continue; // skip tombstones
-          approvals.push({ ...data, _project: proj.name, _file: file });
-        } catch { /* skip malformed files */ }
+          const raw = fs.readFileSync(path.join(issuesDir, file), "utf8");
+          const issue = JSON.parse(raw);
+          const issueId = issue.id || file.replace(".json", "");
+          if (issueId !== id) continue;
+          return res.json({
+            id: issueId,
+            type: "proposed-issue",
+            what: issue.title || file.replace(".json", ""),
+            why: issue.description || null,
+            requester: issue.created_by || issue.assignee || "agent",
+            created: issue.created || null,
+            status: issue.status || "proposed",
+            priority: issue.priority || null,
+            labels: issue.labels || [],
+            comments: issue.comments || [],
+            _project: proj.name,
+            _file: file,
+            _source: "issue",
+          });
+        } catch { /* skip */ }
       }
     }
   }
 
-  // Source 2: Legacy deliverables format (shared/output/index.json with status "needs-feedback")
-  const indexPath = path.join(STATE_DIR, "shared", "output", "index.json");
-  if (fs.existsSync(indexPath)) {
-    try {
-      const indexRaw = fs.readFileSync(indexPath, "utf8");
-      const index = JSON.parse(indexRaw);
-      const entries = Array.isArray(index) ? index : (index.deliverables || index.entries || []);
-      for (const entry of entries) {
-        if (entry.status !== "needs-feedback") continue;
-        // Read deliverable content if file exists
-        let deliverableContent = null;
-        if (entry.deliverable) {
-          const delivPath = path.join(STATE_DIR, entry.deliverable);
-          if (fs.existsSync(delivPath)) {
-            try { deliverableContent = fs.readFileSync(delivPath, "utf8"); } catch {}
-          }
+  return res.status(404).json({ error: "Approval not found" });
+});
+
+// List pending approvals across all projects
+app.get("/mc/api/approvals", requireSetupAuth, (req, res) => {
+  const approvals = [];
+  const filterProject = req.query.project || null;
+
+  const projectsDir = path.join(STATE_DIR, "shared", "projects");
+  if (fs.existsSync(projectsDir)) {
+    const projects = fs.readdirSync(projectsDir, { withFileTypes: true }).filter((e) => e.isDirectory());
+    for (const proj of projects) {
+      if (filterProject && proj.name !== filterProject) continue;
+
+      // Source 1: Project-format approvals (shared/projects/*/approvals/pending/*.json)
+      const pendingDir = path.join(projectsDir, proj.name, "approvals", "pending");
+      if (fs.existsSync(pendingDir)) {
+        const files = fs.readdirSync(pendingDir).filter((f) => f.endsWith(".json"));
+        for (const file of files) {
+          try {
+            const raw = fs.readFileSync(path.join(pendingDir, file), "utf8");
+            const data = JSON.parse(raw);
+            if (data.status === "resolved") continue; // skip tombstones
+            approvals.push({
+              ...data,
+              type: data.gate || "unknown",
+              _project: proj.name,
+              _file: file,
+              _source: "gate",
+            });
+          } catch { /* skip malformed files */ }
         }
-        approvals.push({
-          id: entry.id || entry.taskId || entry.file,
-          gate: "deliverable-review",
-          what: entry.summary || entry.title || entry.description || "Deliverable review",
-          why: deliverableContent || entry.description || null,
-          requester: entry.agent || entry.author || "unknown",
-          created: entry.created || entry.timestamp || entry.date || null,
-          _project: entry.project || null,
-          _deliverablePath: entry.deliverable || null,
-          _file: entry.file || entry.id,
-          _source: "deliverables",
-        });
       }
-    } catch { /* skip malformed index.json */ }
+
+      // Source 2: Proposed issues (shared/projects/*/issues/*.json with status "proposed")
+      const issuesDir = path.join(projectsDir, proj.name, "issues");
+      if (fs.existsSync(issuesDir)) {
+        const issueFiles = fs.readdirSync(issuesDir).filter((f) => f.endsWith(".json") && f !== ".counter");
+        for (const file of issueFiles) {
+          try {
+            const raw = fs.readFileSync(path.join(issuesDir, file), "utf8");
+            const issue = JSON.parse(raw);
+            if (issue.status !== "proposed") continue;
+            approvals.push({
+              id: issue.id || file.replace(".json", ""),
+              type: "proposed-issue",
+              what: issue.title || file.replace(".json", ""),
+              why: issue.description || null,
+              requester: issue.created_by || issue.assignee || "agent",
+              created: issue.created || null,
+              status: "pending",
+              priority: issue.priority || null,
+              _project: proj.name,
+              _file: file,
+              _source: "issue",
+            });
+          } catch { /* skip malformed files */ }
+        }
+      }
+    }
+  }
+
+  // Source 3: Legacy deliverables format (shared/output/index.json with status "needs-feedback")
+  if (!filterProject) {
+    const indexPath = path.join(STATE_DIR, "shared", "output", "index.json");
+    if (fs.existsSync(indexPath)) {
+      try {
+        const indexRaw = fs.readFileSync(indexPath, "utf8");
+        const index = JSON.parse(indexRaw);
+        const entries = Array.isArray(index) ? index : (index.deliverables || index.entries || []);
+        for (const entry of entries) {
+          if (entry.status !== "needs-feedback") continue;
+          let deliverableContent = null;
+          if (entry.deliverable) {
+            const delivPath = path.join(STATE_DIR, entry.deliverable);
+            if (fs.existsSync(delivPath)) {
+              try { deliverableContent = fs.readFileSync(delivPath, "utf8"); } catch {}
+            }
+          }
+          approvals.push({
+            id: entry.id || entry.taskId || entry.file,
+            type: "deliverable-review",
+            gate: "deliverable-review",
+            what: entry.summary || entry.title || entry.description || "Deliverable review",
+            why: deliverableContent || entry.description || null,
+            requester: entry.agent || entry.author || "unknown",
+            created: entry.created || entry.timestamp || entry.date || null,
+            _project: entry.project || null,
+            _deliverablePath: entry.deliverable || null,
+            _file: entry.file || entry.id,
+            _source: "gate",
+          });
+        }
+      } catch { /* skip malformed index.json */ }
+    }
   }
 
   approvals.sort((a, b) => (b.created || "").localeCompare(a.created || ""));

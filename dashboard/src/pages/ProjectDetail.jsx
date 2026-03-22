@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getApprovals, resolveApproval, getExperiments } from "../api.js";
+import { getFile, getProjectCosts, getBudgetPolicy, updateBudgetPolicy, getApprovals, resolveApproval, updateIssue, deleteIssue, getExperiments } from "../api.js";
 import { formatDate as formatDateUtil, formatTimeAgo } from "../utils/formatDate.js";
 import {
   ArrowLeft, FileText, Activity, DollarSign, Clock,
@@ -100,11 +100,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
       loadCosts(projectId),
       getProjectCosts(projectId).catch(() => null),
       getBudgetPolicy(projectId).catch(() => null),
-      getApprovals().then((all) => all.filter((a) => {
-        // Include project-format approvals matching this project
-        if ((a._project || a.project) === projectId) return true;
-        return false;
-      })).catch(() => []),
+      getApprovals(projectId).catch(() => []),
       getExperiments(projectId).catch(() => []),
     ]).then(([proj, miles, activity, standupList, costList, costData, policyData, approvalList, experimentList]) => {
       setProjectRaw(proj?.content || null);
@@ -358,11 +354,8 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
             projectId={projectId}
             navigate={navigate}
             onResolved={() => {
-              getApprovals()
-                .then((all) => setApprovals(all.filter((a) => {
-                  if ((a._project || a.project) === projectId) return true;
-                  return false;
-                })))
+              getApprovals(projectId)
+                .then(setApprovals)
                 .catch(() => {});
             }}
           />
@@ -573,17 +566,21 @@ function ProjectCostsTab({ costs, costSummary, budgetPolicy, totalCost, projectI
 function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate }) {
   async function handleApprove(approval) {
     try {
-      await resolveApproval({
-        project: approval._project || approval.project || projectId,
-        id: approval.id,
-        decision: "approved",
-        comment: null,
-        requester: approval.requester,
-        gate: approval.gate,
-        what: approval.what || approval.title,
-        why: approval.why,
-        created: approval.created,
-      });
+      if (approval._source === "issue") {
+        await updateIssue(approval.id, projectId, { status: "todo" });
+      } else {
+        await resolveApproval({
+          project: approval._project || approval.project || projectId,
+          id: approval.id,
+          decision: "approved",
+          comment: null,
+          requester: approval.requester,
+          gate: approval.gate,
+          what: approval.what || approval.title,
+          why: approval.why,
+          created: approval.created,
+        });
+      }
       onResolved();
     } catch (err) {
       console.error("Approve failed:", err);
@@ -591,23 +588,32 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate }) {
   }
 
   async function handleReject(approval) {
-    const comment = prompt("Reason for rejection:");
-    if (!comment) return;
-    try {
-      await resolveApproval({
-        project: approval._project || approval.project || projectId,
-        id: approval.id,
-        decision: "rejected",
-        comment,
-        requester: approval.requester,
-        gate: approval.gate,
-        what: approval.what || approval.title,
-        why: approval.why,
-        created: approval.created,
-      });
-      onResolved();
-    } catch (err) {
-      console.error("Reject failed:", err);
+    if (approval._source === "issue") {
+      try {
+        await deleteIssue(approval.id, projectId);
+        onResolved();
+      } catch (err) {
+        console.error("Reject failed:", err);
+      }
+    } else {
+      const comment = prompt("Reason for rejection:");
+      if (!comment) return;
+      try {
+        await resolveApproval({
+          project: approval._project || approval.project || projectId,
+          id: approval.id,
+          decision: "rejected",
+          comment,
+          requester: approval.requester,
+          gate: approval.gate,
+          what: approval.what || approval.title,
+          why: approval.why,
+          created: approval.created,
+        });
+        onResolved();
+      } catch (err) {
+        console.error("Reject failed:", err);
+      }
     }
   }
 

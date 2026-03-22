@@ -1,4 +1,4 @@
-import { Check, X, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Check, X, Clock, CheckCircle2, XCircle, CircleDot, FlaskConical, FileText } from "lucide-react";
 import { formatTimeAgo } from "../utils/formatDate.js";
 
 function statusIcon(status) {
@@ -8,6 +8,43 @@ function statusIcon(status) {
     return <XCircle size={14} className="text-red-400" />;
   // pending or anything else
   return <Clock size={14} className="text-amber-400" />;
+}
+
+// Type badge — distinguishes proposed issues from gate requests
+function TypeBadge({ type }) {
+  if (type === "proposed-issue") {
+    return (
+      <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-violet-900/50 text-violet-300">
+        <CircleDot size={10} />
+        Issue
+      </span>
+    );
+  }
+  if (type === "experiment-start" || type === "autoresearch-start") {
+    return (
+      <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
+        <FlaskConical size={10} />
+        Experiment
+      </span>
+    );
+  }
+  if (type === "deliverable-review") {
+    return (
+      <span className="shrink-0 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium bg-blue-900/50 text-blue-300">
+        <FileText size={10} />
+        Deliverable
+      </span>
+    );
+  }
+  // Fallback: show the gate name if present
+  if (type) {
+    return (
+      <span className="shrink-0 inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
+        {type}
+      </span>
+    );
+  }
+  return null;
 }
 
 export default function ApprovalCard({
@@ -22,6 +59,7 @@ export default function ApprovalCard({
   const isPending =
     !approval.status || approval.status === "pending" || approval.status === undefined;
   const status = approval.status || "pending";
+  const itemType = approval.type || approval.gate || null;
 
   const timeAgo = approval.created
     ? formatTimeAgo(approval.created)
@@ -39,13 +77,9 @@ export default function ApprovalCard({
       {/* Status icon */}
       <div className="shrink-0">{statusIcon(status)}</div>
 
-      {/* Gate badge + title + project */}
+      {/* Type badge + title + project */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        {approval.gate && (
-          <span className="shrink-0 inline-flex items-center rounded px-2 py-0.5 text-xs font-medium bg-amber-900/50 text-amber-300">
-            {approval.gate}
-          </span>
-        )}
+        <TypeBadge type={itemType} />
         <span className="text-sm font-medium text-foreground truncate">
           {title}
         </span>
@@ -62,8 +96,13 @@ export default function ApprovalCard({
         )}
       </div>
 
-      {/* Right side: requester, time, buttons */}
+      {/* Right side: priority (issues only), requester, time, buttons */}
       <div className="flex items-center gap-3 shrink-0">
+        {approval.priority && approval.priority !== "none" && (
+          <span className="text-[10px] text-muted-foreground/60 uppercase hidden sm:inline">
+            {approval.priority}
+          </span>
+        )}
         {approval.requester && (
           <span className="text-xs text-muted-foreground hidden sm:inline">
             {approval.requester}

@@ -3,7 +3,7 @@
  * Adapted from Paperclip's IssuesList + KanbanBoard layout.
  */
 import { useState, useEffect, useMemo } from "react";
-import { getIssues, updateIssue, deleteIssue } from "../api.js";
+import { getIssues, updateIssue } from "../api.js";
 import {
   List,
   LayoutGrid,
@@ -11,9 +11,6 @@ import {
   Search,
   ArrowRight,
   CircleDot,
-  CheckCircle2,
-  XCircle,
-  Loader2,
 } from "lucide-react";
 import { formatTimeAgo } from "../utils/formatDate.js";
 import { Skeleton } from "../components/ui/Skeleton.jsx";
@@ -53,7 +50,7 @@ export default function Issues({ projectSlug, navigate }) {
     loadIssues();
   }, [projectSlug]);
 
-  const proposedIssues = useMemo(() => issues.filter((i) => i.status === "proposed"), [issues]);
+  // Proposed issues live in Approvals — only show active issues here
   const activeIssues = useMemo(() => issues.filter((i) => i.status !== "proposed"), [issues]);
 
   const filteredIssues = useMemo(() => {
@@ -77,35 +74,6 @@ export default function Issues({ projectSlug, navigate }) {
     }
     return result;
   }, [activeIssues, searchQuery, filterStatus, filterPriority, filterAssignee]);
-
-  const [approvingId, setApprovingId] = useState(null);
-  const [rejectingId, setRejectingId] = useState(null);
-
-  async function handleApproveProposal(issue) {
-    setApprovingId(issue.id);
-    try {
-      await updateIssue(issue.id, projectSlug, { status: "todo" });
-      setIssues((prev) =>
-        prev.map((i) => (i.id === issue.id ? { ...i, status: "todo" } : i))
-      );
-    } catch (err) {
-      console.error("Failed to approve:", err);
-    } finally {
-      setApprovingId(null);
-    }
-  }
-
-  async function handleRejectProposal(issue) {
-    setRejectingId(issue.id);
-    try {
-      await deleteIssue(issue.id, projectSlug);
-      setIssues((prev) => prev.filter((i) => i.id !== issue.id));
-    } catch (err) {
-      console.error("Failed to reject:", err);
-    } finally {
-      setRejectingId(null);
-    }
-  }
 
   async function handleStatusChange(issueId, newStatus) {
     try {
@@ -140,69 +108,6 @@ export default function Issues({ projectSlug, navigate }) {
 
   return (
     <div className="space-y-4">
-      {/* Proposed issues awaiting review */}
-      {proposedIssues.length > 0 && (
-        <div className="border border-violet-700/30 rounded-lg bg-violet-900/10 p-4 space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-violet-300">
-            Proposed Issues ({proposedIssues.length} awaiting review)
-          </h3>
-          <div className="divide-y divide-border/50">
-            {proposedIssues.map((issue) => (
-              <div key={issue.id} className="py-3 first:pt-0 last:pb-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <PriorityDot priority={issue.priority} />
-                      <span className="text-sm font-medium">{issue.title}</span>
-                    </div>
-                    {issue.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 ml-5">
-                        {issue.description}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-3 mt-1.5 ml-5 text-xs text-muted-foreground">
-                      {issue.assignee && (
-                        <span className="flex items-center gap-1">
-                          <AgentInitial name={issue.assignee} />
-                          <span className="capitalize">{issue.assignee}</span>
-                        </span>
-                      )}
-                      {issue.created && <span>{timeAgo(issue.created)}</span>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button
-                      onClick={() => handleApproveProposal(issue)}
-                      disabled={approvingId === issue.id || rejectingId === issue.id}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
-                    >
-                      {approvingId === issue.id ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <CheckCircle2 size={12} />
-                      )}
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleRejectProposal(issue)}
-                      disabled={approvingId === issue.id || rejectingId === issue.id}
-                      className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50"
-                    >
-                      {rejectingId === issue.id ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <XCircle size={12} />
-                      )}
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
         {/* Search */}
@@ -224,7 +129,7 @@ export default function Issues({ projectSlug, navigate }) {
           className="rounded border border-border bg-transparent px-2 py-1.5 text-xs outline-none"
         >
           <option value="">All statuses</option>
-          {ALL_STATUSES.map((s) => (
+          {ALL_STATUSES.filter((s) => s !== "proposed").map((s) => (
             <option key={s} value={s}>
               {s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             </option>
