@@ -57,7 +57,7 @@ function SidebarNavItem({ active, onClick, icon: Icon, label, badge, badgeTone =
  return (
   <button
    onClick={onClick}
-   className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[13px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
+   className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[15px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
     active
      ?"bg-accent/60 text-foreground"
      :"text-muted-foreground hover:bg-accent/40 hover:text-foreground"
@@ -210,7 +210,7 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
        <button
         key={slug}
         onClick={() => navigate("project", slug)}
-        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[13px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
+        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[15px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
          isActive
           ?"bg-accent/60 text-foreground"
           :"text-muted-foreground hover:bg-accent/40 hover:text-foreground"
@@ -272,7 +272,7 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
       KM
      </div>
      <div className="flex-1 overflow-hidden">
-      <div className="text-[13px] font-medium text-foreground truncate">Kavin</div>
+      <div className="text-[15px] font-medium text-foreground truncate">Kavin</div>
       <div className="text-[11px] text-muted-foreground truncate">OpenClaw v2026.3.13</div>
      </div>
     </div>
