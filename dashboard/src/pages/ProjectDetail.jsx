@@ -280,6 +280,9 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
                </div>
                <h3 className="text-sm font-medium text-zinc-200">{theme.title}</h3>
               </div>
+              {theme.description && (
+               <p className="text-sm text-zinc-400 ml-9 mb-2">{theme.description}</p>
+              )}
               <div className="ml-9 space-y-2.5">
                {(theme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999)).map((pm, pmIdx) => (
                 <div key={pm.id} className="flex items-start gap-3 text-sm text-zinc-400">
