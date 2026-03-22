@@ -43,7 +43,7 @@ function IssueRow({ issue, onClick }) {
    <PriorityDot priority={issue.priority} />
    <StatusCircle status={issue.status} />
    <span className="text-[12px] font-mono text-zinc-500 shrink-0 whitespace-nowrap">{issue.id}</span>
-   <span className={`text-sm flex-1 truncate ${isDone ? "text-zinc-500 line-through decoration-zinc-600" : "text-zinc-200"}`}>
+   <span className={`text-[15px] flex-1 truncate ${isDone ? "text-zinc-500 line-through decoration-zinc-600" : "text-zinc-200"}`}>
     {issue.title}
    </span>
    <StatusBadge status={issue.status} />

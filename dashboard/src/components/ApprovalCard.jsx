@@ -59,7 +59,7 @@ export default function ApprovalCard({
    {/* Left: type badge + description + metadata */}
    <div className="space-y-2 cursor-pointer">
     <TypeBadge type={itemType} />
-    <p className={`text-[14px] text-foreground ${isRejected ?"line-through decoration-muted-foreground/40" :""}`}>
+    <p className={`text-[15px] font-medium text-foreground ${isRejected ?"line-through decoration-muted-foreground/40" :""}`}>
      {title}
     </p>
     {/* Theme + proxy metrics */}

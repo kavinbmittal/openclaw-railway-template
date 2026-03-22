@@ -350,7 +350,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
                <div className={`w-6 h-6 rounded-full ${colors.badgeBg} border ${colors.badgeBorder} flex items-center justify-center text-xs font-mono font-medium ${colors.text} flex-shrink-0`}>
                 {theme.order ?? idx + 1}
                </div>
-               <h3 className="text-sm font-medium text-zinc-200">{theme.title}</h3>
+               <h3 className="text-[15px] font-medium text-zinc-200">{theme.title}</h3>
               </div>
               {theme.description && (
                <p className="text-xs text-zinc-500 ml-9 mb-3">{theme.description}</p>
@@ -815,7 +815,7 @@ function ProjectApprovalsTab({ approvals, projectId, onResolved, navigate, theme
          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${badge.cls}`}>{badge.label}</span>
         </div>
        )}
-       <p className={`text-sm font-medium text-zinc-100 ${isRejected ? "line-through decoration-zinc-500" : ""}`}>{title}</p>
+       <p className={`text-[15px] font-medium text-zinc-100 ${isRejected ? "line-through decoration-zinc-500" : ""}`}>{title}</p>
 
        {/* Theme + Proxy Metric pill row */}
        {td && (
@@ -951,7 +951,7 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
            <StatusBadge status={exp.status} />
           </div>
          )}
-         <h3 className="text-sm font-medium text-zinc-100">{exp.name}</h3>
+         <h3 className="text-[15px] font-medium text-zinc-100">{exp.name}</h3>
 
          {/* Theme + Proxy Metric pill row */}
          {expTheme && (

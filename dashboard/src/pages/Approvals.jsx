@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from"react";
-import { ShieldCheck } from"lucide-react";
+import { Compass, ShieldCheck } from"lucide-react";
 import { getApprovals, resolveApproval, updateIssue, deleteIssue } from"../api.js";
 import { RejectModal } from "../components/RejectModal.jsx";
-import ApprovalCard from "../components/ApprovalCard.jsx";
 
 const TYPE_STYLES = {
  budget: "border-amber-500/20 bg-amber-500/10 text-amber-400",
@@ -218,17 +217,66 @@ export default function Approvals({ navigate }) {
          </span>
         </div>
 
-        {/* Approval Cards — same component as project detail */}
-        <div className="space-y-3 p-[20px]">
+        {/* Approval Rows — Aura */}
+        <div className="flex flex-col">
          {items.map((approval, i) => (
-          <ApprovalCard
+          <div
            key={approval.id || approval._file || i}
-           approval={approval}
-           onApprove={() => handleApprove(approval)}
-           onReject={() => handleReject(approval)}
-           navigate={navigate}
-           hideProject
-          />
+           className={`flex flex-col gap-3 px-[20px] py-4 hover:bg-zinc-800/40 transition-colors cursor-pointer ${i < items.length - 1 ? "border-b border-zinc-800/50" : ""}`}
+           onClick={() => navigate("approval-detail", approval.id || approval._file)}
+          >
+           <div className="flex items-center gap-4">
+            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-normal border shrink-0 ${typeStyle(approval._source || approval.gate || approval.type)}`}>
+             {approval._source || approval.gate || approval.type || "request"}
+            </span>
+            <span className="text-[15px] font-medium text-zinc-200 flex-1 truncate">
+             {approval.what || approval.title}
+            </span>
+            <span className="text-[12px] font-mono text-zinc-500 shrink-0">
+             {timeAgo(approval.created)}
+            </span>
+           </div>
+           {/* Theme + proxy metrics pills */}
+           {(approval.theme_title || (approval.proxy_metric_names && approval.proxy_metric_names.length > 0)) && (
+            <div className="flex items-center gap-2 flex-wrap">
+             {approval.theme_title && (
+              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-teal-500/20 bg-teal-500/10 text-teal-400">
+               <Compass size={10} />
+               {approval.theme_title}
+              </span>
+             )}
+             {approval.proxy_metric_names && approval.proxy_metric_names.map((pm, j) => (
+              <span key={j} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-zinc-700 bg-zinc-800/50 text-zinc-400">
+               {pm}
+              </span>
+             ))}
+            </div>
+           )}
+           <div className="flex items-center justify-between mt-1">
+            <div className="flex items-center gap-2">
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500">
+              <rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h6"/>
+             </svg>
+             <span className="text-[15px] text-zinc-400">
+              Requested by {approval.requester || "agent"}
+             </span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+             <button
+              onClick={() => handleReject(approval)}
+              className="px-3 py-1.5 rounded-[6px] border border-red-500/30 bg-red-500/10 text-[15px] font-normal text-red-400 hover:bg-red-500/20 transition-colors"
+             >
+              Reject
+             </button>
+             <button
+              onClick={() => handleApprove(approval)}
+              className="px-3 py-1.5 rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-[15px] font-normal text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+             >
+              Approve
+             </button>
+            </div>
+           </div>
+          </div>
          ))}
         </div>
        </div>
