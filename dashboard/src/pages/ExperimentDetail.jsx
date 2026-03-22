@@ -161,6 +161,33 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
      {/* ── Left Column ── */}
      <div className="xl:col-span-2 flex flex-col gap-6">
 
+      {/* Created box */}
+      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+       <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Created</div>
+       <div className="text-sm text-zinc-200">{data.created || "Unknown"}</div>
+      </div>
+
+      {/* Theme & Proxy Metric grid */}
+      {(theme || proxy_metric) && (
+       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        {theme && (
+         <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+          <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Theme</div>
+          <div className="text-sm text-zinc-200 flex items-center gap-2">
+           <ThemeDot theme={theme} />
+           {theme}
+          </div>
+         </div>
+        )}
+        {proxy_metric && (
+         <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+          <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Proxy Metric</div>
+          <div className="text-sm text-zinc-200">{proxy_metric}</div>
+         </div>
+        )}
+       </div>
+      )}
+
       {/* Hypothesis card */}
       {hypothesis && (
        <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm">
@@ -244,12 +271,6 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
 
       {/* Metrics card */}
       <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5 space-y-6">
-       {proxy_metric && (
-        <div>
-         <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Proxy Metric</div>
-         <div className="text-sm text-zinc-200">{proxy_metric}</div>
-        </div>
-       )}
        {target_value && (
         <div>
          <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Target Value</div>
@@ -259,10 +280,12 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
        {best_metric !== null && (
         <div>
          <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Current Best</div>
-         <div className="text-3xl font-medium text-emerald-400 font-mono tracking-tight">{best_metric}</div>
+         <div className="flex items-baseline gap-3">
+          <div className="text-3xl font-medium text-emerald-400 font-mono tracking-tight">{best_metric}</div>
+         </div>
          {trend && (
-          <div className={`text-xs font-medium mt-1 ${trend.direction === "up" ? "text-emerald-400" : "text-red-400"}`}>
-           {trend.direction === "up" ? "+" : ""}{trend.value.toFixed(1)}% from previous run
+          <div className={`flex items-center gap-1 mt-2 ${trend.direction === "up" ? "text-emerald-400" : "text-red-400"}`}>
+           <span className="text-xs font-medium">{trend.direction === "up" ? "+" : ""}{trend.value.toFixed(1)}% vs baseline</span>
           </div>
          )}
         </div>
@@ -273,21 +296,10 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
        </div>
       </div>
 
-      {/* Info card */}
-      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5 space-y-5">
-       {theme && (
-        <div>
-         <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Theme</div>
-         <div className="flex items-center gap-2 text-sm text-zinc-200">
-          <ThemeDot theme={theme} />
-          {theme}
-         </div>
-        </div>
-       )}
-       <div>
-        <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Directory</div>
-        <div className="text-sm text-zinc-300 font-mono break-all bg-zinc-800/30 px-2 py-1 rounded border border-zinc-800/50">{experimentDir}</div>
-       </div>
+      {/* Last Run card */}
+      <div className="bg-[#121214] border border-zinc-800 rounded-sm shadow-sm p-5">
+       <div className="text-xs uppercase font-mono tracking-widest text-zinc-500 mb-1.5">Last Run</div>
+       <div className="text-sm text-zinc-200">{results.length > 0 ? "Just now" : "No runs yet"}</div>
       </div>
 
       {/* Actions card */}
