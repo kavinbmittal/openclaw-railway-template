@@ -1728,6 +1728,24 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
           const issue = JSON.parse(raw);
           const issueId = issue.id || file.replace(".json", "");
           if (issueId !== id) continue;
+          // Resolve theme ID to title and proxy metric IDs to names
+          let issuThemeTitle = issue.theme || null;
+          let issuPMNames = issue.proxy_metrics || null;
+          if (issue.theme) {
+            const tPath = path.join(projectsDir, proj.name, "themes", `${issue.theme}.json`);
+            if (fs.existsSync(tPath)) {
+              try {
+                const tData = JSON.parse(fs.readFileSync(tPath, "utf8"));
+                issuThemeTitle = tData.title || issue.theme;
+                if (Array.isArray(issue.proxy_metrics) && Array.isArray(tData.proxy_metrics)) {
+                  issuPMNames = issue.proxy_metrics.map((pmId) => {
+                    const found = tData.proxy_metrics.find((t) => t.id === pmId);
+                    return found ? found.name : pmId;
+                  });
+                }
+              } catch { /* skip */ }
+            }
+          }
           return res.json({
             id: issueId,
             type: "proposed-issue",
@@ -1739,6 +1757,9 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
             priority: issue.priority || null,
             labels: issue.labels || [],
             comments: issue.comments || [],
+            theme: issue.theme || null,
+            theme_title: issuThemeTitle,
+            proxy_metric_names: issuPMNames,
             _project: proj.name,
             _file: file,
             _source: "issue",
@@ -1823,6 +1844,24 @@ app.get("/mc/api/approvals", requireSetupAuth, (req, res) => {
             const raw = fs.readFileSync(path.join(issuesDir, file), "utf8");
             const issue = JSON.parse(raw);
             if (issue.status !== "proposed") continue;
+            // Resolve theme ID to title and proxy metric IDs to names
+            let listThemeTitle = issue.theme || null;
+            let listPMNames = issue.proxy_metrics || null;
+            if (issue.theme) {
+              const tPath = path.join(projectsDir, proj.name, "themes", `${issue.theme}.json`);
+              if (fs.existsSync(tPath)) {
+                try {
+                  const tData = JSON.parse(fs.readFileSync(tPath, "utf8"));
+                  listThemeTitle = tData.title || issue.theme;
+                  if (Array.isArray(issue.proxy_metrics) && Array.isArray(tData.proxy_metrics)) {
+                    listPMNames = issue.proxy_metrics.map((pmId) => {
+                      const found = tData.proxy_metrics.find((t) => t.id === pmId);
+                      return found ? found.name : pmId;
+                    });
+                  }
+                } catch { /* skip */ }
+              }
+            }
             approvals.push({
               id: issue.id || file.replace(".json", ""),
               type: "proposed-issue",
@@ -1832,8 +1871,8 @@ app.get("/mc/api/approvals", requireSetupAuth, (req, res) => {
               created: issue.created || null,
               status: "pending",
               priority: issue.priority || null,
-              theme_title: issue.theme_title || null,
-              proxy_metric_names: issue.proxy_metric_names || null,
+              theme_title: listThemeTitle,
+              proxy_metric_names: listPMNames,
               _project: proj.name,
               _file: file,
               _source: "issue",
