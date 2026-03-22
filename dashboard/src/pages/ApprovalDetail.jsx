@@ -483,7 +483,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
          <button
           onClick={() => handleResolve("approved")}
           disabled={submitting}
-          className="w-full py-2.5 rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-[14px] font-medium text-emerald-400 hover:bg-emerald-500/20 transition-all flex justify-center items-center gap-2 focus:ring-2 focus:ring-emerald-500/50 outline-none disabled:opacity-50"
+          className="w-full py-2.5 rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-[14px] font-medium text-emerald-400 hover:bg-emerald-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-emerald-500/50 disabled:opacity-50"
          >
           {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
           {isThemeProposal ? "Approve Theme" : isIssue ?"Approve Issue" :"Approve Request"}
@@ -493,7 +493,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
           <button
            onClick={() => handleResolve("revision_requested")}
            disabled={submitting || !comment.trim()}
-           className="w-full py-2.5 rounded-[6px] border border-amber-500/30 bg-amber-500/10 text-[14px] font-medium text-amber-400 hover:bg-amber-500/20 transition-all flex justify-center items-center gap-2 focus:ring-2 focus:ring-amber-500/50 outline-none disabled:opacity-50"
+           className="w-full py-2.5 rounded-[6px] border border-amber-500/30 bg-amber-500/10 text-[14px] font-medium text-amber-400 hover:bg-amber-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500/50 disabled:opacity-50"
           >
            {submitting ? <Loader2 size={18} className="animate-spin" /> : <RotateCcw size={18} />}
            Request Revision
@@ -503,7 +503,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
          <button
           onClick={() => handleResolve("rejected")}
           disabled={submitting || (!isIssue && !isThemeProposal && !comment.trim())}
-          className="w-full py-2.5 rounded-[6px] border border-red-500/30 bg-red-500/10 text-[14px] font-medium text-red-400 hover:bg-red-500/20 transition-all flex justify-center items-center gap-2 focus:ring-2 focus:ring-red-500/50 outline-none disabled:opacity-50"
+          className="w-full py-2.5 rounded-[6px] border border-red-500/30 bg-red-500/10 text-[14px] font-medium text-red-400 hover:bg-red-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/50 disabled:opacity-50"
          >
           {submitting ? <Loader2 size={18} className="animate-spin" /> : <XCircle size={18} />}
           {isThemeProposal ? "Reject Theme" : isIssue ?"Reject Issue" :"Reject Request"}
@@ -519,7 +519,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
            <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="w-full rounded-[6px] border border-zinc-800 bg-[#09090b] text-[14px] text-zinc-200 p-3 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 transition-all resize-none h-20"
+            className="w-full rounded-[6px] border border-zinc-800 bg-[#09090b] text-[14px] text-zinc-200 p-3 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-none h-20"
             placeholder="Provide context..."
            />
           </div>

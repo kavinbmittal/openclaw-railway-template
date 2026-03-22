@@ -73,7 +73,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
        onChange={(e) => setName(e.target.value)}
        placeholder="e.g. Batch Size Optimization"
        autoFocus
-       className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all"
+       className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
       />
      </div>
 
@@ -85,7 +85,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
        onChange={(e) => setHypothesis(e.target.value)}
        rows={4}
        placeholder="What do you expect to happen? e.g. Increasing batch size from 500 to 2000 will reduce CPU usage by 15%"
-       className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all resize-none"
+       className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-none"
       />
      </div>
 
@@ -97,7 +97,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
         <select
          value={selectedTheme}
          onChange={(e) => setSelectedTheme(e.target.value)}
-         className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 pr-10 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all cursor-pointer appearance-none"
+         className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all cursor-pointer appearance-none"
         >
          <option value="">No theme</option>
          {themes.map((t) => (
@@ -120,7 +120,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
         <select
          value={primaryMetric}
          onChange={(e) => setPrimaryMetric(e.target.value)}
-         className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 pr-10 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all cursor-pointer appearance-none"
+         className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all cursor-pointer appearance-none"
         >
          <option value="">Select a metric...</option>
          <option value="CPU utilization %">CPU utilization %</option>
@@ -145,7 +145,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
          value={targetValue}
          onChange={(e) => setTargetValue(e.target.value)}
          placeholder="e.g. -15"
-         className="w-full bg-transparent border border-zinc-800 rounded-md pl-3 pr-8 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all"
+         className="w-full bg-transparent border border-zinc-800 rounded-md pl-3 pr-8 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm font-medium">%</span>
        </div>
@@ -160,7 +160,7 @@ export function CreateExperiment({ projectSlug, themes = [], onCreated, onClose 
        onChange={(e) => setProgramMd(e.target.value)}
        rows={6}
        placeholder="Describe the experiment methodology, variables, and success criteria. Markdown supported."
-       className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all resize-y font-mono leading-relaxed"
+       className="w-full bg-transparent border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-y font-mono leading-relaxed"
       />
       <p className="text-[12px] text-zinc-500 mt-2">
        This becomes the experiment's program.md — the source of truth for what to test and how.

@@ -81,7 +81,7 @@ export default function Workspaces() {
    {/* Filters */}
    <div className="flex items-center gap-3 flex-wrap">
     <select
-     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-primary"
+     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      value={filterProject}
      onChange={(e) => setFilterProject(e.target.value)}
     >
@@ -94,7 +94,7 @@ export default function Workspaces() {
     </select>
 
     <select
-     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-primary"
+     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      value={filterAgent}
      onChange={(e) => setFilterAgent(e.target.value)}
     >
@@ -107,7 +107,7 @@ export default function Workspaces() {
     </select>
 
     <select
-     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus:border-primary"
+     className="bg-transparent border border-border px-2 py-1.5 text-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      value={filterStatus}
      onChange={(e) => setFilterStatus(e.target.value)}
     >

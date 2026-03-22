@@ -125,7 +125,7 @@ export default function Activity({ navigate }) {
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
       placeholder="Search activity..."
-      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-ring transition-colors"
+      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors"
      />
     </div>
 
@@ -134,7 +134,7 @@ export default function Activity({ navigate }) {
      <select
       value={filterProject}
       onChange={(e) => setFilterProject(e.target.value)}
-      className="h-7 px-2 text-xs rounded-md bg-background border border-border text-foreground focus:outline-none focus:border-ring transition-colors"
+      className="h-7 px-2 text-xs rounded-md bg-background border border-border text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors"
      >
       <option value="">All projects</option>
       {projects.map((p) => (
@@ -145,7 +145,7 @@ export default function Activity({ navigate }) {
      <select
       value={filterAgent}
       onChange={(e) => setFilterAgent(e.target.value)}
-      className="h-7 px-2 text-xs rounded-md bg-background border border-border text-foreground focus:outline-none focus:border-ring transition-colors"
+      className="h-7 px-2 text-xs rounded-md bg-background border border-border text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors"
      >
       <option value="">All agents</option>
       {agents.map((a) => (
@@ -156,7 +156,7 @@ export default function Activity({ navigate }) {
      <select
       value={filterType}
       onChange={(e) => setFilterType(e.target.value)}
-      className="h-7 px-2 text-xs rounded-md bg-background border border-border text-foreground focus:outline-none focus:border-ring transition-colors"
+      className="h-7 px-2 text-xs rounded-md bg-background border border-border text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors"
      >
       {EVENT_TYPES.map((t) => (
        <option key={t.value} value={t.value}>{t.label}</option>

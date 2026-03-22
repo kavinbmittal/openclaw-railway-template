@@ -149,7 +149,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
      <select
       value={filterStatus}
       onChange={(e) => setFilterStatus(e.target.value)}
-      className="flex items-center gap-2 rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] px-3 py-1.5 text-zinc-300 hover:border-zinc-700 transition-colors focus:outline-none focus:ring-[3px] focus:ring-zinc-700/50"
+      className="flex items-center gap-2 rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] px-3 py-1.5 text-zinc-300 hover:border-zinc-700 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      >
       <option value="">Status: All</option>
       {ALL_STATUSES.filter((s) => s !=="proposed").map((s) => (
@@ -162,7 +162,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
      <select
       value={filterPriority}
       onChange={(e) => setFilterPriority(e.target.value)}
-      className="flex items-center gap-2 rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] px-3 py-1.5 text-zinc-300 hover:border-zinc-700 transition-colors focus:outline-none focus:ring-[3px] focus:ring-zinc-700/50"
+      className="flex items-center gap-2 rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] px-3 py-1.5 text-zinc-300 hover:border-zinc-700 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      >
       <option value="">Priority: All</option>
       {ALL_PRIORITIES.map((p) => (
@@ -175,7 +175,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
      <select
       value={filterAssignee}
       onChange={(e) => setFilterAssignee(e.target.value)}
-      className="flex items-center gap-2 rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] px-3 py-1.5 text-zinc-300 hover:border-zinc-700 transition-colors focus:outline-none focus:ring-[3px] focus:ring-zinc-700/50"
+      className="flex items-center gap-2 rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] px-3 py-1.5 text-zinc-300 hover:border-zinc-700 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
      >
       <option value="">Assignee</option>
       {AGENTS.map((a) => (
@@ -186,7 +186,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
 
     <button
      onClick={() => setShowCreate(!showCreate)}
-     className="rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] font-medium text-zinc-300 px-3 py-1.5 hover:bg-zinc-800 transition-colors focus:outline-none focus:ring-[3px] focus:ring-zinc-700/50"
+     className="rounded-[6px] border border-zinc-800 bg-[#121214] text-[15px] font-medium text-zinc-300 px-3 py-1.5 hover:bg-zinc-800 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
      Create Issue
     </button>

@@ -276,7 +276,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none transition-colors shadow-sm"
+                className="w-full bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors shadow-sm"
                 placeholder="Issue title"
               />
             </div>
@@ -321,7 +321,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
-                    className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                    className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   >
                     {ALL_PRIORITIES.map((p) => (
                       <option key={p} value={p}>
@@ -342,7 +342,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                   <select
                     value={assignee}
                     onChange={(e) => setAssignee(e.target.value)}
-                    className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                    className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                   >
                     <option value="">Unassigned</option>
                     {AGENTS.map((a) => (
@@ -365,7 +365,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 <select
                   value={theme}
                   onChange={(e) => handleThemeChange(e.target.value)}
-                  className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                  className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 >
                   <option value="">No theme</option>
                   {approvedThemes.map((t) => (
@@ -425,7 +425,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="text"
                 value={labels}
                 onChange={(e) => setLabels(e.target.value)}
-                className="w-full bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none transition-colors shadow-sm"
+                className="w-full bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-colors shadow-sm"
                 placeholder="e.g. infra, database, scaling"
               />
               <p className="text-xs text-zinc-500 mt-2">Optional tags for categorization</p>
@@ -438,7 +438,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-4 py-2 rounded-md border border-red-500/20 bg-red-500/10 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-2 outline-none focus:ring-2 focus:ring-red-500/30"
+                className="px-4 py-2 rounded-md border border-red-500/20 bg-red-500/10 text-sm font-medium text-red-400 hover:bg-red-500/20 transition-colors flex items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/30"
               >
                 <Trash2 size={16} />
                 {deleting ? "Deleting..." : "Delete Issue"}
@@ -457,7 +457,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
               <button
                 type="button"
                 onClick={() => navigate("issue-detail", { projectSlug, issueId })}
-                className="px-4 py-2 rounded-md border border-zinc-800 bg-[#121214] text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors shadow-sm outline-none focus:ring-2 focus:ring-zinc-700"
+                className="px-4 py-2 rounded-md border border-zinc-800 bg-[#121214] text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors shadow-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
               >
                 Cancel
               </button>

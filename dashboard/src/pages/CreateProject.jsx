@@ -117,7 +117,7 @@ export default function CreateProject({ navigate }) {
        onChange={(e) => handleNameChange(e.target.value)}
        placeholder="e.g. API Gateway v2"
        required
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow"
       />
      </div>
 
@@ -129,7 +129,7 @@ export default function CreateProject({ navigate }) {
        value={slug}
        onChange={(e) => { setSlug(e.target.value); setSlugManual(true); }}
        placeholder="api-gateway-v2"
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow font-mono"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow font-mono"
       />
       <span className="block text-[12px] text-muted-foreground mt-1.5">Used in file paths and URLs. Must be unique.</span>
      </div>
@@ -143,7 +143,7 @@ export default function CreateProject({ navigate }) {
        rows={4}
        placeholder="What is this project trying to achieve?"
        required
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow resize-y"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow resize-y"
       />
      </div>
 
@@ -155,7 +155,7 @@ export default function CreateProject({ navigate }) {
        value={nsm}
        onChange={(e) => setNsm(e.target.value)}
        placeholder="e.g., Paying customers with >7 day retention"
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow"
       />
       <span className="block text-[12px] text-muted-foreground mt-1.5">How you measure progress. Combine quantity and quality.</span>
      </div>
@@ -169,7 +169,7 @@ export default function CreateProject({ navigate }) {
         <select
          value={lead}
          onChange={(e) => setLead(e.target.value)}
-         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow cursor-pointer appearance-none"
+         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow cursor-pointer appearance-none"
         >
          <option value="" disabled>Select an agent...</option>
          {LEADS.map((l) => (
@@ -190,7 +190,7 @@ export default function CreateProject({ navigate }) {
         <select
          value={status}
          onChange={(e) => setStatus(e.target.value)}
-         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow cursor-pointer appearance-none"
+         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow cursor-pointer appearance-none"
         >
          <option value="active">Active</option>
          <option value="planned">Planned</option>
@@ -213,7 +213,7 @@ export default function CreateProject({ navigate }) {
         value={budget}
         onChange={(e) => setBudget(e.target.value)}
         placeholder="100"
-        className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground pl-7 pr-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-shadow font-mono tabular-nums"
+        className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground pl-7 pr-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-shadow font-mono tabular-nums"
        />
       </div>
       <span className="block text-[12px] text-muted-foreground mt-1.5">Weekly spend limit in USD</span>

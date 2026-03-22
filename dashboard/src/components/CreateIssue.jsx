@@ -82,7 +82,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
        onChange={(e) => setTitle(e.target.value)}
        placeholder="Issue title"
        autoFocus
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
       />
      </div>
 
@@ -94,7 +94,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
        onChange={(e) => setDescription(e.target.value)}
        rows={4}
        placeholder="Describe the issue in detail. Markdown supported."
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all resize-y"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-y"
       />
      </div>
 
@@ -107,7 +107,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
         <select
          value={priority}
          onChange={(e) => setPriority(e.target.value)}
-         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
+         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all cursor-pointer appearance-none"
         >
          {ALL_PRIORITIES.map((p) => (
           <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -126,7 +126,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
         <select
          value={assignee}
          onChange={(e) => setAssignee(e.target.value)}
-         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
+         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all cursor-pointer appearance-none"
         >
          <option value="">Unassigned</option>
          {AGENTS.map((a) => (
@@ -148,7 +148,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
         <select
          value={selectedTheme}
          onChange={(e) => { setSelectedTheme(e.target.value); setSelectedProxyMetrics([]); }}
-         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
+         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all cursor-pointer appearance-none"
         >
          <option value="">No theme</option>
          {themes.map((t) => (
@@ -199,7 +199,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
        value={labelInput}
        onChange={(e) => setLabelInput(e.target.value)}
        placeholder="Add labels separated by commas"
-       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all"
+       className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
       />
       <p className="text-[12px] text-muted-foreground mt-1.5">Optional tags for categorization</p>
      </div>

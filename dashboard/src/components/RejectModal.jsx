@@ -39,7 +39,7 @@ export function RejectModal({ onConfirm, onCancel }) {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Reason for rejection..."
             rows={3}
-            className="w-full rounded-md bg-secondary border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:border-ring"
+            className="w-full rounded-md bg-secondary border border-border px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 resize-none focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
           />
           <div className="flex justify-end gap-2">
             <button

@@ -66,7 +66,7 @@ function SidebarNavItem({ active, onClick, icon: Icon, label, badge, badgeTone =
  return (
   <button
    onClick={onClick}
-   className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[15px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
+   className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[15px] font-medium transition-colors w-full text-left focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
     active
      ?"bg-accent/60 text-foreground"
      :"text-muted-foreground hover:bg-accent/40 hover:text-foreground"
@@ -219,7 +219,7 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
        <button
         key={slug}
         onClick={() => navigate("project", slug)}
-        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[15px] font-medium transition-colors w-full text-left focus:outline-none focus:ring-[3px] focus:ring-ring/50 ${
+        className={`flex items-center gap-2.5 px-2 py-1.5 rounded-[6px] text-[15px] font-medium transition-colors w-full text-left focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
          isActive
           ?"bg-accent/60 text-foreground"
           :"text-muted-foreground hover:bg-accent/40 hover:text-foreground"

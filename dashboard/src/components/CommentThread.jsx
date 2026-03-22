@@ -74,7 +74,7 @@ export function CommentThread({ comments = [], onAdd, className ="" }) {
       onChange={(e) => setBody(e.target.value)}
       onKeyDown={handleKeyDown}
       placeholder="Leave a comment..."
-      className="w-full min-h-[80px] rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/50 resize-y"
+      className="w-full min-h-[80px] rounded-md border border-border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 placeholder:text-muted-foreground/50 resize-y"
      />
      <div className="flex items-center justify-end gap-2">
       <span className="text-[11px] text-muted-foreground/50 mr-auto">

@@ -314,7 +314,7 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
        <textarea
         value={commentText}
         onChange={(e) => setCommentText(e.target.value)}
-        className="w-full rounded-sm border border-zinc-800 bg-[#09090b] text-sm text-zinc-200 p-3 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 transition-all resize-y min-h-[100px]"
+        className="w-full rounded-sm border border-zinc-800 bg-[#09090b] text-sm text-zinc-200 p-3 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all resize-y min-h-[100px]"
         placeholder="Leave a comment or instruction for the agents..."
        />
        <div className="flex justify-between items-center mt-3">
