@@ -5,7 +5,8 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { Cpu, Save, RotateCcw } from "lucide-react";
-import { getModelRouting, updateModelRouting, getAgents } from "../api.js";
+import { getModelRouting, updateModelRouting } from "../api.js";
+import { AGENTS } from "../components/AssigneeSelect.jsx";
 import { Skeleton } from "../components/ui/Skeleton.jsx";
 import { EmptyState } from "../components/EmptyState.jsx";
 
@@ -92,7 +93,6 @@ function AuraSelect({ value, onChange, options, className = "" }) {
 
 export default function ModelRouting({ navigate }) {
   const [config, setConfig] = useState(null);
-  const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -103,16 +103,13 @@ export default function ModelRouting({ navigate }) {
   const originalRef = useRef(null);
 
   useEffect(() => {
-    Promise.all([
-      getModelRouting().catch(() => ({ exists: false, config: null })),
-      getAgents().catch(() => []),
-    ])
-      .then(([routingData, agentList]) => {
+    getModelRouting()
+      .catch(() => ({ exists: false, config: null }))
+      .then((routingData) => {
         const cfg = routingData.exists && routingData.config
           ? routingData.config
-          : { ...DEFAULT_CONFIG, agents: buildDefaultAgentMap(agentList) };
+          : { ...DEFAULT_CONFIG, agents: buildDefaultAgentMap(AGENTS) };
         setConfig(cfg);
-        setAgents(agentList);
         originalRef.current = JSON.stringify(cfg);
       })
       .catch((e) => setError(e.message))
@@ -301,9 +298,8 @@ export default function ModelRouting({ navigate }) {
             Assign each agent to a tier. This sets their default model when they run tasks.
           </p>
           <div className="space-y-2">
-            {agents.map((agent) => {
-              const id = agent.id || agent.name?.toLowerCase();
-              if (!id) return null;
+            {AGENTS.map((agent) => {
+              const id = agent.id;
               const currentTier = config.agents[id] || "complex";
               return (
                 <div key={id} className="flex items-center gap-4 p-3 rounded-md border border-zinc-800 bg-[#09090b]">
