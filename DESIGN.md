@@ -59,13 +59,15 @@
 - **Grid:** `grid-cols-2 xl:grid-cols-4` for metric cards. `grid-cols-2 sm:grid-cols-3` for smaller card sets. Data tables for project lists.
 - **Max content width:** None — content fills available space. Tables and cards reflow responsively.
 - **Border radius:**
-  - **Cards and sections: `rounded-sm`** (2px) — subtle softening. Not bubbly, not razor sharp. Adds warmth.
-  - **Buttons, inputs, dropdowns: sharp** (0px) — interactive elements stay crisp.
+  - **Cards and sections: `rounded-sm`** (2px) — subtle softening. Not bubbly, not razor sharp.
+  - **Buttons, inputs, textareas, dropdowns: `rounded-md`** (6px) — soft interactive elements, matches Paperclip.
   - **Exception: `rounded-full`** — status dots, badge pills. Semantically circular.
   - **Exception: `rounded-sm`** — sidebar project dots (small color squares).
-  - **Never: `rounded-md`, `rounded-lg`** — these read as AI-generated.
-- **Borders:** `border border-border` (1px, `oklch(0.269 0 0)`) on all cards and sections. No shadows on cards (shadows are for elevation in light mode; borders are for dark mode).
-- **Card background:** `bg-card/50` — subtle lift from page background. Creates depth without shadows.
+  - **Never: `rounded-lg`** — too bubbly, reads as AI-generated.
+- **Borders:** `border border-border` (1px, `oklch(0.269 0 0)`) on all cards and sections.
+- **Shadows:** `shadow-sm` on cards for subtle depth. `shadow-lg` on dropdown menus. No shadows on flat elements.
+- **Card background:** `bg-card` (full opacity) — distinct from page background. Creates clear card boundaries.
+- **Focus rings:** `box-shadow: 0 0 0 3px oklch(0.556 0 0 / 0.5)` — 3px ring at 50% opacity on `:focus-visible`.
 - **Responsive strategy:** Hide table columns at breakpoints (`hidden sm:table-cell`, `hidden lg:table-cell`). Touch targets enforced at 44px via `@media (pointer: coarse)`.
 
 ## Motion
@@ -78,8 +80,8 @@
 ## Component Patterns
 
 ### Cards
-- Default: `bg-card/50 rounded-sm border border-border p-5` — subtle lift, soft corners, generous padding
-- Elevated (primary status): `bg-card/50 rounded-sm border border-border border-l-2 border-l-{color} bg-accent/20 p-5` — left accent border + tinted background. Use for the single most important section on a page (e.g., "Current Work" on agent detail).
+- Default: `bg-card rounded-sm border border-border shadow-sm p-5` — full card background, soft corners, subtle shadow, generous padding
+- Elevated (primary status): `bg-card rounded-sm border border-border shadow-sm border-l-2 border-l-{color} bg-accent/20 p-5` — left accent border + tinted background. Use for the single most important section on a page (e.g., "Current Work" on agent detail).
 - Never more than one elevated card per view.
 
 ### Status Badges
@@ -118,10 +120,10 @@
 
 ## Anti-Patterns (Never Do)
 
-1. **No `rounded-md` or `rounded-lg` on containers.** Cards use `rounded-sm` (2px) only. Buttons/inputs stay sharp. `rounded-full` is reserved for pills and dots.
+1. **No `rounded-lg` on anything.** Cards use `rounded-sm` (2px). Buttons/inputs/dropdowns use `rounded-md` (6px). `rounded-full` for pills and dots only.
 2. **No gradients.** Not on buttons, not on backgrounds, not on anything.
 3. **No decorative color.** Every color must map to a semantic meaning.
-4. **No shadows on cards.** Use borders for separation in dark mode.
+4. **Shadows are intentional.** `shadow-sm` on cards, `shadow-lg` on dropdowns. No shadows on flat elements, rows, or buttons.
 5. **No web fonts.** System stack only. Zero loading overhead.
 6. **No light mode.** This is a dark-mode-only product.
 7. **No `prompt()` or `alert()`.** Native browser dialogs break the visual language. Use inline modals.
@@ -143,3 +145,7 @@
 | 2026-03-22 | Card background lift with `bg-card/50` | Subtle depth without shadows. Cards are visually distinct from page background. |
 | 2026-03-22 | Card padding increased to `p-5` | More breathing room inside cards. Inspired by Paperclip's generous spacing. |
 | 2026-03-22 | Section headers split from micro-labels | Section h3/h4 headers now 14px semibold (readable). Micro-labels (11px mono uppercase) reserved for table/metric/form/sidebar labels. |
+| 2026-03-22 | `shadow-sm` on cards, `shadow-lg` on dropdowns | Adopted from Paperclip. Adds depth in dark mode without being heavy. Reversed earlier "no shadows" rule. |
+| 2026-03-22 | `bg-card` full opacity on cards | Upgraded from `bg-card/50`. Cards are now clearly distinct from page background. |
+| 2026-03-22 | `rounded-md` on buttons, inputs, dropdowns | Adopted from Paperclip. Soft interactive elements feel more polished. Cards stay `rounded-sm`. |
+| 2026-03-22 | Focus ring: 3px box-shadow at 50% opacity | Adopted from Paperclip. More polished than 1px outline. Uses ring color at half opacity. |
