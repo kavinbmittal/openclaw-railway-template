@@ -1,6 +1,6 @@
 import { useState, useEffect } from"react";
 import { getProjects, getInbox, getIssues, getProjectsSummary, getAgents } from "../api.js";
-import { FolderKanban, User, DollarSign, AlertTriangle, CheckCircle, ArrowUpRight, CircleDot, Milestone, TrendingUp } from "lucide-react";
+import { FolderKanban, User, DollarSign, AlertTriangle, CheckCircle, ArrowUpRight, CircleDot, TrendingUp } from "lucide-react";
 import { formatTimeAgo } from"../utils/formatDate.js";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
 import { MetricCard } from"../components/MetricCard.jsx";
@@ -172,7 +172,6 @@ export default function Overview({ navigate }) {
          <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[25%]">Project</th>
          <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[20%] hidden lg:table-cell">Mission / Goal</th>
          <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[15%] hidden sm:table-cell">Lead</th>
-         <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[15%] hidden md:table-cell">Milestone</th>
          <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[10%]">Issues</th>
          <th className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground pb-3 px-[20px] pt-4 border-b border-border font-normal w-[15%] hidden sm:table-cell">Budget</th>
         </tr>
@@ -227,13 +226,6 @@ export default function Overview({ navigate }) {
             ) : (
              <span className="text-[15px] text-muted-foreground">--</span>
             )}
-           </td>
-
-           {/* Milestone */}
-           <td className="px-[20px] py-3.5 hidden md:table-cell text-[15px] text-muted-foreground">
-            {project.currentMilestone
-             ? truncate(project.currentMilestone, 40)
-             : <span className="text-muted-foreground/40 italic">No milestones yet</span>}
            </td>
 
            {/* Issues */}

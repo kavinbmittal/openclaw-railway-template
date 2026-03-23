@@ -11,10 +11,6 @@ export async function getProjects() {
   return data.projects || [];
 }
 
-export async function getDashboard() {
-  return fetchJSON(`${BASE}/dashboard`);
-}
-
 export async function getFile(filePath) {
   return fetchJSON(`${BASE}/files?path=${encodeURIComponent(filePath)}`);
 }
