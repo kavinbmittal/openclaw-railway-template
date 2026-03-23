@@ -91,7 +91,6 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
   navigate("project-tab", { slug: projectId, tab: newTab });
  };
  const [projectRaw, setProjectRaw] = useState(null);
- const [milestones, setMilestones] = useState(null);
  const [standups, setStandups] = useState([]);
  const [costs, setCosts] = useState([]);
  const [costSummary, setCostSummary] = useState(null);
@@ -107,7 +106,6 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
  useEffect(() => {
   Promise.all([
    getFile(`shared/projects/${projectId}/PROJECT.md`).catch(() => null),
-   getFile(`shared/projects/${projectId}/milestones.md`).catch(() => null),
    getFile(`shared/projects/${projectId}/activity.log`).catch(() => null),
    loadStandups(projectId),
    loadCosts(projectId),
@@ -116,9 +114,8 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
    getApprovals(projectId).catch(() => []),
    getExperiments(projectId).catch(() => []),
    getThemes(projectId).catch(() => []),
-  ]).then(([proj, miles, activity, standupList, costList, costData, policyData, approvalList, experimentList, themeList]) => {
+  ]).then(([proj, activity, standupList, costList, costData, policyData, approvalList, experimentList, themeList]) => {
    setProjectRaw(proj?.content || null);
-   setMilestones(miles?.content || null);
    setActivityLog(activity?.content ||"");
    setStandups(standupList);
    setCosts(costList);

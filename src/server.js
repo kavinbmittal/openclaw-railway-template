@@ -1731,16 +1731,16 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
           const issueId = issue.id || file.replace(".json", "");
           if (issueId !== id) continue;
           // Resolve theme ID to title and proxy metric IDs to names
-          let issuThemeTitle = issue.theme || null;
-          let issuPMNames = issue.proxy_metrics || null;
+          let issueThemeTitle = issue.theme || null;
+          let issuePMNames = issue.proxy_metrics || null;
           if (issue.theme) {
             const tPath = path.join(projectsDir, proj.name, "themes", `${issue.theme}.json`);
             if (fs.existsSync(tPath)) {
               try {
                 const tData = JSON.parse(fs.readFileSync(tPath, "utf8"));
-                issuThemeTitle = tData.title || issue.theme;
+                issueThemeTitle = tData.title || issue.theme;
                 if (Array.isArray(issue.proxy_metrics) && Array.isArray(tData.proxy_metrics)) {
-                  issuPMNames = issue.proxy_metrics.map((pm) => {
+                  issuePMNames = issue.proxy_metrics.map((pm) => {
                     const pmId = typeof pm === "string" ? pm : pm.id;
                     const found = tData.proxy_metrics.find((t) => t.id === pmId);
                     return found ? found.name : pmId;
@@ -1761,8 +1761,8 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
             labels: issue.labels || [],
             comments: issue.comments || [],
             theme: issue.theme || null,
-            theme_title: issuThemeTitle,
-            proxy_metric_names: issuPMNames,
+            theme_title: issueThemeTitle,
+            proxy_metric_names: issuePMNames,
             _project: proj.name,
             _file: file,
             _source: "issue",
@@ -2608,20 +2608,6 @@ app.get("/mc/api/agents/:id/runs", requireSetupAuth, (req, res) => {
   } catch (err) {
     return res.json({ runs: [], error: err.message });
   }
-});
-
-// Get compiled dashboard data
-app.get("/mc/api/dashboard", requireSetupAuth, (_req, res) => {
-  const dashboardPath = path.join(STATE_DIR, "shared", "projects", "dashboard.json");
-  if (fs.existsSync(dashboardPath)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(dashboardPath, "utf8"));
-      return res.json(data);
-    } catch {
-      return res.status(500).json({ error: "Failed to parse dashboard.json" });
-    }
-  }
-  return res.json({ projects: [], approvals: [], standups: [], costs: {} });
 });
 
 // --- Issue Management API ---
@@ -3502,31 +3488,6 @@ app.get("/mc/api/projects/summary", requireSetupAuth, (_req, res) => {
           meta.mission = missionMatch?.[1]?.trim() || "";
           meta.nsm = nsmMatch?.[1]?.trim() || null;
         }
-
-        // Parse milestones.md for current milestone
-        const milestonesPath = path.join(projDir, "milestones.md");
-        let currentMilestone = null;
-        if (fs.existsSync(milestonesPath)) {
-          const milestonesRaw = fs.readFileSync(milestonesPath, "utf8");
-          const lines = milestonesRaw.split("\n");
-          for (const line of lines) {
-            const m = line.match(/^[-*]\s+\[([x ])\]\s+(.+)/i);
-            if (m && m[1] === " ") {
-              currentMilestone = m[2].trim();
-              break;
-            }
-          }
-          if (!currentMilestone) {
-            // Check for heading-style milestones
-            for (const line of lines) {
-              if (line.match(/^##\s+/) && !line.toLowerCase().includes("completed")) {
-                currentMilestone = line.replace(/^##\s+/, "").trim();
-                break;
-              }
-            }
-          }
-        }
-        meta.currentMilestone = currentMilestone;
 
         // Count issues by status
         const issuesDir = path.join(projDir, "issues");
