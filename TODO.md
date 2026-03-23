@@ -102,6 +102,29 @@
 ### Build dist
 - [x] Build and commit
 
+## 2026-03-23-autoloop-experiments
+
+### Server
+- [x] `parseExperimentMeta()`: extract `## Required Tools` section into `required_tools` array
+- [x] `deriveStatusFromResults()`: add `pause` decision → `paused` status
+- [x] `buildPhases()`: add `pause` as a phase node
+- [x] Inbox: `pause` decision badge color (orange)
+- [x] Approval detail enrichment: attach `required_tools` to experiment gate responses
+
+### Frontend — ApprovalDetail
+- [x] Render Required Tools card with green/red checklist
+- [x] Block Approve button when any tool is unchecked
+
+### Frontend — ExperimentDetail
+- [x] `paused` status badge with orange pulsing dot
+
+### Build
+- [x] Build dist
+
+### Protocol (Railway API)
+- [x] Update `experiments.md`: auto-execute rule, Required Tools format, pause decision, re-validate per action
+- [x] Update `autoresearch.md`: same changes
+
 ## 2026-03-23-issue-cost-governance
 
 ### Dashboard Build

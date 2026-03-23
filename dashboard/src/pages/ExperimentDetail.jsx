@@ -15,6 +15,7 @@ const DECISION_COLORS = {
  pivot: { border: "border-amber-500",   bg: "bg-amber-500",   text: "text-amber-400",   pill: "border-amber-500/20 bg-amber-500/10 text-amber-400",  dot: "bg-amber-400" },
  scale: { border: "border-emerald-500", bg: "bg-emerald-500", text: "text-emerald-400", pill: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400", dot: "bg-emerald-400" },
  kill:  { border: "border-red-500",     bg: "bg-red-500",     text: "text-red-400",     pill: "border-red-500/20 bg-red-500/10 text-red-400",      dot: "bg-red-400" },
+ pause: { border: "border-orange-500",  bg: "bg-orange-500",  text: "text-orange-400",  pill: "border-orange-500/20 bg-orange-500/10 text-orange-400", dot: "bg-orange-400" },
 };
 
 /* ── Status badge with animated pulse for running ── */
@@ -25,7 +26,7 @@ function StatusBadge({ status }) {
   planned:"border-zinc-700 bg-zinc-800/50 text-zinc-400",
   completed:"border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
   killed:"border-red-500/30 bg-red-500/10 text-red-400",
-  paused:"border-amber-500/30 bg-amber-500/10 text-amber-400",
+  paused:"border-orange-500/30 bg-orange-500/10 text-orange-400",
  };
  const cls = map[s] || "border-zinc-700 bg-zinc-800/50 text-zinc-400";
  return (
@@ -34,6 +35,12 @@ function StatusBadge({ status }) {
     <span className="relative flex h-2 w-2">
      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
      <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
+    </span>
+   )}
+   {s === "paused" && (
+    <span className="relative flex h-2 w-2">
+     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+     <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-400" />
     </span>
    )}
    {s.charAt(0).toUpperCase() + s.slice(1)}

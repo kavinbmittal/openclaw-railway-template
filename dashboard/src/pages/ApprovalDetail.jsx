@@ -3,7 +3,7 @@
  * UI ported from Aura HTML reference.
  */
 import { useState, useEffect } from"react";
-import { CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3, Clock, ShieldCheck } from"lucide-react";
+import { CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3, Clock, ShieldCheck, Wrench } from"lucide-react";
 import { getApprovalDetail, resolveApproval, requestRevision, updateIssue, deleteIssue, resolveTheme, getThemes } from"../api.js";
 import { formatTimeAgo } from"../utils/formatDate.js";
 import Markdown from"../components/Markdown.jsx";
@@ -158,6 +158,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
  const isRevisionRequested = status ==="revision_requested";
  const isDeliverable = approval._source ==="deliverables" || approval.gate ==="deliverable" || approval.gate ==="deliverable-review";
  const isExperiment = approval.gate ==="experiment-start" || approval.gate ==="autoresearch-start";
+ const hasBlockedTools = isExperiment && Array.isArray(approval.required_tools) && approval.required_tools.some((t) => !t.checked);
  const isIssue = approval._source ==="issue";
  const isTheme = approval._source ==="theme";
  const itemType = approval.type || approval.gate || null;
@@ -375,6 +376,31 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        </>
       )}
 
+      {/* Required Tools checklist — experiment proposals with tool declarations */}
+      {isExperiment && approval.required_tools && approval.required_tools.length > 0 && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="flex items-center gap-3 px-5 py-3 bg-amber-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+          <Wrench className="w-3.5 h-3.5 text-amber-400" />
+         </div>
+         <div className="text-[15px] font-medium text-amber-100">Required Tools</div>
+         {approval.required_tools.some((t) => !t.checked) && (
+          <span className="ml-auto text-[11px] font-mono text-red-400 uppercase tracking-widest">Blocked</span>
+         )}
+        </header>
+        <div className="p-[20px] space-y-2">
+         {approval.required_tools.map((tool, i) => (
+          <div key={i} className={`flex items-start gap-3 p-3 rounded-[2px] border ${tool.checked ? "border-border/60 bg-zinc-800/10" : "border-red-500/20 bg-red-500/5"}`}>
+           {tool.checked
+            ? <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 shrink-0" />
+            : <XCircle size={16} className="text-red-400 mt-0.5 shrink-0" />}
+           <span className={`text-[13px] font-mono leading-relaxed ${tool.checked ? "text-zinc-300" : "text-red-300"}`}>{tool.description}</span>
+          </div>
+         ))}
+        </div>
+       </section>
+      )}
+
       {/* Details Card — Aura card (fallback for old experiments with `why`, non-experiment gates, issues) */}
       {approval.why && !(isExperiment && approval.hypothesis) && (
        <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
@@ -434,6 +460,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
         .replace(/## Theme\s*\n[\s\S]*?(?=\n##|$)/, "")
         .replace(/## Proxy Metrics\s*\n[\s\S]*?(?=\n##|$)/, "")
         .replace(/## Hypothesis\s*\n[\s\S]*?(?=\n##|$)/, "")
+        .replace(/## Required Tools\s*\n[\s\S]*?(?=\n##|$)/, "")
         .replace(/\n{3,}/g, "\n\n")
         .trim();
        return stripped ? (
@@ -494,12 +521,15 @@ export default function ApprovalDetail({ approvalId, navigate }) {
         <div className="p-[20px] space-y-3">
          <button
           onClick={() => handleResolve("approved")}
-          disabled={submitting}
+          disabled={submitting || hasBlockedTools}
           className="w-full py-2.5 rounded-[6px] border border-emerald-500/30 bg-emerald-500/10 text-[14px] font-medium text-emerald-400 hover:bg-emerald-500/20 transition-all flex justify-center items-center gap-2 outline-none focus-visible:ring-[3px] focus-visible:ring-emerald-500/50 disabled:opacity-50"
          >
           {submitting ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
           {isThemeProposal ? "Approve Theme" : isIssue ?"Approve Issue" :"Approve Request"}
          </button>
+         {hasBlockedTools && (
+          <p className="text-[12px] text-red-400 text-center font-mono">Resolve tool access before approving</p>
+         )}
 
          <button
           onClick={() => handleResolve("revision_requested")}
