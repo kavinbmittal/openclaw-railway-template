@@ -33,8 +33,10 @@ const THEME_COLORS = [
 ];
 
 /** Single issue row inside a theme group */
-function IssueRow({ issue, onClick }) {
+function IssueRow({ issue, onClick, themeProxyMetrics = [] }) {
  const isDone = issue.status === "done" || issue.status === "cancelled";
+ // Resolve which proxy metric letters this issue is tagged to
+ const issuePmIds = (issue.proxy_metrics || []).map(pm => typeof pm === "string" ? pm : pm.id);
  return (
   <div
    onClick={onClick}
@@ -46,6 +48,17 @@ function IssueRow({ issue, onClick }) {
    <span className={`text-[15px] flex-1 truncate ${isDone ? "text-zinc-500 line-through decoration-zinc-600" : "text-zinc-200"}`}>
     {issue.title}
    </span>
+   {issuePmIds.length > 0 && (
+    <div className="flex items-center gap-1 shrink-0">
+     {themeProxyMetrics.map((pm, pmIdx) =>
+      issuePmIds.includes(pm.id) ? (
+       <div key={pm.id} className="w-4 h-4 rounded bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[9px] font-mono text-zinc-500">
+        {String.fromCharCode(97 + pmIdx)}
+       </div>
+      ) : null
+     )}
+    </div>
+   )}
    <StatusBadge status={issue.status} />
    {issue.assignee && (
     <span className="text-[12px] text-zinc-400 w-24 truncate capitalize hidden sm:block">{issue.assignee}</span>
@@ -262,7 +275,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
           ) : (
            <div>
             {themeIssues.map(issue => (
-             <IssueRow key={issue.id} issue={issue} onClick={() => handleIssueClick(issue)} />
+             <IssueRow key={issue.id} issue={issue} onClick={() => handleIssueClick(issue)} themeProxyMetrics={(theme.proxy_metrics || []).sort((a, b) => (a.order ?? 999) - (b.order ?? 999))} />
             ))}
            </div>
           )}
