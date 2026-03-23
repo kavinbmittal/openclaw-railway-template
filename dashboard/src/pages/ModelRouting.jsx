@@ -37,7 +37,6 @@ const RESEARCH_PHASES = [
 // Tier descriptions shown at the bottom of the page
 const TIER_DESCRIPTIONS = {
   "claude-code": "Spawns a Claude Code session to execute the task autonomously",
-  complex: "Handles high-stakes or deeply reasoned execution tasks",
   strategic: "Decides what the team should focus on across all projects",
   analyst: "Decides how to approach work within their domain",
   operator: "Executes multi-step tasks where the approach is already set",
@@ -48,7 +47,6 @@ const TIER_DESCRIPTIONS = {
 const DEFAULT_CONFIG = {
   tiers: {
     "claude-code": { model: "claude-code", thinking: "adaptive" },
-    complex: { model: "anthropic/claude-opus-4-6", thinking: "high" },
     strategic: { model: "anthropic/claude-opus-4-6", thinking: "adaptive" },
     analyst: { model: "anthropic/claude-sonnet-4-6", thinking: "high" },
     operator: { model: "anthropic/claude-sonnet-4-6", thinking: "medium" },
@@ -63,7 +61,7 @@ const DEFAULT_CONFIG = {
   },
 };
 
-const TIER_ORDER = ["claude-code", "complex", "strategic", "analyst", "operator", "runner"];
+const TIER_ORDER = ["claude-code", "strategic", "analyst", "operator", "runner"];
 
 // Friendly label for a model string
 function modelLabel(modelStr) {

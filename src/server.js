@@ -2694,7 +2694,7 @@ app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
   }
 
   // Validate model routing fields
-  const validComplexity = ["simple", "complex", "strategic"];
+  const validComplexity = ["claude-code", "strategic", "analyst", "operator", "runner"];
   if (complexity && !validComplexity.includes(complexity)) {
     return res.status(400).json({ error: `Invalid complexity "${complexity}" — must be one of: ${validComplexity.join(", ")}` });
   }

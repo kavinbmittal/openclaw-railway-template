@@ -453,7 +453,6 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                   className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
                 >
                   <option value="claude-code">Claude Code</option>
-                  <option value="complex">Complex</option>
                   <option value="strategic">Strategic</option>
                   <option value="analyst">Analyst</option>
                   <option value="operator">Operator</option>
