@@ -121,9 +121,9 @@
 ### Build
 - [x] Build dist
 
-### Protocol (Railway SSH)
-- [ ] Update `experiments.md`: auto-execute rule, Required Tools format, pause decision, re-validate per action
-- [ ] Update `autoresearch.md`: same changes
+### Protocol (Railway API)
+- [x] Update `experiments.md`: auto-execute rule, Required Tools format, pause decision, re-validate per action
+- [x] Update `autoresearch.md`: same changes
 
 ## 2026-03-23-issue-cost-governance
 
