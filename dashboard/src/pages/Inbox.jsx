@@ -128,6 +128,7 @@ const CATEGORIES = [
       if (d === "pivot") return "border-amber-500/20 bg-amber-500/10 text-amber-400";
       if (d === "scale") return "border-emerald-500/20 bg-emerald-500/10 text-emerald-400";
       if (d === "kill") return "border-red-500/20 bg-red-500/10 text-red-400";
+      if (d === "pause") return "border-orange-500/20 bg-orange-500/10 text-orange-400";
       return "border-cyan-500/20 bg-cyan-500/10 text-cyan-400";
     },
     badgeLabel: (item) => {

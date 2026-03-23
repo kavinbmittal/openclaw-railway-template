@@ -18,6 +18,8 @@
 - Edit issues from a dedicated form page: update title, description, priority, assignee, theme, proxy metrics, labels, and model tier; delete issues from the danger zone
 - Issues and experiments tagged to themes with target proxy metrics (server-validated)
 - Experiment approvals show structured hypothesis, program, and proxy metric targets
+- Experiment approvals show Required Tools checklist — each tool verified against the tool registry with green checkmark or red X; approve button blocked until all tools are ready
+- Experiments can be paused when a tool breaks mid-run — paused status shows orange pulsing badge on experiment detail, orange node in phase arc, and orange decision badge in inbox
 - Click any approved theme to see all issues tagged to it
 - Agent comments auto-format: flat text becomes bullet lists with bold status labels, backticked file paths, and comma-separated items split into bullets
 - Sticky headers with breadcrumb navigation on all detail pages (projects, issues, agents, approvals, create project)

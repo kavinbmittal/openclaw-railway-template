@@ -1,6 +1,7 @@
 # SHIPPED.md
 
 ## 2026-03-23
+- **feat:** Autoloop experiments — Required Tools checklist on experiment approvals (green/red per tool), approve blocked until all tools verified; `pause` experiment decision with orange badge, pulsing dot, phase arc node, and inbox notification; Required Tools stripped from plan markdown to avoid duplication
 - **feat:** Edit Project page — edit name, mission, NSM, lead, status, budget, workdir, and approval gates; "Edit" button on project detail header
 - **feat:** Issue rows show proxy metric letter pills (a, b, c) to the left of status badges, so you can see which metrics each issue contributes to at a glance
 - **feat:** Proxy metrics on Issues page now show target values (→ target) matching the overview page

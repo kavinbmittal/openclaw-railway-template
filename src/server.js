@@ -1544,6 +1544,16 @@ function parseExperimentMeta(programMd) {
       return idOnly ? { id: idOnly[1], contribution: null } : null;
     }).filter(Boolean);
   }
+  // Extract required tools: "- [x] tool desc" or "- [ ] tool desc"
+  const toolsSection = programMd.match(/## Required Tools\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (toolsSection) {
+    const toolLines = toolsSection[1].trim().split("\n").filter((l) => /^- \[[ x]\]/.test(l));
+    meta.required_tools = toolLines.map((line) => {
+      const checked = line.startsWith("- [x]");
+      const description = line.replace(/^- \[[ x]\]\s*/, "").trim();
+      return { checked, description };
+    });
+  }
   return meta;
 }
 
@@ -1605,13 +1615,12 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
             const programMd = findExperimentProgram(projectsDir, proj.name, data);
             if (programMd) {
               enriched.programMd = programMd;
-              // Parse theme/hypothesis/proxy_metrics from program.md when gate is thin
-              if (!data.hypothesis || !data.theme) {
-                const meta = parseExperimentMeta(programMd);
-                if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
-                if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
-                if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
-              }
+              // Always parse for required_tools; also parse theme/hypothesis when gate is thin
+              const meta = parseExperimentMeta(programMd);
+              if (meta.required_tools) enriched.required_tools = meta.required_tools;
+              if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
+              if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
+              if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
             }
             // Resolve theme title and proxy metric names
             if (data.theme) {
@@ -1650,12 +1659,11 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
             const programMd = findExperimentProgram(projectsDir, proj.name, data);
             if (programMd) {
               enriched.programMd = programMd;
-              if (!data.hypothesis || !data.theme) {
-                const meta = parseExperimentMeta(programMd);
-                if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
-                if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
-                if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
-              }
+              const meta = parseExperimentMeta(programMd);
+              if (meta.required_tools) enriched.required_tools = meta.required_tools;
+              if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
+              if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
+              if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
             }
             if (data.theme) {
               const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
@@ -2827,7 +2835,7 @@ app.post("/mc/api/issues/:id/comments", requireSetupAuth, (req, res) => {
 // Derive experiment status from the decision column in results.tsv rows.
 // Falls back to the old ## Status markdown parse if no decision columns exist.
 function deriveStatusFromResults(results, mdStatus) {
-  const validDecisions = ["keep", "pivot", "scale", "kill"];
+  const validDecisions = ["keep", "pivot", "scale", "kill", "pause"];
   const decisions = results
     .map((r) => (r.decision || "").toLowerCase().trim())
     .filter((d) => validDecisions.includes(d));
@@ -2839,6 +2847,7 @@ function deriveStatusFromResults(results, mdStatus) {
   const latest = decisions[decisions.length - 1];
   if (latest === "kill") return "killed";
   if (latest === "scale") return "completed";
+  if (latest === "pause") return "paused";
   // keep, pivot → still running
   return "running";
 }
@@ -2847,7 +2856,7 @@ function deriveStatusFromResults(results, mdStatus) {
 // Each run period between decisions is a "run" node; each decision is its own node.
 function buildPhases(results, created) {
   const phases = [{ type: "design", date: created || null }];
-  const validDecisions = ["keep", "pivot", "scale", "kill"];
+  const validDecisions = ["keep", "pivot", "scale", "kill", "pause"];
   let runNumber = 1;
   let inRun = false;
 
@@ -2859,10 +2868,12 @@ function buildPhases(results, created) {
       inRun = true;
     }
     if (validDecisions.includes(decision)) {
-      // Decision node
+      // Decision node — pause doesn't increment run number (resumes same run)
       phases.push({ type: decision, date: row.date || null, reason: row.reason || "" });
-      inRun = false;
-      runNumber++;
+      if (decision !== "pause") {
+        inRun = false;
+        runNumber++;
+      }
     }
   }
   return phases;
