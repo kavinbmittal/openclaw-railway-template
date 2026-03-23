@@ -15,6 +15,7 @@ import OrgChart from"./pages/OrgChart.jsx";
 import Workspaces from"./pages/Workspaces.jsx";
 import ExperimentDetail from"./pages/ExperimentDetail.jsx";
 import EditIssue from"./pages/EditIssue.jsx";
+import EditProject from"./pages/EditProject.jsx";
 import ModelRouting from"./pages/ModelRouting.jsx";
 
 /* ── Hash → state parser ──────────────────────────────────────────── */
@@ -58,6 +59,13 @@ function parseHash(hash) {
      page:"experiment-detail",
      selectedProject: slug,
      experimentContext: { projectSlug: slug, experimentDir: parts[3] },
+    };
+   }
+   // #/projects/{slug}/edit
+   if (parts[2] ==="edit" && !parts[3]) {
+    return {
+     page:"edit-project",
+     selectedProject: slug,
     };
    }
    // #/projects/{slug}/issues/{id}/edit
@@ -124,6 +132,8 @@ function buildHash(target, data) {
    return"#/workspaces";
   case"model-routing":
    return"#/model-routing";
+  case"edit-project":
+   return `#/projects/${data}/edit`;
   case"create-project":
    return"#/create-project";
   case"approvals":
@@ -184,7 +194,7 @@ export default function App() {
     <Sidebar page={page} selectedProject={selectedProject} navigate={navigate} refreshKey={refreshKey} />
     <div className="flex min-w-0 flex-col h-full flex-1">
      {/* Detail pages manage their own padding and scrolling for sticky headers */}
-     {(page ==="approval-detail" || page ==="issue-detail" || page ==="edit-issue" || page ==="experiment-detail" || page ==="agent-detail" || page ==="project" || page ==="create-project") ? (
+     {(page ==="approval-detail" || page ==="issue-detail" || page ==="edit-issue" || page ==="edit-project" || page ==="experiment-detail" || page ==="agent-detail" || page ==="project" || page ==="create-project") ? (
       <main className="flex-1 overflow-hidden flex flex-col">
        {page ==="approval-detail" && approvalId && (
         <ApprovalDetail approvalId={approvalId} navigate={navigate} />
@@ -217,6 +227,9 @@ export default function App() {
         <ProjectDetail projectId={selectedProject} navigate={navigate} initialTab={projectTab} />
        )}
        {page ==="create-project" && <CreateProject navigate={navigate} />}
+       {page ==="edit-project" && selectedProject && (
+        <EditProject projectSlug={selectedProject} navigate={navigate} />
+       )}
       </main>
      ) : (
       <main className="flex-1 p-6 md:p-8 overflow-auto">

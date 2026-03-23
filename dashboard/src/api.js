@@ -113,6 +113,45 @@ ${gateLines}
   return { slug };
 }
 
+export async function updateProject(slug, { name, mission, nsm, lead, budget, status, workdir, gates }) {
+  // Read existing PROJECT.md to preserve Created date and Sub-agents section
+  const existing = await getFile(`shared/projects/${slug}/PROJECT.md`);
+  const createdMatch = existing.content?.match(/\*\*Created:\*\*\s*(.+)/);
+  const created = createdMatch?.[1]?.trim() || new Date().toISOString().split("T")[0];
+
+  // Preserve sub-agents section if it exists
+  const subagentsMatch = existing.content?.match(/## Sub-agents\n([\s\S]*?)(?=\n## |$)/);
+  const subagents = subagentsMatch?.[1]?.trim() || "(none yet)";
+
+  const gateLines = gates
+    .filter((g) => g.checked)
+    .map((g) => `- ${g.id}: requires kavin`)
+    .join("\n");
+
+  const nsmLine = nsm ? `\n**NSM:** ${nsm}` : "";
+  const workdirLine = workdir ? `\n**Workdir:** ${workdir}` : "";
+
+  const projectMd = `# ${name}
+
+**Lead:** ${lead}
+**Budget:** $${budget}/week
+**Created:** ${created}
+**Status:** ${status}${nsmLine}${workdirLine}
+
+## Mission / Goal
+${mission}
+
+## Approval Gates
+${gateLines}
+
+## Sub-agents
+${subagents}
+`;
+
+  await writeFile(`shared/projects/${slug}/PROJECT.md`, projectMd);
+  return { slug };
+}
+
 // --- Issues API ---
 
 export async function getIssues(projectSlug) {

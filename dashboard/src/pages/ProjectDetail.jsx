@@ -232,12 +232,19 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
      <span className="text-zinc-100 font-semibold">{project.title || projectId}</span>
     </nav>
 
-    {/* Title + Status Badge */}
+    {/* Title + Status Badge + Edit */}
     <div className="flex items-center gap-4 mb-4">
      <h1 className="text-[30px] font-semibold text-zinc-100 leading-none tracking-tight">
       {project.title || projectId}
      </h1>
      <StatusBadge status={project.status} />
+     <button
+      onClick={() => navigate("edit-project", projectId)}
+      className="ml-auto px-3 py-1.5 rounded-[6px] border border-border bg-card text-[14px] font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors flex items-center gap-1.5"
+     >
+      <Pencil size={13} />
+      Edit
+     </button>
     </div>
 
     {/* Metadata */}
