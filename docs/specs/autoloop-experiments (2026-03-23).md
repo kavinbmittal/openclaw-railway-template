@@ -86,13 +86,13 @@ Rules:
 
 ### 2. Tool registry cross-reference protocol
 
-When an agent proposes an experiment:
+When an agent proposes an experiment, three checks must pass for each tool — all three for `[x]`:
 
-1. Read `shared/tools/registry.md` for each required tool
-2. Check status is `Active` (not `Pending`, `Degraded`, or `Down`)
-3. Check the per-tool doc (`shared/tools/<tool>.md`) for execute and measure instructions
-4. If the tool doc doesn't have a `## How to Measure` section, the measurement path is unverified — mark as `[ ]`
-5. Write the `## Required Tools` section with real status, not aspirational status
+1. **Agent's TOOLS.md** — confirm the agent has the tool and knows its specific config (e.g. which Typefully social set, which email alias, which browser profile). If the agent's TOOLS.md doesn't mention the tool, it's `[ ]`.
+2. **`shared/tools/registry.md`** — confirm the tool is currently `Active` (not `Pending`, `Degraded`, or `Down`). The registry is the auth source of truth.
+3. **`shared/tools/<tool>.md`** — confirm the tool doc has a `## How to Measure` section. If the measurement path is unverified, mark as `[ ]`.
+
+Write the `## Required Tools` section with real status from all three sources, not aspirational status.
 
 ### 3. Per-tool doc format
 
