@@ -2,6 +2,7 @@
 
 ## 2026-03-23
 - **feat:** Edit Project page — edit name, mission, NSM, lead, status, budget, workdir, and approval gates; "Edit" button on project detail header
+- **feat:** Proxy metrics on Issues page now show target values (→ target) matching the overview page
 - **feat:** Agent comments auto-format into bullet lists — flat text becomes structured with bold labels, bullets for sentences and comma lists, backticked file paths; comment timestamps now display correctly
 - **refactor:** Ship-ready cleanup — removed dead milestones code, 4 unused components, dead getDashboard endpoint, unused CSS animation, fixed variable typos, deleted stale spec docs (919 lines removed)
 - **feat:** Experiment journal — phase arc (Design → Run → Pivot → Scale), decision-aware run history table with colored badges, status derived from results.tsv, inbox Experiment Updates category with deep links to experiment detail (`988eecf`)

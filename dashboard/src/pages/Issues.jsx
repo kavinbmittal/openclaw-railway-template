@@ -248,7 +248,7 @@ export default function Issues({ projectSlug, navigate, themes = [] }) {
               <div className="w-4 h-4 rounded bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[9px] font-mono text-zinc-500 flex-shrink-0">
                {String.fromCharCode(97 + pmIdx)}
               </div>
-              <span>{pm.name}</span>
+              <span>{pm.name}{pm.target && <span className="text-zinc-500 font-mono text-[11px] ml-2">→ {pm.target}</span>}</span>
              </div>
             ))}
            </div>
