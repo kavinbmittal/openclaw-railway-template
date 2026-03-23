@@ -25,6 +25,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
  const [selectedTheme, setSelectedTheme] = useState("");
  const [selectedProxyMetrics, setSelectedProxyMetrics] = useState([]);
  const [complexity, setComplexity] = useState("operator");
+ const [budget, setBudget] = useState("");
  const [submitting, setSubmitting] = useState(false);
  const [error, setError] = useState(null);
 
@@ -47,6 +48,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
     theme: selectedTheme || null,
     proxy_metrics: selectedProxyMetrics.length > 0 ? selectedProxyMetrics : null,
     complexity,
+    budget: budget ? parseFloat(budget) : null,
    });
    onCreated?.(issue);
   } catch (err) {
@@ -215,6 +217,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
         onChange={(e) => setComplexity(e.target.value)}
         className="w-full rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 pr-10 focus:outline-none focus:ring-[3px] focus:ring-ring/50 transition-all cursor-pointer appearance-none"
        >
+        <option value="claude-code">Claude Code</option>
         <option value="complex">Complex</option>
         <option value="strategic">Strategic</option>
         <option value="analyst">Analyst</option>
@@ -226,6 +229,22 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
        </div>
       </div>
       <p className="text-[12px] text-muted-foreground mt-1.5">Sets which model tier this issue runs on.</p>
+
+      {/* Budget */}
+      <div className="mt-4">
+       <label className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-2 block">Budget ($)</label>
+       <input
+        type="number"
+        step="0.01"
+        min="0"
+        value={budget}
+        onChange={(e) => setBudget(e.target.value)}
+        placeholder="e.g. 10.00"
+        className="rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
+        style={{ maxWidth: "160px" }}
+       />
+       <p className="text-[12px] text-muted-foreground mt-1.5">Max spend for this issue. Agent pauses if exceeded.</p>
+      </div>
      </div>
     </div>
 

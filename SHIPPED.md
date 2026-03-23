@@ -2,7 +2,8 @@
 
 ## 2026-03-23
 - **feat:** Experiment journal — phase arc (Design → Run → Pivot → Scale), decision-aware run history table with colored badges, status derived from results.tsv, inbox Experiment Updates category with deep links to experiment detail (`988eecf`)
-- **refactor:** Model routing simplified — removed model/thinking overrides from issues, single tier dropdown (Complex/Strategic/Analyst/Operator/Runner), reordered routing page sections (`fa5fb7e`)
+- **feat:** Claude Code tier — agents can now be assigned to spawn Claude Code sessions for full autonomous execution; six tiers: Claude Code > Complex > Strategic > Analyst > Operator > Runner (`dba260f`)
+- **refactor:** Model routing simplified — removed model/thinking overrides from issues, single tier dropdown, reordered routing page sections (`fa5fb7e`)
 - **fix:** Global approvals pills now show colored number badge for theme + letter badge for proxy metric, matching project approvals exactly
 - **fix:** Auto-bold known labels in agent descriptions (what:, why:, etc.) so they render cleanly regardless of agent formatting
 - **feat:** Request revision on proposed issues — leave feedback instead of just approve/reject, issue stays pending with comment attached, agent gets notified

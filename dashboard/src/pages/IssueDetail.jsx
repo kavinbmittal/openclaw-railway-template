@@ -398,13 +398,62 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
         {issue.complexity && (
          <div className="flex justify-between items-center">
           <span className="text-xs text-zinc-500">Tier</span>
-          <span className="text-sm text-zinc-300 capitalize">{issue.complexity}</span>
+          <span className="text-sm text-zinc-300">{issue.complexity === "claude-code" ? "Claude Code" : issue.complexity.charAt(0).toUpperCase() + issue.complexity.slice(1)}</span>
          </div>
         )}
         {issue.escalation_count > 0 && (
          <div className="flex justify-between items-center">
           <span className="text-xs text-zinc-500">Escalations</span>
           <span className="text-sm text-amber-400 font-mono">{issue.escalation_count}</span>
+         </div>
+        )}
+       </div>
+      </div>
+     )}
+
+     {/* Cost Card — estimated vs actual with delta */}
+     {(issue.estimated_cost != null || issue.actual_cost != null) && (
+      <div className="bg-app-card border border-zinc-800 rounded-sm shadow-sm p-5 space-y-3">
+       <h3 className="text-xs uppercase font-mono tracking-widest text-zinc-500">Cost</h3>
+       <div className="space-y-2.5">
+        {issue.estimated_cost != null && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Estimated</span>
+          <span className="text-sm text-zinc-300 font-mono">${Number(issue.estimated_cost).toFixed(2)}</span>
+         </div>
+        )}
+        {issue.budget != null && issue.budget !== issue.estimated_cost && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Budget</span>
+          <span className="text-sm text-zinc-300 font-mono">${Number(issue.budget).toFixed(2)}</span>
+         </div>
+        )}
+        {issue.actual_cost != null && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Actual</span>
+          <span className="text-sm text-zinc-300 font-mono">${Number(issue.actual_cost).toFixed(2)}</span>
+         </div>
+        )}
+        {issue.estimated_cost != null && issue.actual_cost != null && (() => {
+         const delta = issue.actual_cost - issue.estimated_cost;
+         const isOver = delta > 0;
+         return (
+          <div className="flex justify-between items-center">
+           <span className="text-xs text-zinc-500">Delta</span>
+           <span className={`text-sm font-mono ${isOver ? "text-red-400" : "text-emerald-400"}`}>
+            {isOver ? "+" : ""}${delta.toFixed(2)}
+           </span>
+          </div>
+         );
+        })()}
+        {issue.budget_status && (
+         <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">Budget Status</span>
+          <span className={`text-sm capitalize ${
+           issue.budget_status === "exceeded" ? "text-red-400" :
+           issue.budget_status === "approved" ? "text-emerald-400" :
+           "text-zinc-300"
+          }`}>{issue.budget_status}</span>
          </div>
         )}
        </div>

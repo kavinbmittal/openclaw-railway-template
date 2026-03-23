@@ -14,6 +14,7 @@ function TypeBadge({ type }) {
   "proposed-theme": { label:"Theme", cls:"border-teal-500/20 bg-teal-500/10 text-teal-400" },
   theme: { label:"Theme", cls:"border-teal-500/20 bg-teal-500/10 text-teal-400" },
   "deliverable-review": { label:"Deliverable", cls:"border-blue-500/20 bg-blue-500/10 text-blue-400" },
+  "budget-exceeded": { label:"Budget", cls:"border-amber-500/20 bg-amber-500/10 text-amber-400" },
  };
 
  const badge = badges[type] || (type ? { label: type, cls:"border-amber-500/20 bg-amber-500/10 text-amber-400" } : null);
@@ -86,6 +87,30 @@ export default function ApprovalCard({
       ))}
      </div>
     )}
+    {/* Cost governance: tier + estimated cost (proposed issues) or budget vs actual (budget approvals) */}
+    {(approval.complexity || approval.estimated_cost != null || itemType === "budget-exceeded") && (
+     <div className="flex items-center gap-2 flex-wrap">
+      {approval.complexity && (
+       <span className="px-2 py-0.5 rounded-full text-[11px] font-medium border border-cyan-500/20 bg-cyan-500/10 text-cyan-400">
+        {approval.complexity === "claude-code" ? "Claude Code" : approval.complexity.charAt(0).toUpperCase() + approval.complexity.slice(1)}
+       </span>
+      )}
+      {approval.estimated_cost != null ? (
+       <span className="text-[12px] font-mono text-zinc-400">
+        Est. ${Number(approval.estimated_cost).toFixed(2)}
+       </span>
+      ) : (itemType === "proposed-issue" && (
+       <span className="text-[11px] font-mono text-amber-400 border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 rounded-full">
+        No estimate
+       </span>
+      ))}
+      {itemType === "budget-exceeded" && approval.actual_cost != null && approval.budget != null && (
+       <span className="text-[12px] font-mono text-amber-400">
+        ${Number(approval.actual_cost).toFixed(2)} / ${Number(approval.budget).toFixed(2)} budget
+       </span>
+      )}
+     </div>
+    )}
     <div className="text-[13px] text-muted-foreground flex items-center gap-2">
      {approval.requester && <span>Requested by: {approval.requester}</span>}
      {approval.requester && timeAgo && <span>·</span>}
@@ -114,7 +139,7 @@ export default function ApprovalCard({
     )}
    </div>
 
-   {/* Right: action buttons */}
+   {/* Right: action buttons — budget approvals get Continue/Stop, others get Approve/Reject */}
    {isPending && (
     <div
      className="flex items-center gap-2 shrink-0"
@@ -124,13 +149,13 @@ export default function ApprovalCard({
       onClick={() => onReject && onReject(approval)}
       className="px-4 py-1.5 rounded-[6px] border border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-[color,box-shadow] text-[15px] font-medium focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-red-500/30"
      >
-      Reject
+      {itemType === "budget-exceeded" ? "Stop" : "Reject"}
      </button>
      <button
       onClick={() => onApprove && onApprove(approval)}
       className="px-4 py-1.5 rounded-[6px] border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 transition-[color,box-shadow] text-[15px] font-medium focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-emerald-500/30"
      >
-      Approve
+      {itemType === "budget-exceeded" ? "Continue" : "Approve"}
      </button>
     </div>
    )}

@@ -29,10 +29,11 @@
 - Telegram fallback alerts when agents encounter issues
 
 ## Model Routing
-- Model Routing page: manage five model tiers (Complex, Strategic, Analyst, Operator, Runner) with model and thinking level per tier
+- Model Routing page: manage six model tiers (Claude Code, Complex, Strategic, Analyst, Operator, Runner) with model and thinking level per tier
 - Assign each agent to a tier — sets their default model for task execution
 - Map research loop phases (hypothesis, execution, analysis, synthesis) to tiers
-- Set model tier on any issue from create or edit forms — tier drives which model runs the task
+- Set model tier on any issue from create or edit forms — tier drives which model or execution environment runs the task
+- Claude Code tier: agents spawn a Claude Code session for full autonomous execution instead of a direct API call
 - Agent detail pages show tier badge with resolved model next to agent name
 - Routing config saved to Railway volume as `shared/model-routing.json` — agents read it at task creation time
 

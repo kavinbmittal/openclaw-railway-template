@@ -45,6 +45,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
   const [status, setStatus] = useState("");
   const [complexity, setComplexity] = useState("complex");
   const [escalationCount, setEscalationCount] = useState(0);
+  const [budget, setBudget] = useState("");
 
   // Data state
   const [themes, setThemes] = useState([]);
@@ -72,6 +73,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
         setLabels((issue.labels || []).join(", "));
         setComplexity(issue.complexity || "operator");
         setEscalationCount(issue.escalation_count || 0);
+        setBudget(issue.budget != null ? String(issue.budget) : "");
         const metricIds = (issue.proxy_metrics || []).map((pm) =>
           typeof pm === "string" ? pm : pm.id
         );
@@ -86,6 +88,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           theme: issue.theme || "",
           labels: (issue.labels || []).join(", "),
           complexity: issue.complexity || "operator",
+          budget: issue.budget != null ? String(issue.budget) : "",
           metrics: new Set(metricIds),
           updated: issue.updated,
         };
@@ -109,9 +112,10 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
       theme !== o.theme ||
       labels !== o.labels ||
       complexity !== o.complexity ||
+      budget !== o.budget ||
       metricsChanged;
     setHasChanges(changed);
-  }, [title, description, priority, assignee, theme, selectedMetrics, labels, complexity]);
+  }, [title, description, priority, assignee, theme, selectedMetrics, labels, complexity, budget]);
 
   // Get proxy metrics for the currently selected theme
   const currentTheme = themes.find((t) => t.id === theme || t.title === theme);
@@ -152,6 +156,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           .map((s) => s.trim())
           .filter(Boolean),
         complexity,
+        budget: budget ? parseFloat(budget) : null,
       });
       navigate("issue-detail", { projectSlug, issueId });
     } catch (err) {
@@ -447,6 +452,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                   onChange={(e) => setComplexity(e.target.value)}
                   className="w-full appearance-none bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 pr-10 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
                 >
+                  <option value="claude-code">Claude Code</option>
                   <option value="complex">Complex</option>
                   <option value="strategic">Strategic</option>
                   <option value="analyst">Analyst</option>
@@ -458,6 +464,23 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 </div>
               </div>
               <p className="text-xs text-zinc-500 mt-2">Sets which model tier this issue runs on.</p>
+
+              {/* Budget */}
+              <div className="mt-4">
+                <label className="text-[11px] text-zinc-500 mb-1.5 block">Budget ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={budget}
+                  onChange={(e) => setBudget(e.target.value)}
+                  placeholder="e.g. 10.00"
+                  className="bg-[#09090b] border border-zinc-800 rounded-md px-3 py-2 text-sm text-zinc-200 shadow-sm hover:border-zinc-700 transition-colors focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 outline-none"
+                  style={{ maxWidth: "160px" }}
+                />
+                <p className="text-xs text-zinc-500 mt-1.5">Max spend for this issue. Agent pauses if exceeded.</p>
+              </div>
+
               {escalationCount > 0 && (
                 <div className="mt-3 flex items-center gap-2">
                   <span className="text-[11px] uppercase font-mono tracking-[0.15em] text-zinc-500">Escalation Count</span>

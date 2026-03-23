@@ -102,6 +102,24 @@
 ### Build dist
 - [x] Build and commit
 
+## 2026-03-23-issue-cost-governance
+
+### Dashboard Build
+- [ ] ApprovalCard: show tier badge + estimated cost on proposed issues, "No estimate" warning if missing
+- [ ] ApprovalCard: budget approval type — budget vs actual, Continue/Stop actions
+- [ ] IssueDetail: cost card — estimated, actual, delta (green/red)
+- [ ] CreateIssue: budget field (editable, dollar amount)
+- [ ] EditIssue: budget field (editable, dollar amount)
+- [ ] API: accept + persist estimated_cost, budget, actual_cost, budget_status on issues
+- [ ] Build dist
+
+## v2: Agent Protocol — Cost Governance + Model Routing (bundle)
+
+- [ ] Teach agents to include `estimated_cost` + `complexity` in all issue proposals — effort S
+- [ ] Teach agents to track token spend per issue and check budget at step boundaries — effort M
+- [ ] Teach agents to read `shared/model-routing.json` and use model/thinking fields at spawn time — effort M
+- [ ] Teach agents to write `budget_status` + budget approval JSON when cap is hit — effort S
+
 ## v2: One-tap model switch from Telegram
 
 When a model fallback alert fires, include an inline "Switch" button that rewrites `agents.defaults.model.primary` in `openclaw.json` via an HMAC-secured `/ops/model-switch` endpoint. Also add an "Undo" button to the confirmation message so switching back is one more tap.

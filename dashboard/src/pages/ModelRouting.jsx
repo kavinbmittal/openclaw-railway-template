@@ -36,6 +36,7 @@ const RESEARCH_PHASES = [
 
 // Tier descriptions shown at the bottom of the page
 const TIER_DESCRIPTIONS = {
+  "claude-code": "Spawns a Claude Code session to execute the task autonomously",
   complex: "Handles high-stakes or deeply reasoned execution tasks",
   strategic: "Decides what the team should focus on across all projects",
   analyst: "Decides how to approach work within their domain",
@@ -46,9 +47,10 @@ const TIER_DESCRIPTIONS = {
 // Default config — used when creating from scratch
 const DEFAULT_CONFIG = {
   tiers: {
+    "claude-code": { model: "claude-code", thinking: "adaptive" },
+    complex: { model: "anthropic/claude-opus-4-6", thinking: "high" },
     strategic: { model: "anthropic/claude-opus-4-6", thinking: "adaptive" },
     analyst: { model: "anthropic/claude-sonnet-4-6", thinking: "high" },
-    complex: { model: "anthropic/claude-opus-4-6", thinking: "high" },
     operator: { model: "anthropic/claude-sonnet-4-6", thinking: "medium" },
     runner: { model: "anthropic/claude-haiku-4-5", thinking: "off" },
   },
@@ -61,7 +63,7 @@ const DEFAULT_CONFIG = {
   },
 };
 
-const TIER_ORDER = ["complex", "strategic", "analyst", "operator", "runner"];
+const TIER_ORDER = ["claude-code", "complex", "strategic", "analyst", "operator", "runner"];
 
 // Friendly label for a model string
 function modelLabel(modelStr) {
@@ -71,6 +73,7 @@ function modelLabel(modelStr) {
 
 // Resolve tier to display string: "Sonnet 4.6 (high)"
 function resolveTierDisplay(tiers, tierName) {
+  if (tierName === "claude-code") return "Claude Code";
   const tier = tiers[tierName];
   if (!tier) return "—";
   const label = modelLabel(tier.model);
@@ -349,21 +352,28 @@ export default function ModelRouting({ navigate }) {
           <div className="space-y-3">
             {TIER_ORDER.map((tierName) => {
               const tier = config.tiers[tierName] || {};
+              const isClaudeCode = tierName === "claude-code";
               return (
                 <div key={tierName} className="flex items-center gap-4 p-3 rounded-md border border-zinc-800 bg-[#09090b]">
-                  <span className="w-28 text-sm font-medium text-zinc-300 capitalize shrink-0">{tierName}</span>
-                  <AuraSelect
-                    value={tier.model || ""}
-                    onChange={(v) => updateTier(tierName, "model", v)}
-                    options={AVAILABLE_MODELS}
-                    className="flex-1"
-                  />
-                  <AuraSelect
-                    value={tier.thinking || "off"}
-                    onChange={(v) => updateTier(tierName, "thinking", v)}
-                    options={THINKING_LEVELS}
-                    className="w-40"
-                  />
+                  <span className="w-28 text-sm font-medium text-zinc-300 shrink-0">{tierName === "claude-code" ? "Claude Code" : tierName.charAt(0).toUpperCase() + tierName.slice(1)}</span>
+                  {isClaudeCode ? (
+                    <span className="flex-1 text-sm text-zinc-500 font-mono">Claude Code session</span>
+                  ) : (
+                    <>
+                      <AuraSelect
+                        value={tier.model || ""}
+                        onChange={(v) => updateTier(tierName, "model", v)}
+                        options={AVAILABLE_MODELS}
+                        className="flex-1"
+                      />
+                      <AuraSelect
+                        value={tier.thinking || "off"}
+                        onChange={(v) => updateTier(tierName, "thinking", v)}
+                        options={THINKING_LEVELS}
+                        className="w-40"
+                      />
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -377,7 +387,7 @@ export default function ModelRouting({ navigate }) {
         <div className="space-y-1.5">
           {TIER_ORDER.map((tierName) => (
             <div key={tierName} className="flex items-baseline gap-3">
-              <span className="text-sm font-medium text-zinc-300 capitalize w-24 shrink-0">{tierName}</span>
+              <span className="text-sm font-medium text-zinc-300 w-28 shrink-0">{tierName === "claude-code" ? "Claude Code" : tierName.charAt(0).toUpperCase() + tierName.slice(1)}</span>
               <span className="text-sm text-zinc-500">{TIER_DESCRIPTIONS[tierName]}</span>
             </div>
           ))}
