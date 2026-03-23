@@ -240,15 +240,18 @@ export default function Approvals({ navigate }) {
            {(approval.theme_title || (approval.proxy_metric_names && approval.proxy_metric_names.length > 0)) && (
             <div className="flex items-center gap-2 flex-wrap">
              {approval.theme_title && (
-              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-teal-500/20 bg-teal-500/10 text-teal-400">
-               <Compass size={10} />
-               {approval.theme_title}
-              </span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+               <Compass size={10} className="text-zinc-400" />
+               <span className="text-[12px] text-zinc-300">{approval.theme_title}</span>
+              </div>
+             )}
+             {approval.proxy_metric_names && approval.proxy_metric_names.length > 0 && approval.theme_title && (
+              <span className="text-zinc-600 text-[14px]">{"\u203A"}</span>
              )}
              {approval.proxy_metric_names && approval.proxy_metric_names.map((pm, j) => (
-              <span key={j} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border border-zinc-700 bg-zinc-800/50 text-zinc-400">
-               {pm}
-              </span>
+              <div key={j} className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] bg-zinc-800/40 border border-zinc-700/30">
+               <span className="text-[12px] text-zinc-400">{pm}</span>
+              </div>
              ))}
             </div>
            )}

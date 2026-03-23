@@ -1,6 +1,8 @@
 # SHIPPED.md
 
 ## 2026-03-23
+- **fix:** Global approvals page now uses DESIGN.md pill spec (rounded-[4px] box, `›` separator) instead of old teal rounded-full style
+- **fix:** Auto-bold known labels in agent descriptions (what:, why:, etc.) so they render cleanly regardless of agent formatting
 - **feat:** Request revision on proposed issues — leave feedback instead of just approve/reject, issue stays pending with comment attached, agent gets notified
 - **fix:** Rejecting a proposed issue now requires a comment
 - **feat:** Agent model routing — Routing Config page to manage model tiers, agent assignments, and research phase mapping; model/thinking/complexity override on issues; tier badge on agent detail

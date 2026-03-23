@@ -219,7 +219,7 @@ Used on both project-level and global approval cards to show which theme and pro
 
 ## Anti-Patterns (Never Do)
 
-1. **No `rounded-lg` on anything.** Cards: `rounded-[2px]`. Interactive: `rounded-[6px]`. Pills: `rounded-full`.
+1. **No `rounded-lg` on anything.** Cards: `rounded-[2px]`. Interactive: `rounded-[6px]`. Status pills: `rounded-full`. Theme/proxy pills: `rounded-[4px]`.
 2. **No gradients.** Not on buttons, backgrounds, or anything.
 3. **No decorative color.** Every color maps to a semantic meaning.
 4. **No web fonts.** System stack only.
