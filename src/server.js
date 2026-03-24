@@ -1856,13 +1856,38 @@ app.get("/mc/api/approvals", requireSetupAuth, (req, res) => {
             const raw = fs.readFileSync(path.join(pendingDir, file), "utf8");
             const data = JSON.parse(raw);
             if (data.status === "resolved") continue; // skip tombstones
-            approvals.push({
+            const entry = {
               ...data,
               type: data.gate || "unknown",
               _project: proj.name,
               _file: file,
               _source: "gate",
-            });
+            };
+            // Enrich experiment approvals with theme/proxy from program.md
+            if (data.gate === "experiment-start" || data.gate === "autoresearch-start") {
+              const programMd = findExperimentProgram(projectsDir, proj.name, data);
+              if (programMd) {
+                const meta = parseExperimentMeta(programMd);
+                if (meta.theme) {
+                  entry.theme = meta.theme;
+                  // Resolve theme title and proxy metric names
+                  const themePath = path.join(projectsDir, proj.name, "themes", `${meta.theme}.json`);
+                  if (fs.existsSync(themePath)) {
+                    try {
+                      const themeData = JSON.parse(fs.readFileSync(themePath, "utf8"));
+                      entry.theme_title = themeData.title || meta.theme;
+                      if (Array.isArray(meta.proxy_metrics) && Array.isArray(themeData.proxy_metrics)) {
+                        entry.proxy_metric_names = meta.proxy_metrics.map((pm) => {
+                          const found = themeData.proxy_metrics.find((t) => t.id === pm.id);
+                          return found ? found.name : pm.id;
+                        });
+                      }
+                    } catch { /* skip theme resolution */ }
+                  }
+                }
+              }
+            }
+            approvals.push(entry);
           } catch { /* skip malformed files */ }
         }
       }
