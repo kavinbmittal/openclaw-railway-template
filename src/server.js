@@ -1566,6 +1566,9 @@ function parseExperimentMeta(programMd) {
   // Extract constraints section
   const constraintsMatch = programMd.match(/## Constraints\s*\n([\s\S]*?)(?=\n##|$)/);
   if (constraintsMatch) meta.constraints = constraintsMatch[1].trim();
+  // Extract mode: "one-shot" or "autoloop", default autoloop
+  const modeMatch = programMd.match(/## Mode\s*\n\s*(.+)/);
+  meta.mode = modeMatch ? modeMatch[1].trim().toLowerCase() : "autoloop";
   return meta;
 }
 
@@ -1646,6 +1649,7 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
               if (meta.eval_method) enriched.eval_method = meta.eval_method;
               if (meta.decision_triggers) enriched.decision_triggers = meta.decision_triggers;
               if (meta.constraints) enriched.constraints = meta.constraints;
+              enriched.mode = meta.mode || "autoloop";
             }
             // Resolve theme title and proxy metric names
             if (data.theme) {
@@ -1693,6 +1697,7 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
               if (meta.eval_method) enriched.eval_method = meta.eval_method;
               if (meta.decision_triggers) enriched.decision_triggers = meta.decision_triggers;
               if (meta.constraints) enriched.constraints = meta.constraints;
+              enriched.mode = meta.mode || "autoloop";
             }
             if (data.theme) {
               const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
@@ -3418,12 +3423,14 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       } catch { /* skip */ }
     }
 
-    let hypothesis = null, theme = null, proxyMetric = null, targetValue = null, proxyMetricIds = [];
+    let hypothesis = null, theme = null, proxyMetric = null, targetValue = null, proxyMetricIds = [], mode = "autoloop";
     if (programMd) {
       const hypoMatch = programMd.match(/## Hypothesis\s*\n([\s\S]*?)(?=\n##|$)/);
       if (hypoMatch) hypothesis = hypoMatch[1].trim();
       const themeMatch = programMd.match(/## Theme\s*\n\s*(.+)/);
       if (themeMatch) theme = themeMatch[1].trim();
+      const modeMatch = programMd.match(/## Mode\s*\n\s*(.+)/);
+      if (modeMatch) mode = modeMatch[1].trim().toLowerCase();
       const pmSection = programMd.match(/## Proxy Metrics\s*\n([\s\S]*?)(?=\n##|$)/);
       if (pmSection) {
         const pmLines = pmSection[1].trim().split("\n").filter((l) => l.startsWith("- "));
@@ -3463,6 +3470,7 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       proxy_metric: proxyMetric,
       proxy_metrics: proxyMetricIds.map((id) => ({ id })),
       target_value: targetValue,
+      mode,
       results,
       result_count: results.length,
       best_metric: bestMetric,
@@ -3571,9 +3579,10 @@ app.get("/mc/api/experiments/:dir", requireSetupAuth, (req, res) => {
   }
 
   // Parse structured sections from program.md
-  let playbook = null, evalMethod = null, decisionTriggers = null, constraints = null, requiredTools = null;
+  let playbook = null, evalMethod = null, decisionTriggers = null, constraints = null, requiredTools = null, mode = "autoloop";
   if (programMd) {
     const meta = parseExperimentMeta(programMd);
+    mode = meta.mode || "autoloop";
     if (meta.playbook) playbook = meta.playbook;
     if (meta.eval_method) evalMethod = meta.eval_method;
     if (meta.decision_triggers) decisionTriggers = meta.decision_triggers;
@@ -3607,7 +3616,7 @@ app.get("/mc/api/experiments/:dir", requireSetupAuth, (req, res) => {
   try { createdDate = fs.statSync(expPath).birthtime.toISOString().split("T")[0]; } catch {}
   const phases = buildPhases(results, createdDate);
 
-  res.json({ name, dir, status, hypothesis, proxy_metric: proxyMetric, target_value: targetValue, theme: themeTitle, program_md: programMd, program: programSection, proxy_metrics: resolvedPMs, results, result_count: results.length, best_metric: bestMetric, phases, playbook, eval_method: evalMethod, decision_triggers: decisionTriggers, constraints, required_tools: requiredTools });
+  res.json({ name, dir, status, hypothesis, proxy_metric: proxyMetric, target_value: targetValue, theme: themeTitle, program_md: programMd, program: programSection, proxy_metrics: resolvedPMs, mode, results, result_count: results.length, best_metric: bestMetric, phases, playbook, eval_method: evalMethod, decision_triggers: decisionTriggers, constraints, required_tools: requiredTools });
 });
 
 // Create experiment

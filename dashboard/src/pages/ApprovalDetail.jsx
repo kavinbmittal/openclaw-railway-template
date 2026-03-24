@@ -376,6 +376,28 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        </>
       )}
 
+      {/* Mode badge — experiment proposals */}
+      {isExperiment && approval.mode && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <Activity className="w-3.5 h-3.5 text-cyan-400" />
+         </div>
+         <div className="text-[15px] font-medium text-cyan-100">Mode</div>
+        </header>
+        <div className="p-[20px]">
+         {(() => {
+          const isAutoloop = approval.mode === "autoloop";
+          return (
+           <span className={`rounded-full px-3 py-1 text-[13px] font-medium border ${isAutoloop ? "border-orange-500/20 bg-orange-500/10 text-orange-400" : "border-blue-500/20 bg-blue-500/10 text-blue-400"}`}>
+            {isAutoloop ? "Autoloop — runs continuously until decision trigger" : "One-shot — single execution, then evaluate"}
+           </span>
+          );
+         })()}
+        </div>
+       </section>
+      )}
+
       {/* Required Tools checklist — experiment proposals with tool declarations */}
       {isExperiment && approval.required_tools && approval.required_tools.length > 0 && (
        <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">

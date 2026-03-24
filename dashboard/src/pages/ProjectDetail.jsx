@@ -993,11 +993,17 @@ function ExperimentsTab({ experiments, themes = [], projectSlug, onRefresh, navi
        return (
        <div key={exp.dir} onClick={() => navigate("experiment-detail", { slug: projectSlug, dir: exp.dir })} className="bg-card border border-border rounded-[2px] shadow-sm p-[20px] flex flex-col h-full gap-4 cursor-pointer hover:bg-zinc-800/30 transition-colors">
         <div className="space-y-2.5">
-         {exp.status && exp.status !== "unknown" && (
-          <div>
-           <StatusBadge status={exp.status} />
-          </div>
-         )}
+         <div className="flex items-center gap-2">
+          {exp.status && exp.status !== "unknown" && <StatusBadge status={exp.status} />}
+          {(() => {
+           const isAutoloop = (exp.mode || "autoloop") === "autoloop";
+           return (
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium border ${isAutoloop ? "border-orange-500/20 bg-orange-500/10 text-orange-400" : "border-blue-500/20 bg-blue-500/10 text-blue-400"}`}>
+             {isAutoloop ? "autoloop" : "one-shot"}
+            </span>
+           );
+          })()}
+         </div>
          <h3 className="text-[15px] font-medium text-zinc-100">{exp.name}</h3>
 
          {/* Theme + Proxy Metric pill row */}

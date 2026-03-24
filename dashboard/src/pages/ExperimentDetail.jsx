@@ -224,7 +224,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
   );
  }
 
- const { name, status, hypothesis, proxy_metric, target_value, theme, program_md, program, proxy_metrics, results, result_count, best_metric, phases, playbook, eval_method, decision_triggers, constraints, required_tools } = data;
+ const { name, status, hypothesis, proxy_metric, target_value, theme, program_md, program, proxy_metrics, mode, results, result_count, best_metric, phases, playbook, eval_method, decision_triggers, constraints, required_tools } = data;
 
  // Determine run history table headers dynamically from results
  // Filter out decision/reason from the main numeric columns — they get special rendering
@@ -265,6 +265,14 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
     <div className="flex items-center gap-4">
      <h1 className="text-[30px] font-semibold text-foreground leading-none tracking-tight">{name}</h1>
      <StatusBadge status={status} />
+     {(() => {
+      const isAutoloop = (mode || "autoloop") === "autoloop";
+      return (
+       <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium border ${isAutoloop ? "border-orange-500/20 bg-orange-500/10 text-orange-400" : "border-blue-500/20 bg-blue-500/10 text-blue-400"}`}>
+        {isAutoloop ? "autoloop" : "one-shot"}
+       </span>
+      );
+     })()}
     </div>
 
     {/* Metadata pills */}

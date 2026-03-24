@@ -76,6 +76,16 @@ const EXP_STATUS_STYLES = {
  paused: "border-amber-500/20 bg-amber-500/10 text-amber-400",
 };
 
+/** Mode badge for experiments */
+function ModeBadge({ mode }) {
+ const isAutoloop = (mode || "autoloop") === "autoloop";
+ return (
+  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium border shrink-0 ${isAutoloop ? "border-orange-500/20 bg-orange-500/10 text-orange-400" : "border-blue-500/20 bg-blue-500/10 text-blue-400"}`}>
+   {isAutoloop ? "autoloop" : "one-shot"}
+  </span>
+ );
+}
+
 /** Single experiment row inside a theme group */
 function ExperimentRow({ exp, onClick, themeProxyMetrics = [] }) {
  const expPmIds = (exp.proxy_metrics || []).map(pm => typeof pm === "string" ? pm : pm.id);
@@ -87,6 +97,7 @@ function ExperimentRow({ exp, onClick, themeProxyMetrics = [] }) {
   >
    <FlaskConical size={14} className="text-cyan-500/60 shrink-0" />
    <span className="text-[12px] font-mono text-zinc-500 shrink-0 whitespace-nowrap">{exp.dir}</span>
+   <ModeBadge mode={exp.mode} />
    <span className="text-[15px] flex-1 truncate text-zinc-200">
     {exp.name || exp.dir}
    </span>
