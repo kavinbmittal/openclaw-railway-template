@@ -478,7 +478,7 @@ export default function ProjectDetail({ projectId, navigate, initialTab }) {
     {/* ──────────────── ISSUES TAB ──────────────── */}
     <TabsContent value="issues">
      <div className="mt-6">
-      <Issues projectSlug={projectId} navigate={navigate} themes={themes.filter((t) => t.status === "approved")} />
+      <Issues projectSlug={projectId} navigate={navigate} themes={themes.filter((t) => t.status === "approved")} experiments={experiments} />
      </div>
     </TabsContent>
 

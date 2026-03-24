@@ -3418,7 +3418,7 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       } catch { /* skip */ }
     }
 
-    let hypothesis = null, theme = null, proxyMetric = null, targetValue = null;
+    let hypothesis = null, theme = null, proxyMetric = null, targetValue = null, proxyMetricIds = [];
     if (programMd) {
       const hypoMatch = programMd.match(/## Hypothesis\s*\n([\s\S]*?)(?=\n##|$)/);
       if (hypoMatch) hypothesis = hypoMatch[1].trim();
@@ -3427,11 +3427,17 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       const pmSection = programMd.match(/## Proxy Metrics\s*\n([\s\S]*?)(?=\n##|$)/);
       if (pmSection) {
         const pmLines = pmSection[1].trim().split("\n").filter((l) => l.startsWith("- "));
+        // Parse all proxy metric IDs
+        proxyMetricIds = pmLines.map((line) => {
+          const m = line.match(/^- ([\w-]+)/);
+          return m ? m[1] : null;
+        }).filter(Boolean);
         const m = pmLines[0] && pmLines[0].match(/^- ([\w-]+)\s*[—–-]\s*contribution:\s*(.+)/i);
         if (m) { proxyMetric = m[1]; targetValue = m[2].trim(); }
       }
     }
     // Resolve theme title and proxy metric name
+    const themeId = theme; // preserve raw ID for grouping
     let themeTitle = theme;
     if (theme) {
       const themePath = path.join(STATE_DIR, "shared", "projects", slug, "themes", `${theme}.json`);
@@ -3452,8 +3458,10 @@ app.get("/mc/api/experiments", requireSetupAuth, (req, res) => {
       dir: entry.name,
       program_md: programMd,
       hypothesis,
-      theme: themeTitle,
+      theme: themeId,
+      theme_title: themeTitle,
       proxy_metric: proxyMetric,
+      proxy_metrics: proxyMetricIds.map((id) => ({ id })),
       target_value: targetValue,
       results,
       result_count: results.length,
