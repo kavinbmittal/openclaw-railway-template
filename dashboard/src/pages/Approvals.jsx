@@ -88,7 +88,7 @@ export default function Approvals({ navigate }) {
  }
 
  const pendingApprovals = useMemo(
-  () => approvals.filter((a) => !a.status || a.status ==="pending"),
+  () => approvals.filter((a) => !a.status || a.status ==="pending" || a.status === "revision_requested"),
   [approvals]
  );
 

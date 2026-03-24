@@ -592,7 +592,7 @@ export default function ApprovalDetail({ approvalId, navigate }) {
      <div className="xl:col-span-1 space-y-6">
 
       {/* Actions Card — Aura: sticky, approve/reject buttons */}
-      {isPending && !resolved && (
+      {(isPending || isRevisionRequested) && !resolved && (
        <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col sticky top-0">
         <header className="flex items-center gap-3 px-5 py-3 bg-amber-500/[0.02] transition-colors">
          <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
