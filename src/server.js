@@ -1528,7 +1528,7 @@ app.delete("/mc/api/files", requireSetupAuth, (req, res) => {
 function parseExperimentMeta(programMd) {
   const meta = {};
   // Extract theme ID from "## Theme\ntheme-xxx" or "## Theme\ntheme-xxx (Title)"
-  const themeMatch = programMd.match(/## Theme\s*\n\s*(theme-[\w-]+)/);
+  const themeMatch = programMd.match(/## Theme\s*\n\s*([\w-]+)/);
   if (themeMatch) meta.theme = themeMatch[1];
   // Extract hypothesis
   const hypoMatch = programMd.match(/## Hypothesis\s*\n([\s\S]*?)(?=\n##|$)/);
