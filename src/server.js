@@ -1582,7 +1582,16 @@ function findExperimentProgram(projectsDir, projectName, approvalData) {
     }
   }
 
-  // Otherwise, find the most recent experiment directory (highest exp-NNN)
+  // Try to extract experiment ID from approval ID (e.g. "experiment-start-exp-003" → "exp-003")
+  const expMatch = (approvalData.id || "").match(/(exp-\d+)/);
+  if (expMatch) {
+    const programPath = path.join(expDir, expMatch[1], "program.md");
+    if (fs.existsSync(programPath)) {
+      try { return fs.readFileSync(programPath, "utf8"); } catch { /* skip */ }
+    }
+  }
+
+  // Fallback: find the most recent experiment directory (highest exp-NNN)
   try {
     const entries = fs.readdirSync(expDir, { withFileTypes: true })
       .filter((e) => e.isDirectory())
