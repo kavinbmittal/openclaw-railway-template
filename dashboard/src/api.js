@@ -309,11 +309,11 @@ export async function getExperiments(projectSlug) {
   return data.experiments || [];
 }
 
-export async function createExperiment({ project, name, hypothesis, proxy_metric, target_value, program_md, theme }) {
+export async function createExperiment({ project, name, hypothesis, proxy_metric, target_value, program_md, theme, playbook, eval_method, decision_triggers, constraints }) {
   const res = await fetch(`${BASE}/experiments`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project, name, hypothesis, proxy_metric, target_value, program_md, theme }),
+    body: JSON.stringify({ project, name, hypothesis, proxy_metric, target_value, program_md, theme, playbook, eval_method, decision_triggers, constraints }),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));

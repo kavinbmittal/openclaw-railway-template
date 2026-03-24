@@ -1554,6 +1554,18 @@ function parseExperimentMeta(programMd) {
       return { checked, description };
     });
   }
+  // Extract playbook section
+  const playbookMatch = programMd.match(/## Playbook\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (playbookMatch) meta.playbook = playbookMatch[1].trim();
+  // Extract eval method section
+  const evalMatch = programMd.match(/## Eval Method\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (evalMatch) meta.eval_method = evalMatch[1].trim();
+  // Extract decision triggers section
+  const triggersMatch = programMd.match(/## Decision Triggers\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (triggersMatch) meta.decision_triggers = triggersMatch[1].trim();
+  // Extract constraints section
+  const constraintsMatch = programMd.match(/## Constraints\s*\n([\s\S]*?)(?=\n##|$)/);
+  if (constraintsMatch) meta.constraints = constraintsMatch[1].trim();
   return meta;
 }
 
@@ -1621,6 +1633,10 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
               if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
               if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
               if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
+              if (meta.playbook) enriched.playbook = meta.playbook;
+              if (meta.eval_method) enriched.eval_method = meta.eval_method;
+              if (meta.decision_triggers) enriched.decision_triggers = meta.decision_triggers;
+              if (meta.constraints) enriched.constraints = meta.constraints;
             }
             // Resolve theme title and proxy metric names
             if (data.theme) {
@@ -1664,6 +1680,10 @@ app.get("/mc/api/approvals/:id", requireSetupAuth, (req, res) => {
               if (!data.hypothesis && meta.hypothesis) enriched.hypothesis = meta.hypothesis;
               if (!data.theme && meta.theme) { data.theme = meta.theme; enriched.theme = meta.theme; }
               if (!data.proxy_metrics && meta.proxy_metrics) { data.proxy_metrics = meta.proxy_metrics; enriched.proxy_metrics = meta.proxy_metrics; }
+              if (meta.playbook) enriched.playbook = meta.playbook;
+              if (meta.eval_method) enriched.eval_method = meta.eval_method;
+              if (meta.decision_triggers) enriched.decision_triggers = meta.decision_triggers;
+              if (meta.constraints) enriched.constraints = meta.constraints;
             }
             if (data.theme) {
               const themePath = path.join(projectsDir, proj.name, "themes", `${data.theme}.json`);
@@ -3086,11 +3106,22 @@ app.get("/mc/api/experiments/:dir", requireSetupAuth, (req, res) => {
     } catch {}
   }
 
-  // Extract just the ## Program section for the detail page
+  // Extract just the ## Program section for the detail page (legacy fallback)
   let programSection = programMd;
   if (programMd) {
     const progMatch = programMd.match(/## Program\s*\n([\s\S]*?)$/);
     if (progMatch) programSection = progMatch[1].trim();
+  }
+
+  // Parse structured sections from program.md
+  let playbook = null, evalMethod = null, decisionTriggers = null, constraints = null, requiredTools = null;
+  if (programMd) {
+    const meta = parseExperimentMeta(programMd);
+    if (meta.playbook) playbook = meta.playbook;
+    if (meta.eval_method) evalMethod = meta.eval_method;
+    if (meta.decision_triggers) decisionTriggers = meta.decision_triggers;
+    if (meta.constraints) constraints = meta.constraints;
+    if (meta.required_tools) requiredTools = meta.required_tools;
   }
 
   // Resolve proxy metric names from theme data
@@ -3119,12 +3150,12 @@ app.get("/mc/api/experiments/:dir", requireSetupAuth, (req, res) => {
   try { createdDate = fs.statSync(expPath).birthtime.toISOString().split("T")[0]; } catch {}
   const phases = buildPhases(results, createdDate);
 
-  res.json({ name, dir, status, hypothesis, proxy_metric: proxyMetric, target_value: targetValue, theme: themeTitle, program_md: programMd, program: programSection, proxy_metrics: resolvedPMs, results, result_count: results.length, best_metric: bestMetric, phases });
+  res.json({ name, dir, status, hypothesis, proxy_metric: proxyMetric, target_value: targetValue, theme: themeTitle, program_md: programMd, program: programSection, proxy_metrics: resolvedPMs, results, result_count: results.length, best_metric: bestMetric, phases, playbook, eval_method: evalMethod, decision_triggers: decisionTriggers, constraints, required_tools: requiredTools });
 });
 
 // Create experiment
 app.post("/mc/api/experiments", requireSetupAuth, (req, res) => {
-  const { project, name, hypothesis, proxy_metric, target_value, program_md, theme } = req.body;
+  const { project, name, hypothesis, proxy_metric, target_value, program_md, theme, playbook, eval_method, decision_triggers, constraints } = req.body;
   if (!project || !name) {
     return res.status(400).json({ error: "Missing project or name" });
   }
@@ -3154,20 +3185,32 @@ app.post("/mc/api/experiments", requireSetupAuth, (req, res) => {
   const newExpDir = path.join(expDir, dirName);
   fs.mkdirSync(newExpDir, { recursive: true });
 
-  // Build program.md content
+  // Build program.md content — structured format
   const lines = [`# ${name}`, ""];
-  lines.push("## Status", "planned", "");
+  if (theme) {
+    lines.push("## Theme", theme, "");
+  }
   if (hypothesis) {
     lines.push("## Hypothesis", hypothesis, "");
   }
   if (proxy_metric) {
-    const targetPart = target_value ? `: ${target_value}` : "";
-    lines.push("## Proxy Metric", `${proxy_metric}${targetPart}`, "");
+    const targetPart = target_value ? ` — contribution: ${target_value}` : "";
+    lines.push("## Proxy Metrics", `- ${proxy_metric}${targetPart}`, "");
   }
-  if (theme) {
-    lines.push("## Theme", theme, "");
+  if (playbook) {
+    lines.push("## Playbook", playbook, "");
   }
-  if (program_md) {
+  if (eval_method) {
+    lines.push("## Eval Method", eval_method, "");
+  }
+  if (decision_triggers) {
+    lines.push("## Decision Triggers", decision_triggers, "");
+  }
+  if (constraints) {
+    lines.push("## Constraints", constraints, "");
+  }
+  // Legacy fallback: if program_md was sent instead of structured fields
+  if (program_md && !playbook && !eval_method) {
     lines.push("## Program", program_md, "");
   }
 

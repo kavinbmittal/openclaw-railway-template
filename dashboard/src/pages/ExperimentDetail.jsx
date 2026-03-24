@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, useRef, useCallback } from"react";
 import { getExperiment } from"../api.js";
-import { Lightbulb, Code, History } from"lucide-react";
+import { Lightbulb, Code, History, FileText, Activity, Target, AlertTriangle, Wrench, CheckCircle2, XCircle } from"lucide-react";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
 import Markdown from"../components/Markdown.jsx";
 
@@ -224,7 +224,7 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
   );
  }
 
- const { name, status, hypothesis, proxy_metric, target_value, theme, program_md, program, proxy_metrics, results, result_count, best_metric, phases } = data;
+ const { name, status, hypothesis, proxy_metric, target_value, theme, program_md, program, proxy_metrics, results, result_count, best_metric, phases, playbook, eval_method, decision_triggers, constraints, required_tools } = data;
 
  // Determine run history table headers dynamically from results
  // Filter out decision/reason from the main numeric columns — they get special rendering
@@ -350,8 +350,93 @@ export default function ExperimentDetail({ projectSlug, experimentDir, navigate 
        </div>
       )}
 
-      {/* Program card */}
-      {(program || program_md) && (
+      {/* Playbook card */}
+      {playbook && (
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
+        <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <FileText className="w-3.5 h-3.5 text-cyan-400" />
+         </div>
+         <div className="text-[15px] font-medium text-cyan-100 flex-1">Playbook</div>
+        </div>
+        <div className="p-[20px] text-[14px] text-zinc-300 leading-relaxed space-y-4 mc-prose">
+         <Markdown content={playbook} />
+        </div>
+       </div>
+      )}
+
+      {/* Required Tools card */}
+      {required_tools && required_tools.length > 0 && (
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
+        <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <Wrench className="w-3.5 h-3.5 text-cyan-400" />
+         </div>
+         <div className="text-[15px] font-medium text-cyan-100">Required Tools</div>
+         {required_tools.some((t) => !t.checked) && (
+          <span className="ml-auto text-[11px] font-mono text-red-400 uppercase tracking-widest">Blocked</span>
+         )}
+        </div>
+        <div className="p-[20px] space-y-2">
+         {required_tools.map((tool, i) => (
+          <div key={i} className={`flex items-start gap-3 p-3 rounded-[2px] border ${tool.checked ? "border-border/60 bg-zinc-800/10" : "border-red-500/20 bg-red-500/5"}`}>
+           {tool.checked
+            ? <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 shrink-0" />
+            : <XCircle size={16} className="text-red-400 mt-0.5 shrink-0" />}
+           <span className={`text-[13px] font-mono leading-relaxed ${tool.checked ? "text-zinc-300" : "text-red-300"}`}>{tool.description}</span>
+          </div>
+         ))}
+        </div>
+       </div>
+      )}
+
+      {/* Eval Method card */}
+      {eval_method && (
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
+        <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <Activity className="w-3.5 h-3.5 text-cyan-400" />
+         </div>
+         <div className="text-[15px] font-medium text-cyan-100 flex-1">Eval Method</div>
+        </div>
+        <div className="p-[20px] text-[14px] text-zinc-300 leading-relaxed space-y-4 mc-prose">
+         <Markdown content={eval_method} />
+        </div>
+       </div>
+      )}
+
+      {/* Decision Triggers card */}
+      {decision_triggers && (
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
+        <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <Target className="w-3.5 h-3.5 text-cyan-400" />
+         </div>
+         <div className="text-[15px] font-medium text-cyan-100 flex-1">Decision Triggers</div>
+        </div>
+        <div className="p-[20px] text-[14px] text-zinc-300 leading-relaxed space-y-4 mc-prose">
+         <Markdown content={decision_triggers} />
+        </div>
+       </div>
+      )}
+
+      {/* Constraints card */}
+      {constraints && (
+       <div className="bg-card border border-border rounded-[2px] shadow-sm">
+        <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+          <AlertTriangle className="w-3.5 h-3.5 text-cyan-400" />
+         </div>
+         <div className="text-[15px] font-medium text-cyan-100 flex-1">Constraints</div>
+        </div>
+        <div className="p-[20px] text-[14px] text-zinc-300 leading-relaxed space-y-4 mc-prose">
+         <Markdown content={constraints} />
+        </div>
+       </div>
+      )}
+
+      {/* Legacy: Program card for old experiments without structured sections */}
+      {!playbook && !eval_method && (program || program_md) && (
        <div className="bg-card border border-border rounded-[2px] shadow-sm">
         <div className="flex items-center gap-3 px-5 py-3 bg-cyan-500/[0.02] transition-colors">
          <div className="w-6 h-6 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">

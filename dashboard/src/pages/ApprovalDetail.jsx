@@ -3,7 +3,7 @@
  * UI ported from Aura HTML reference.
  */
 import { useState, useEffect } from"react";
-import { CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3, Clock, ShieldCheck, Wrench } from"lucide-react";
+import { CheckCircle2, XCircle, RotateCcw, Loader2, CircleDot, FlaskConical, FileText, Compass, BarChart3, Clock, ShieldCheck, Wrench, Target, Activity, AlertTriangle } from"lucide-react";
 import { getApprovalDetail, resolveApproval, requestRevision, updateIssue, deleteIssue, resolveTheme, getThemes } from"../api.js";
 import { formatTimeAgo } from"../utils/formatDate.js";
 import Markdown from"../components/Markdown.jsx";
@@ -453,10 +453,70 @@ export default function ApprovalDetail({ approvalId, navigate }) {
        </section>
       )}
 
-      {/* Experiment Plan — strip sections shown in their own cards */}
-      {isExperiment && approval.programMd && (() => {
+      {/* Playbook — the execution plan */}
+      {isExperiment && approval.playbook && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="flex items-center gap-3 px-5 py-3 bg-amber-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+          <FileText className="w-3.5 h-3.5 text-amber-400" />
+         </div>
+         <div className="text-[15px] font-medium text-amber-100">Playbook</div>
+        </header>
+        <div className="p-[20px] mc-prose">
+         <Markdown content={approval.playbook} />
+        </div>
+       </section>
+      )}
+
+      {/* Eval Method — how the experiment measures results */}
+      {isExperiment && approval.eval_method && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="flex items-center gap-3 px-5 py-3 bg-amber-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+          <Activity className="w-3.5 h-3.5 text-amber-400" />
+         </div>
+         <div className="text-[15px] font-medium text-amber-100">Eval Method</div>
+        </header>
+        <div className="p-[20px] mc-prose">
+         <Markdown content={approval.eval_method} />
+        </div>
+       </section>
+      )}
+
+      {/* Decision Triggers — when to pivot/kill/scale */}
+      {isExperiment && approval.decision_triggers && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="flex items-center gap-3 px-5 py-3 bg-amber-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+          <Target className="w-3.5 h-3.5 text-amber-400" />
+         </div>
+         <div className="text-[15px] font-medium text-amber-100">Decision Triggers</div>
+        </header>
+        <div className="p-[20px] mc-prose">
+         <Markdown content={approval.decision_triggers} />
+        </div>
+       </section>
+      )}
+
+      {/* Constraints — guardrails */}
+      {isExperiment && approval.constraints && (
+       <section className="bg-card border border-border rounded-[2px] shadow-sm flex flex-col">
+        <header className="flex items-center gap-3 px-5 py-3 bg-amber-500/[0.02] transition-colors">
+         <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+         </div>
+         <div className="text-[15px] font-medium text-amber-100">Constraints</div>
+        </header>
+        <div className="p-[20px] mc-prose">
+         <Markdown content={approval.constraints} />
+        </div>
+       </section>
+      )}
+
+      {/* Legacy: Experiment Plan fallback for old experiments without structured sections */}
+      {isExperiment && approval.programMd && !approval.playbook && !approval.eval_method && (() => {
        const stripped = approval.programMd
-        .replace(/^#[^\n]*\n/m, "") // Remove title line
+        .replace(/^#[^\n]*\n/m, "")
         .replace(/## Theme\s*\n[\s\S]*?(?=\n##|$)/, "")
         .replace(/## Proxy Metrics\s*\n[\s\S]*?(?=\n##|$)/, "")
         .replace(/## Hypothesis\s*\n[\s\S]*?(?=\n##|$)/, "")
