@@ -1,5 +1,29 @@
 # TODO
 
+## 2026-03-24-edit-strategy
+
+### Backend (server.js)
+- [x] POST `/mc/api/projects/:slug/strategy/preview` — compute impact of proposed theme changes
+- [x] POST `/mc/api/projects/:slug/strategy` — apply strategy revision with crash-safe write order
+
+### Frontend API (api.js)
+- [x] `previewStrategyChanges(slug, themes)` — call preview endpoint
+- [x] `applyStrategyChanges(slug, payload)` — call apply endpoint
+
+### Frontend — EditStrategyModal component
+- [x] Step 1: Strategy editor — mission/NSM read-only, themes editable (title, description, caps, metrics)
+- [x] Add/remove metrics (min 1, max 3), add theme, retire theme
+- [x] Step 2: Impact review — affected issues/experiments with keep/discard checkboxes
+- [x] Confirm flow — calls apply endpoint, shows toast, closes modal
+
+### Integration — ProjectDetail
+- [x] "Edit Strategy" button on Overview tab header (indigo outline)
+- [x] Wire modal open/close, refresh themes after save
+- [x] Toast notification on success
+
+### Build
+- [x] Build dist
+
 ## 2026-03-22-unified-approvals
 - [x] Backend: `GET /mc/api/approvals` includes proposed issues with `_source: "issue"` and `type` field
 - [x] Backend: `GET /mc/api/approvals/:id` resolves proposed issue IDs

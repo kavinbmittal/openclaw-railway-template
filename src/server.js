@@ -2043,6 +2043,421 @@ app.get("/mc/api/themes", requireSetupAuth, (req, res) => {
   return res.json({ themes });
 });
 
+// --- Strategy Edit API ---
+// Preview impact of proposed strategy changes
+app.post("/mc/api/projects/:slug/strategy/preview", requireSetupAuth, (req, res) => {
+  const slug = req.params.slug;
+  const { themes: proposedThemes } = req.body;
+  if (!proposedThemes || !Array.isArray(proposedThemes)) {
+    return res.status(400).json({ error: "themes array required" });
+  }
+
+  const projectDir = path.join(STATE_DIR, "shared", "projects", slug);
+  if (!fs.existsSync(projectDir)) {
+    return res.status(404).json({ error: "Project not found" });
+  }
+
+  // Validation: duplicate theme IDs
+  const ids = proposedThemes.map((t) => t.id);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dupes.length > 0) {
+    return res.status(400).json({ error: `Duplicate theme IDs: ${[...new Set(dupes)].join(", ")}` });
+  }
+
+  // Validation: active themes must have at least 1 metric
+  for (const theme of proposedThemes) {
+    if (theme.status !== "retired" && (!theme.proxy_metrics || theme.proxy_metrics.length === 0)) {
+      return res.status(400).json({ error: `Active theme "${theme.id}" must have at least 1 proxy metric` });
+    }
+  }
+
+  // Read current themes to detect renames, retirements, metric removals
+  const themesDir = path.join(projectDir, "themes");
+  const currentThemes = new Map();
+  if (fs.existsSync(themesDir)) {
+    for (const file of fs.readdirSync(themesDir).filter((f) => f.endsWith(".json"))) {
+      try {
+        const t = JSON.parse(fs.readFileSync(path.join(themesDir, file), "utf8"));
+        currentThemes.set(t.id, t);
+      } catch { /* skip */ }
+    }
+  }
+
+  // Build change sets
+  const renamed = []; // { from, to }
+  const retired = []; // theme IDs
+  const added = []; // theme IDs
+  const metricsRemoved = []; // { theme, metric }
+  const metricsAdded = []; // { theme, metric }
+
+  for (const proposed of proposedThemes) {
+    if (proposed.previous_id && proposed.previous_id !== proposed.id) {
+      renamed.push({ from: proposed.previous_id, to: proposed.id });
+    }
+    if (proposed.status === "retired") {
+      const current = currentThemes.get(proposed.id) || currentThemes.get(proposed.previous_id);
+      if (current && current.status !== "retired") {
+        retired.push(proposed.previous_id || proposed.id);
+      }
+    }
+    if (!currentThemes.has(proposed.id) && !proposed.previous_id) {
+      added.push(proposed.id);
+    }
+
+    // Metric changes — compare against current theme (using previous_id for renames)
+    const currentId = proposed.previous_id || proposed.id;
+    const current = currentThemes.get(currentId);
+    if (current) {
+      const currentMetricIds = (current.proxy_metrics || []).map((m) => m.id);
+      const proposedMetricIds = (proposed.proxy_metrics || []).map((m) => m.id);
+      for (const mid of currentMetricIds) {
+        if (!proposedMetricIds.includes(mid)) {
+          metricsRemoved.push({ theme: proposed.id, metric: mid });
+        }
+      }
+      for (const mid of proposedMetricIds) {
+        if (!currentMetricIds.includes(mid)) {
+          metricsAdded.push({ theme: proposed.id, metric: mid });
+        }
+      }
+    }
+  }
+
+  // Compute affected issues
+  const issuesPath = path.join(projectDir, "issues");
+  const affectedIssues = [];
+  if (fs.existsSync(issuesPath)) {
+    for (const file of fs.readdirSync(issuesPath).filter((f) => f.endsWith(".json"))) {
+      try {
+        const issue = JSON.parse(fs.readFileSync(path.join(issuesPath, file), "utf8"));
+        if (!issue.theme) continue;
+
+        // Check rename
+        const rename = renamed.find((r) => r.from === issue.theme);
+        if (rename) {
+          affectedIssues.push({ ...issue, change_type: "renamed", from_theme: rename.from, to_theme: rename.to });
+          continue;
+        }
+
+        // Check retirement
+        if (retired.includes(issue.theme)) {
+          affectedIssues.push({ ...issue, change_type: "retired" });
+          continue;
+        }
+
+        // Check metric removal
+        if (issue.proxy_metrics && issue.proxy_metrics.length > 0) {
+          const removedMetrics = metricsRemoved
+            .filter((mr) => {
+              // Match theme: issue references old theme ID (before rename) or current ID
+              const themeRename = renamed.find((r) => r.to === mr.theme);
+              const issueThemeId = themeRename ? themeRename.from : mr.theme;
+              return issue.theme === issueThemeId || issue.theme === mr.theme;
+            })
+            .filter((mr) => issue.proxy_metrics.includes(mr.metric));
+          if (removedMetrics.length > 0) {
+            affectedIssues.push({ ...issue, change_type: "metric_removed", removed_metrics: removedMetrics.map((m) => m.metric) });
+            continue;
+          }
+        }
+      } catch { /* skip */ }
+    }
+  }
+
+  // Compute affected experiments
+  const expDir = path.join(projectDir, "experiments");
+  const affectedExperiments = [];
+  if (fs.existsSync(expDir)) {
+    for (const entry of fs.readdirSync(expDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const programPath = path.join(expDir, entry.name, "program.md");
+      if (!fs.existsSync(programPath)) continue;
+      try {
+        const md = fs.readFileSync(programPath, "utf8");
+        const themeMatch = md.match(/## Theme\s*\n\s*(.+)/);
+        if (!themeMatch) continue;
+        const expTheme = themeMatch[1].trim();
+        const titleMatch = md.match(/^#\s+(.+)/m);
+
+        // Check rename
+        const rename = renamed.find((r) => r.from === expTheme);
+        if (rename) {
+          affectedExperiments.push({ dir: entry.name, name: titleMatch?.[1] || entry.name, theme: expTheme, change_type: "renamed", from_theme: rename.from, to_theme: rename.to });
+          continue;
+        }
+
+        // Check retirement
+        if (retired.includes(expTheme)) {
+          affectedExperiments.push({ dir: entry.name, name: titleMatch?.[1] || entry.name, theme: expTheme, change_type: "retired" });
+          continue;
+        }
+      } catch { /* skip */ }
+    }
+  }
+
+  return res.json({
+    changes: { renamed, retired, added, metrics_removed: metricsRemoved, metrics_added: metricsAdded },
+    affected_issues: affectedIssues,
+    affected_experiments: affectedExperiments,
+  });
+});
+
+// Apply strategy revision — write order: notification → themes → cascade → activity
+app.post("/mc/api/projects/:slug/strategy", requireSetupAuth, (req, res) => {
+  const slug = req.params.slug;
+  const { themes: proposedThemes, issue_decisions, experiment_decisions } = req.body;
+  if (!proposedThemes || !Array.isArray(proposedThemes)) {
+    return res.status(400).json({ error: "themes array required" });
+  }
+
+  const projectDir = path.join(STATE_DIR, "shared", "projects", slug);
+  if (!fs.existsSync(projectDir)) {
+    return res.status(404).json({ error: "Project not found" });
+  }
+
+  // Validation: duplicate theme IDs
+  const ids = proposedThemes.map((t) => t.id);
+  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dupes.length > 0) {
+    return res.status(400).json({ error: `Duplicate theme IDs: ${[...new Set(dupes)].join(", ")}` });
+  }
+
+  // Validation: active themes must have at least 1 metric
+  for (const theme of proposedThemes) {
+    if (theme.status !== "retired" && (!theme.proxy_metrics || theme.proxy_metrics.length === 0)) {
+      return res.status(400).json({ error: `Active theme "${theme.id}" must have at least 1 proxy metric` });
+    }
+  }
+
+  const themesDir = path.join(projectDir, "themes");
+  const issuesPath = path.join(projectDir, "issues");
+  const expDir = path.join(projectDir, "experiments");
+  const notifDir = path.join(projectDir, "notifications");
+  const activityPath = path.join(projectDir, "activity.log");
+
+  // Read current themes for detecting renames
+  const currentThemes = new Map();
+  if (fs.existsSync(themesDir)) {
+    for (const file of fs.readdirSync(themesDir).filter((f) => f.endsWith(".json"))) {
+      try {
+        const t = JSON.parse(fs.readFileSync(path.join(themesDir, file), "utf8"));
+        currentThemes.set(t.id, t);
+      } catch { /* skip */ }
+    }
+  }
+
+  // Build change manifest
+  const renamed = [];
+  const retired = [];
+  const addedIds = [];
+  const metricsRemoved = [];
+  const metricsAdded = [];
+
+  for (const proposed of proposedThemes) {
+    if (proposed.previous_id && proposed.previous_id !== proposed.id) {
+      renamed.push({ from: proposed.previous_id, to: proposed.id });
+    }
+    if (proposed.status === "retired") {
+      const current = currentThemes.get(proposed.id) || currentThemes.get(proposed.previous_id);
+      if (current && current.status !== "retired") {
+        retired.push(proposed.previous_id || proposed.id);
+      }
+    }
+    if (!currentThemes.has(proposed.id) && !proposed.previous_id) {
+      addedIds.push(proposed.id);
+    }
+    const currentId = proposed.previous_id || proposed.id;
+    const current = currentThemes.get(currentId);
+    if (current) {
+      const currentMetricIds = (current.proxy_metrics || []).map((m) => m.id);
+      const proposedMetricIds = (proposed.proxy_metrics || []).map((m) => m.id);
+      for (const mid of currentMetricIds) {
+        if (!proposedMetricIds.includes(mid)) metricsRemoved.push({ theme: proposed.id, metric: mid });
+      }
+      for (const mid of proposedMetricIds) {
+        if (!currentMetricIds.includes(mid)) metricsAdded.push({ theme: proposed.id, metric: mid });
+      }
+    }
+  }
+
+  const keepIssues = issue_decisions?.keep || [];
+  const discardIssues = issue_decisions?.discard || [];
+  const keepExperiments = experiment_decisions?.keep || [];
+  const discardExperiments = experiment_decisions?.discard || [];
+  const now = new Date().toISOString();
+  const today = now.split("T")[0];
+  const timestamp = Date.now();
+
+  // Read project lead for notification
+  let lead = "unknown";
+  const projectMdPath = path.join(projectDir, "PROJECT.md");
+  if (fs.existsSync(projectMdPath)) {
+    const raw = fs.readFileSync(projectMdPath, "utf8");
+    const m = raw.match(/\*\*Lead:\*\*\s*(\S+)/);
+    if (m) lead = m[1];
+  }
+
+  try {
+    // 1. Write notification FIRST (crash recovery signal)
+    fs.mkdirSync(notifDir, { recursive: true });
+    const notification = {
+      type: "strategy-change",
+      to: lead,
+      project: slug,
+      timestamp: now,
+      changes: {
+        renamed,
+        retired,
+        added: addedIds,
+        metrics_removed: metricsRemoved,
+        metrics_added: metricsAdded,
+      },
+      kept_issues: keepIssues,
+      discarded_issues: discardIssues,
+      discarded_experiments: discardExperiments,
+    };
+    fs.writeFileSync(
+      path.join(notifDir, `strategy-change-${timestamp}.json`),
+      JSON.stringify(notification, null, 2),
+      "utf8"
+    );
+
+    // 2. Update theme JSONs
+    fs.mkdirSync(themesDir, { recursive: true });
+    // Delete old files for renamed themes
+    for (const r of renamed) {
+      const oldFile = path.join(themesDir, `${r.from}.json`);
+      if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+    }
+    // Write all proposed themes
+    for (const theme of proposedThemes) {
+      const themeData = {
+        id: theme.id,
+        title: theme.title,
+        description: theme.description || "",
+        status: theme.status,
+        max_active_issues: theme.max_active_issues ?? 5,
+        max_active_experiments: theme.max_active_experiments ?? 2,
+        order: theme.order,
+        proxy_metrics: theme.proxy_metrics || [],
+        // Preserve original proposal metadata if it existed
+        proposed_by: currentThemes.get(theme.previous_id || theme.id)?.proposed_by || "kavin",
+        proposed_at: currentThemes.get(theme.previous_id || theme.id)?.proposed_at || now,
+        resolved_by: "kavin",
+        resolved_at: now,
+      };
+      fs.writeFileSync(
+        path.join(themesDir, `${theme.id}.json`),
+        JSON.stringify(themeData, null, 2),
+        "utf8"
+      );
+    }
+
+    // 3. Cascade to kept issues — re-tag theme ID, strip removed metric refs
+    if (fs.existsSync(issuesPath)) {
+      for (const file of fs.readdirSync(issuesPath).filter((f) => f.endsWith(".json"))) {
+        try {
+          const filePath = path.join(issuesPath, file);
+          const issue = JSON.parse(fs.readFileSync(filePath, "utf8"));
+          if (!issue.theme) continue;
+
+          const rename = renamed.find((r) => r.from === issue.theme);
+          const isKept = keepIssues.includes(issue.id);
+          const isDiscarded = discardIssues.includes(issue.id);
+
+          if (isDiscarded) {
+            // 4. Archive discarded issues
+            issue.status = "cancelled";
+            issue.comments = issue.comments || [];
+            issue.comments.push({
+              author: "system",
+              text: `Cancelled — strategy revision on ${today}`,
+              created: now,
+            });
+            issue.updated = now;
+            fs.writeFileSync(filePath, JSON.stringify(issue, null, 2), "utf8");
+            continue;
+          }
+
+          if (isKept || rename) {
+            let changed = false;
+
+            // Re-tag theme if renamed
+            if (rename) {
+              issue.theme = rename.to;
+              changed = true;
+            }
+
+            // Strip removed metric refs
+            if (issue.proxy_metrics && issue.proxy_metrics.length > 0) {
+              const removedIds = metricsRemoved.map((mr) => mr.metric);
+              const before = issue.proxy_metrics.length;
+              issue.proxy_metrics = issue.proxy_metrics.filter((m) => !removedIds.includes(m));
+              if (issue.proxy_metrics.length < before) {
+                const stripped = removedIds.filter((id) => !issue.proxy_metrics.includes(id));
+                issue.comments = issue.comments || [];
+                issue.comments.push({
+                  author: "system",
+                  text: `Proxy metric reference(s) removed during strategy revision: ${stripped.join(", ")}`,
+                  created: now,
+                });
+                changed = true;
+              }
+            }
+
+            if (changed) {
+              issue.updated = now;
+              fs.writeFileSync(filePath, JSON.stringify(issue, null, 2), "utf8");
+            }
+          }
+        } catch { /* skip malformed issues */ }
+      }
+    }
+
+    // 5. Archive discarded experiments — add cancelled row to results.tsv
+    if (fs.existsSync(expDir)) {
+      for (const expId of discardExperiments) {
+        const resultsPath = path.join(expDir, expId, "results.tsv");
+        try {
+          if (fs.existsSync(resultsPath)) {
+            let content = fs.readFileSync(resultsPath, "utf8").trimEnd();
+            // Append a cancelled row
+            const headers = content.split("\n")[0].split("\t").map((h) => h.trim());
+            const row = headers.map((h) => {
+              if (h === "date") return today;
+              if (h === "decision") return "cancelled";
+              if (h === "reason") return `Strategy revision on ${today}`;
+              return "";
+            });
+            content += "\n" + row.join("\t");
+            fs.writeFileSync(resultsPath, content + "\n", "utf8");
+          } else if (fs.existsSync(path.join(expDir, expId))) {
+            // No results.tsv yet — create one with header + cancelled row
+            const content = `date\tmetric\tvalue\tdecision\treason\n${today}\t\t\tcancelled\tStrategy revision on ${today}\n`;
+            fs.writeFileSync(resultsPath, content, "utf8");
+          }
+        } catch { /* skip */ }
+      }
+    }
+
+    // 6. Append to activity.log
+    const changeSummary = [];
+    if (renamed.length > 0) changeSummary.push(`${renamed.length} theme(s) renamed`);
+    if (retired.length > 0) changeSummary.push(`${retired.length} theme(s) retired`);
+    if (addedIds.length > 0) changeSummary.push(`${addedIds.length} theme(s) added`);
+    if (discardIssues.length > 0) changeSummary.push(`${discardIssues.length} issue(s) discarded`);
+    if (discardExperiments.length > 0) changeSummary.push(`${discardExperiments.length} experiment(s) discarded`);
+    const summary = changeSummary.length > 0 ? changeSummary.join(", ") : "no structural changes";
+    const logLine = `${now.replace("T", " ").slice(0, 16)} | kavin | Strategy revised: ${summary}\n`;
+    fs.appendFileSync(activityPath, logLine, "utf8");
+
+    return res.json({ ok: true, lead, changes: { renamed, retired, added: addedIds, metrics_removed: metricsRemoved, metrics_added: metricsAdded } });
+  } catch (err) {
+    console.error("[strategy-apply] Error:", err);
+    return res.status(500).json({ error: "Failed to apply strategy changes" });
+  }
+});
+
 // Unified inbox — aggregates approvals, budget warnings, stale tasks, recent standups
 app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
   const projectsDir = path.join(STATE_DIR, "shared", "projects");
