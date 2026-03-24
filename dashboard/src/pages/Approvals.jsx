@@ -16,7 +16,20 @@ const TYPE_STYLES = {
  deliverable: "border-blue-500/20 bg-blue-500/10 text-blue-400",
  issue: "border-violet-500/20 bg-violet-500/10 text-violet-400",
  experiment: "border-cyan-500/20 bg-cyan-500/10 text-cyan-400",
+ theme: "border-indigo-500/20 bg-indigo-500/10 text-indigo-400",
 };
+
+// Map raw source/gate values to friendly labels and style keys
+function resolveType(approval) {
+ const source = approval._source || "";
+ const gate = (approval.gate || approval.type || "").toLowerCase();
+ if (source === "issue") return { label: "Issue", key: "issue" };
+ if (source === "theme") return { label: "Theme", key: "theme" };
+ if (gate.includes("experiment") || gate.includes("autoresearch")) return { label: "Experiment", key: "experiment" };
+ if (gate.includes("budget")) return { label: "Budget", key: "budget" };
+ if (gate.includes("deliverable") || source === "deliverables") return { label: "Deliverable", key: "deliverable" };
+ return { label: gate || source || "request", key: gate || source };
+}
 
 function typeStyle(type) {
  const key = (type || "").toLowerCase();
@@ -285,9 +298,10 @@ export default function Approvals({ navigate }) {
                onClick={() => navigate("approval-detail", approval.id || approval._file)}
               >
                <div className="flex items-center gap-4">
-                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-normal border shrink-0 ${typeStyle(approval._source || approval.gate || approval.type)}`}>
-                 {approval._source || approval.gate || approval.type || "request"}
-                </span>
+                {(() => { const t = resolveType(approval); return (
+                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-normal border shrink-0 ${typeStyle(t.key)}`}>
+                 {t.label}
+                </span>); })()}
                 <span className="text-[15px] font-medium text-zinc-200 flex-1 truncate">
                  {approval.what || approval.title}
                 </span>
