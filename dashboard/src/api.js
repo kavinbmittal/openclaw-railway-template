@@ -326,6 +326,34 @@ export async function getExperiment(dir, projectSlug) {
   return fetchJSON(`${BASE}/experiments/${encodeURIComponent(dir)}?project=${encodeURIComponent(projectSlug)}`);
 }
 
+// --- Strategy API ---
+
+export async function previewStrategyChanges(projectSlug, themes) {
+  const res = await fetch(`${BASE}/projects/${encodeURIComponent(projectSlug)}/strategy/preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ themes }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function applyStrategyChanges(projectSlug, payload) {
+  const res = await fetch(`${BASE}/projects/${encodeURIComponent(projectSlug)}/strategy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
 // --- Themes API ---
 
 export async function getThemes(projectSlug) {

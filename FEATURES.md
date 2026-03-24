@@ -10,6 +10,8 @@
 - Create projects with mission, North Star Metric, lead, budget, working directory, and approval gates
 - Edit projects from a dedicated form page: update name, mission, NSM, lead, status, budget, working directory, and approval gates
 - Strategy tab per project: NSM at top, approved themes with proxy metrics, pending theme proposals
+- Edit Strategy from the Overview tab: rename themes, adjust proxy metrics, retire themes, add new ones — impact review shows all affected issues/experiments with keep/discard controls before committing
+- Theme caps (max active issues/experiments per theme) editable from the strategy editor — agents respect caps on heartbeat
 - Agents propose themes (with up to 3 proxy metrics each) for individual approval
 - Create experiments from the dashboard with name, hypothesis, proxy metric, target value, theme, and program
 - Click any experiment card to view full detail: phase arc showing experiment lifecycle (Design → Run → Pivot → Scale), hypothesis, program markdown, decision-aware run history table with colored badges and reasons, metrics sidebar, and action buttons
