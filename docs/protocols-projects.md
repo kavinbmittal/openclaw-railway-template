@@ -59,9 +59,12 @@ When proposing an issue, include these fields in the JSON:
 ```json
 {
   "theme": "theme-001",
-  "proxy_metrics": ["pm-001", "pm-002"]
+  "proxy_metrics": ["pm-001", "pm-002"],
+  "target_date": "2026-04-01"
 }
 ```
+
+Always propose a `target_date` (YYYY-MM-DD) — this helps prioritize work. Kavin can override it from the dashboard.
 
 Same for experiment approval requests — include `theme` and `proxy_metrics` in the gate request JSON.
 
@@ -73,7 +76,7 @@ During your heartbeat check:
 - Read `shared/projects/{slug}/PROJECT.md` for mission and NSM
 - Check `shared/projects/{slug}/themes/` for approved themes
 - Check your pending issues and experiments
-- Post standup to `shared/projects/{slug}/standups/YYYY-MM-DD.md`
+- **Only the project lead** posts standups to `shared/projects/{slug}/standups/YYYY-MM-DD.md`. If you are not the lead (check `**Lead:**` in PROJECT.md), do not write standup files.
 - Log activity to `shared/projects/{slug}/activity.log`
 
 ## Key Rules

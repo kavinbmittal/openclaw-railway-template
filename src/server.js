@@ -2517,7 +2517,7 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
   }
 
   const items = [];
-  const projects = fs.readdirSync(projectsDir, { withFileTypes: true }).filter((e) => e.isDirectory());
+  const projects = fs.readdirSync(projectsDir, { withFileTypes: true }).filter((e) => e.isDirectory() && !e.name.startsWith("_"));
   const now = Date.now();
   const threeDays = 3 * 24 * 60 * 60 * 1000;
   const today = new Date().toISOString().split("T")[0];
@@ -2615,20 +2615,26 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
       }
     }
 
-    // D. Recent Standups — today/yesterday
+    // D. Recent Standups — today/yesterday, grouped by date (one item per project per day)
     const standupsDir = path.join(projDir, "standups");
     if (fs.existsSync(standupsDir)) {
       const standupFiles = fs.readdirSync(standupsDir).filter((f) => f.endsWith(".md"));
+      // Group files by date
+      const byDate = {};
       for (const sf of standupFiles) {
         const dateMatch = sf.match(/(\d{4}-\d{2}-\d{2})/);
         if (!dateMatch) continue;
         const fileDate = dateMatch[1];
         if (fileDate !== today && fileDate !== yesterday) continue;
+        if (!byDate[fileDate]) byDate[fileDate] = [];
+        byDate[fileDate].push(sf);
+      }
+      // One inbox item per date
+      for (const [fileDate, files] of Object.entries(byDate)) {
         try {
-          const content = fs.readFileSync(path.join(standupsDir, sf), "utf8");
-          const lines = content.split("\n").filter((l) => l.trim());
+          const firstContent = fs.readFileSync(path.join(standupsDir, files[0]), "utf8");
+          const lines = firstContent.split("\n").filter((l) => l.trim());
           const preview = lines.slice(0, 2).join(" ").slice(0, 120);
-          // Try to extract lead from PROJECT.md
           let lead = null;
           if (fs.existsSync(projectMdPath)) {
             const raw = fs.readFileSync(projectMdPath, "utf8");
@@ -2643,6 +2649,7 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
             subtitle: preview,
             lead,
             date: fileDate,
+            fileCount: files.length,
             timestamp: new Date(fileDate + "T09:00:00Z").toISOString(),
           });
         } catch { /* skip */ }
