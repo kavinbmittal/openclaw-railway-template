@@ -46,6 +46,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
   const [complexity, setComplexity] = useState("complex");
   const [escalationCount, setEscalationCount] = useState(0);
   const [budget, setBudget] = useState("");
+  const [targetDate, setTargetDate] = useState("");
 
   // Data state
   const [themes, setThemes] = useState([]);
@@ -74,6 +75,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
         setComplexity(issue.complexity || "operator");
         setEscalationCount(issue.escalation_count || 0);
         setBudget(issue.budget != null ? String(issue.budget) : "");
+        setTargetDate(issue.target_date || "");
         const metricIds = (issue.proxy_metrics || []).map((pm) =>
           typeof pm === "string" ? pm : pm.id
         );
@@ -89,6 +91,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           labels: (issue.labels || []).join(", "),
           complexity: issue.complexity || "operator",
           budget: issue.budget != null ? String(issue.budget) : "",
+          targetDate: issue.target_date || "",
           metrics: new Set(metricIds),
           updated: issue.updated,
         };
@@ -113,9 +116,10 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
       labels !== o.labels ||
       complexity !== o.complexity ||
       budget !== o.budget ||
+      targetDate !== o.targetDate ||
       metricsChanged;
     setHasChanges(changed);
-  }, [title, description, priority, assignee, theme, selectedMetrics, labels, complexity, budget]);
+  }, [title, description, priority, assignee, theme, selectedMetrics, labels, complexity, budget, targetDate]);
 
   // Get proxy metrics for the currently selected theme
   const currentTheme = themes.find((t) => t.id === theme || t.title === theme);
@@ -157,6 +161,7 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
           .filter(Boolean),
         complexity,
         budget: budget ? parseFloat(budget) : null,
+        target_date: targetDate || null,
       });
       navigate("issue-detail", { projectSlug, issueId });
     } catch (err) {
@@ -441,6 +446,19 @@ export default function EditIssue({ projectSlug, issueId, navigate }) {
                 placeholder="e.g. infra, database, scaling"
               />
               <p className="text-[12px] text-zinc-500 mt-2">Optional tags for categorization</p>
+            </div>
+
+            {/* Target Date */}
+            <div>
+              <label className="block text-[12px] font-medium text-zinc-400 mb-2">Target Date</label>
+              <input
+                type="date"
+                value={targetDate}
+                onChange={(e) => setTargetDate(e.target.value)}
+                className="bg-background border border-border rounded-[6px] px-3 py-2 text-[14px] text-zinc-200 shadow-sm hover:border-zinc-700 transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                style={{ maxWidth: "200px" }}
+              />
+              <p className="text-[12px] text-zinc-500 mt-2">When should this be done? Leave empty to clear.</p>
             </div>
 
             {/* Model Tier */}

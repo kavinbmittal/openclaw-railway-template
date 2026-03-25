@@ -17,7 +17,8 @@
 - Click any experiment card to view full detail: phase arc showing experiment lifecycle (Design → Run → Pivot → Scale), hypothesis, program markdown, decision-aware run history table with colored badges and reasons, metrics sidebar, and action buttons
 - Experiment decisions (pivot, scale, kill) appear in the Inbox as Experiment Updates with deep links to the experiment detail page
 - Issues grouped by theme in list view with collapsible sections, color-coded headers, proxy metric display, and unthemed fallback group
-- Edit issues from a dedicated form page: update title, description, priority, assignee, theme, proxy metrics, labels, and model tier; delete issues from the danger zone
+- Edit issues from a dedicated form page: update title, description, priority, assignee, theme, proxy metrics, labels, target date, and model tier; delete issues from the danger zone
+- Issue target dates: set a due date on create or edit, shown as color-coded relative text on issue rows (overdue/today/tomorrow/in X days) and in issue detail sidebar
 - Issues and experiments tagged to themes with target proxy metrics (server-validated)
 - Experiment approvals show structured hypothesis, program, and proxy metric targets
 - Experiment approvals show Required Tools checklist — each tool verified against the tool registry with green checkmark or red X; approve button blocked until all tools are ready

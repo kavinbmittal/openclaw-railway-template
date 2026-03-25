@@ -26,6 +26,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
  const [selectedProxyMetrics, setSelectedProxyMetrics] = useState([]);
  const [complexity, setComplexity] = useState("operator");
  const [budget, setBudget] = useState("");
+ const [targetDate, setTargetDate] = useState("");
  const [submitting, setSubmitting] = useState(false);
  const [error, setError] = useState(null);
 
@@ -49,6 +50,7 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
     proxy_metrics: selectedProxyMetrics.length > 0 ? selectedProxyMetrics : null,
     complexity,
     budget: budget ? parseFloat(budget) : null,
+    target_date: targetDate || null,
    });
    onCreated?.(issue);
   } catch (err) {
@@ -142,6 +144,19 @@ export function CreateIssue({ projectSlug, onCreated, onClose, themes = [] }) {
         </div>
        </div>
       </div>
+     </div>
+
+     {/* Target Date */}
+     <div>
+      <label className="text-[11px] uppercase font-mono tracking-[0.15em] text-muted-foreground mb-2 block">Target Date</label>
+      <input
+       type="date"
+       value={targetDate}
+       onChange={(e) => setTargetDate(e.target.value)}
+       className="rounded-[6px] border border-border bg-background text-[14px] text-foreground px-3 py-2 placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 transition-all"
+       style={{ maxWidth: "200px" }}
+      />
+      <p className="text-[12px] text-muted-foreground mt-1.5">When should this be done?</p>
      </div>
 
      {/* Theme — Aura */}

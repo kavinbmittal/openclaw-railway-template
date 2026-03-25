@@ -23,6 +23,29 @@ export function formatDateTime(dateStr) {
   return `${formatDate(dateStr)} at ${time}`;
 }
 
+/**
+ * Formats a target date as friendly relative text with urgency color class.
+ * Returns { text, colorClass } or null if no date.
+ */
+export function formatTargetDate(dateStr) {
+  if (!dateStr) return null;
+  const target = new Date(dateStr + "T00:00:00"); // treat as local date
+  if (isNaN(target)) return null;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((target - today) / 86400000);
+
+  if (diffDays < 0) return { text: "overdue", colorClass: "text-red-400" };
+  if (diffDays === 0) return { text: "today", colorClass: "text-amber-400" };
+  if (diffDays === 1) return { text: "tomorrow", colorClass: "text-amber-400" };
+  if (diffDays <= 30) return { text: `in ${diffDays} days`, colorClass: "text-muted-foreground" };
+  // 31+ days — show "Mon DD"
+  const month = target.toLocaleDateString("en-US", { month: "short" });
+  const day = target.getDate();
+  return { text: `${month} ${day}`, colorClass: "text-muted-foreground" };
+}
+
 export function formatTimeAgo(dateStr) {
   const d = new Date(dateStr);
   if (isNaN(d)) return dateStr;

@@ -6,7 +6,7 @@
 import { useState, useEffect, useMemo } from"react";
 import { getIssues, updateIssue } from"../api.js";
 import { List, LayoutGrid, Plus, Search, CircleDot, ChevronDown, FlaskConical } from"lucide-react";
-import { formatTimeAgo } from"../utils/formatDate.js";
+import { formatTimeAgo, formatTargetDate } from"../utils/formatDate.js";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
 import { StatusBadge } from"../components/StatusBadge.jsx";
 import { EmptyState } from"../components/EmptyState.jsx";
@@ -60,6 +60,11 @@ function IssueRow({ issue, onClick, themeProxyMetrics = [] }) {
     </div>
    )}
    <StatusBadge status={issue.status} />
+   {(() => {
+    const td = formatTargetDate(issue.target_date);
+    if (!td) return null;
+    return <span className={`text-[12px] shrink-0 ${td.colorClass}`}>{td.text === "overdue" ? "overdue" : td.text}</span>;
+   })()}
    {issue.assignee && (
     <span className="text-[12px] text-zinc-400 w-12 truncate capitalize hidden sm:block">{issue.assignee}</span>
    )}

@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from"react";
 import { getIssue, updateIssue, addComment, getThemes } from"../api.js";
 import { Pencil, Trash2, FileText, MessageSquare } from"lucide-react";
-import { formatDate as formatDateUtil, formatTimeAgo } from"../utils/formatDate.js";
+import { formatDate as formatDateUtil, formatTimeAgo, formatTargetDate } from"../utils/formatDate.js";
 import { Skeleton } from"../components/ui/Skeleton.jsx";
 import Markdown from"../components/Markdown.jsx";
 import { StatusSelect } from"../components/StatusSelect.jsx";
@@ -176,6 +176,16 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
        <span className="text-zinc-300 capitalize">{issue.assignee}</span>
       </>
      )}
+     {(() => {
+      const td = formatTargetDate(issue.target_date);
+      if (!td) return null;
+      return (
+       <>
+        <span className="text-zinc-600">&middot;</span>
+        <span className={`font-medium ${td.colorClass}`}>{td.text === "overdue" ? "Overdue" : `Due ${td.text}`}</span>
+       </>
+      );
+     })()}
     </div>
    </header>
 
@@ -386,6 +396,18 @@ export default function IssueDetail({ projectSlug, issueId, navigate }) {
          <label className="text-[12px] uppercase font-mono tracking-widest text-zinc-500">Updated</label>
          <span className="text-[14px] text-zinc-300">{timeAgo(issue.updated)}</span>
         </div>
+
+        {issue.target_date && (() => {
+         const td = formatTargetDate(issue.target_date);
+         return (
+          <div className="flex flex-col gap-1">
+           <label className="text-[12px] uppercase font-mono tracking-widest text-zinc-500">Target Date</label>
+           <span className={`text-[14px] font-medium ${td?.colorClass || "text-zinc-300"}`}>
+            {issue.target_date}{td ? ` (${td.text})` : ""}
+           </span>
+          </div>
+         );
+        })()}
        </div>
       </div>
      </div>
