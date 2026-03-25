@@ -30,6 +30,7 @@
 
 ## Agent Heartbeats
 - Agents run 15-minute heartbeat crons to check notifications, update issues, and post standups
+- Only project leads post standups — non-lead agents skip standup writes during heartbeat
 - Heartbeat messages include direct dashboard links so agents can reference specific project pages
 
 ## Ops Watcher
