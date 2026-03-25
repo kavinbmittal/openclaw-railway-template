@@ -3182,7 +3182,7 @@ app.get("/mc/api/issues/:id", requireSetupAuth, (req, res) => {
 
 // Create issue
 app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
-  const { project, title, description, priority, assignee, labels, theme, proxy_metrics, model_override, thinking_override, complexity } = req.body;
+  const { project, title, description, priority, assignee, labels, theme, proxy_metrics, model_override, thinking_override, complexity, target_date } = req.body;
   if (!project || !title) {
     return res.status(400).json({ error: "Missing project or title" });
   }
@@ -3250,6 +3250,7 @@ app.post("/mc/api/issues", requireSetupAuth, (req, res) => {
     model_override: model_override || null,
     thinking_override: thinking_override || null,
     complexity: complexity || "complex",
+    target_date: target_date || null,
     escalation_count: 0,
     created: now,
     updated: now,

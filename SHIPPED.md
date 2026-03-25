@@ -1,5 +1,8 @@
 # SHIPPED.md
 
+## 2026-03-25
+- **feat:** Issue target dates — agents can propose a due date when creating issues, editable from the dashboard; issues list shows friendly relative text ("overdue" in red, "today"/"tomorrow" in amber, "in X days" in gray); issue detail shows target date in header metadata and sidebar; create and edit forms include a date picker field
+
 ## 2026-03-24
 - **feat:** Edit Strategy modal — restructure project themes mid-flight from the Overview tab: inline edit theme titles/descriptions/caps, add/remove proxy metrics (min 1, max 3), add new themes, retire old ones; two-step flow with impact review showing affected issues/experiments with keep/discard checkboxes; crash-safe write order (notification → themes → cascade → archive → activity log); agent reconciliation via heartbeat notification
 - **feat:** Merged autoresearch + experiments into single canonical protocol — eval harness per domain, never-stop iteration rule, three-check tool validation (agent TOOLS.md + registry + tool doc), auto-execute on approval, pause/resume on tool failure
