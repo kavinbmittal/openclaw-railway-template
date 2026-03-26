@@ -173,6 +173,21 @@
 - [ ] Teach agents to read `shared/model-routing.json` and use model/thinking fields at spawn time — effort M
 - [ ] Teach agents to write `budget_status` + budget approval JSON when cap is hit — effort S
 
+## 2026-03-26-dashboard-briefing
+
+### Backend
+- [x] Add `overdue_issue` item type to `/mc/api/inbox` (issues scan loop)
+- [x] Add `paused_experiment` item type to `/mc/api/inbox` (new scan loop)
+- [x] Add `overdue` and `paused` to counts object
+
+### Frontend
+- [x] Create `Briefing.jsx` — three priority-ordered sections with visual hierarchy
+- [x] Update `App.jsx` — swap route, keep `#/inbox` as alias
+- [x] Update `Sidebar.jsx` — rename to "Briefing", badge = S1+S2 only
+- [x] Update `Overview.jsx` — banner navigates to "briefing"
+- [x] Delete `Inbox.jsx`
+- [x] Build dist
+
 ## v2: One-tap model switch from Telegram
 
 When a model fallback alert fires, include an inline "Switch" button that rewrites `agents.defaults.model.primary` in `openclaw.json` via an HMAC-secured `/ops/model-switch` endpoint. Also add an "Undo" button to the confirmation message so switching back is one more tap.

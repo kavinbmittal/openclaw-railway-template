@@ -114,7 +114,7 @@ export default function Overview({ navigate }) {
    {/* Needs Attention banner */}
    {inboxCount !== null && (
     <div
-     onClick={() => navigate("inbox")}
+     onClick={() => navigate("briefing")}
      className={`flex items-center gap-3 px-[20px] py-3 rounded-[2px] border shadow-sm cursor-pointer transition-colors ${
       inboxCount > 0
        ?"border-amber-500/20 bg-amber-500/5"
