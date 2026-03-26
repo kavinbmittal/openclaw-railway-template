@@ -43,7 +43,7 @@ const WORKSPACE_DIR =
 // Canonical heartbeat message — source of truth is shared/protocols/projects.md
 const DASHBOARD_URL = "https://dash.belowthesurface.studio/mc";
 
-const HEARTBEAT_MESSAGE = `Project heartbeat (scan only — do NOT do actual work): Read shared/protocols/projects.md. Check shared/projects/ for projects where you are lead. (1) Check notifications/ — process and delete. (2) Check issues/ — update statuses, propose new issues if needed (status: proposed). (3) Post daily standup if not done today — ONLY if you are the project lead (skip if you are not lead). (4) If .budget-exceeded exists, message Kavin you are paused. Do NOT execute work items in this turn. When referencing the dashboard, always include a direct link: ${DASHBOARD_URL}#/projects/{project-slug}/issues for issues, ${DASHBOARD_URL}#/projects/{project-slug} for project overview.`;
+const HEARTBEAT_MESSAGE = `Project heartbeat (scan only — do NOT do actual work): Read shared/protocols/projects.md. Check shared/projects/ — ONLY process projects where **Lead:** matches YOUR name in PROJECT.md. Skip ALL other projects entirely. For each project you lead: (1) Check notifications/ — process and delete. (2) Check issues/ — update statuses, propose new issues if needed (status: proposed, include target_date). (3) Post daily standup to standups/YYYY-MM-DD.md if not done today. (4) If .budget-exceeded exists, message Kavin you are paused. NEVER write standups or any files to projects you do not lead. Do NOT execute work items in this turn. When referencing the dashboard, always include a direct link: ${DASHBOARD_URL}#/projects/{project-slug}/issues for issues, ${DASHBOARD_URL}#/projects/{project-slug} for project overview.`;
 
 // Protect /setup with a user-provided password.
 const SETUP_PASSWORD = process.env.SETUP_PASSWORD?.trim();
@@ -2030,7 +2030,11 @@ app.get("/mc/api/projects", requireSetupAuth, (_req, res) => {
   }
   const entries = fs.readdirSync(projectsDir, { withFileTypes: true });
   const projects = entries
-    .filter((e) => e.isDirectory() && !e.name.startsWith("_"))
+    .filter((e) => {
+      if (!e.isDirectory() || e.name.startsWith("_")) return false;
+      // Only real projects have a PROJECT.md — skip stray directories
+      return fs.existsSync(path.join(projectsDir, e.name, "PROJECT.md"));
+    })
     .map((e) => {
       const projectPath = path.join(projectsDir, e.name, "PROJECT.md");
       let meta = { id: e.name };
@@ -3926,6 +3930,8 @@ app.get("/mc/api/costs/overview", requireSetupAuth, (_req, res) => {
 
   for (const entry of dirs) {
     if (!entry.isDirectory() || entry.name.startsWith("_")) continue;
+    // Only real projects have a PROJECT.md
+    if (!fs.existsSync(path.join(projectsDir, entry.name, "PROJECT.md"))) continue;
     const slug = entry.name;
     const costData = loadProjectCosts(slug);
     const policy = loadBudgetPolicy(slug);
