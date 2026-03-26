@@ -119,7 +119,7 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
     .then((data) => {
      const c = data?.counts || {};
      // Badge = Sections 1+2 only (Decisions + Risks). Excludes standups and experiment updates.
-     setInboxCount((c.approvals || 0) + (c.proposed || 0) + (c.budget || 0) + (c.tasks || 0) + (c.overdue || 0) + (c.paused || 0));
+     setInboxCount((c.approvals || 0) + (c.proposed || 0) + (c.budget || 0) + (c.blocked || 0) + (c.tasks || 0) + (c.overdue || 0) + (c.paused || 0));
     })
     .catch(() => {});
   load();

@@ -10,6 +10,7 @@ import {
   FlaskConical,
   Wallet,
   MessageSquare,
+  UserCheck,
 } from "lucide-react";
 import { Skeleton } from "../components/ui/Skeleton.jsx";
 import { formatTimeAgo } from "../utils/formatDate.js";
@@ -39,7 +40,8 @@ const SECTIONS = [
     filter: (item) =>
       item.type === "approval" ||
       item.type === "proposed_issue" ||
-      item.type === "budget",
+      item.type === "budget" ||
+      item.type === "blocked_on_operator",
     showEmpty: true,
   },
   {
@@ -65,7 +67,6 @@ const SECTIONS = [
 
 /**
  * Badge color and label by item type.
- * Returns { classes, label } for each item's type badge.
  */
 function getItemBadge(item) {
   switch (item.type) {
@@ -83,6 +84,15 @@ function getItemBadge(item) {
       return item.severity === "critical"
         ? { classes: "border-red-500/20 bg-red-500/10 text-red-400", label: "Critical" }
         : { classes: "border-amber-500/20 bg-amber-500/10 text-amber-400", label: "Warning" };
+    case "blocked_on_operator": {
+      const d = item.days_blocked;
+      // Show hours if < 1 day, days otherwise
+      const timeStr = d >= 1 ? `${d}d` : shortTime(item.blocked_at) || "<1h";
+      return {
+        classes: "border-orange-500/20 bg-orange-500/10 text-orange-400",
+        label: `Waiting · ${timeStr}`,
+      };
+    }
     case "stale_task":
       return {
         classes: "border-cyan-500/20 bg-cyan-500/10 text-cyan-400",
@@ -121,7 +131,7 @@ function getItemBadge(item) {
   }
 }
 
-/** Row icon by item type — small contextual hint left of the badge */
+/** Row icon by item type */
 function getRowIcon(item) {
   switch (item.type) {
     case "approval":
@@ -129,6 +139,8 @@ function getRowIcon(item) {
       return ShieldCheck;
     case "budget":
       return Wallet;
+    case "blocked_on_operator":
+      return UserCheck;
     case "stale_task":
       return Clock;
     case "overdue_issue":
@@ -158,6 +170,7 @@ function handleClick(item, navigate) {
       break;
     case "stale_task":
     case "overdue_issue":
+    case "blocked_on_operator":
       if (item.project && item.project !== "general" && item.id) {
         navigate("issue-detail", { projectSlug: item.project, issueId: item.id });
       }
@@ -180,8 +193,30 @@ function handleClick(item, navigate) {
   }
 }
 
+/**
+ * Groups items by project, sorted by urgency (oldest item first).
+ * Returns array of { project, items } objects.
+ */
+function groupByProject(items) {
+  const byProject = {};
+  for (const item of items) {
+    const proj = item.project && item.project !== "general" ? item.project : "General";
+    if (!byProject[proj]) byProject[proj] = [];
+    byProject[proj].push(item);
+  }
+
+  // Sort items within each project by age (oldest first)
+  for (const proj of Object.keys(byProject)) {
+    byProject[proj].sort((a, b) => (a.timestamp || "").localeCompare(b.timestamp || ""));
+  }
+
+  // Sort projects by their oldest item (most urgent project first)
+  return Object.entries(byProject)
+    .map(([project, items]) => ({ project, items }))
+    .sort((a, b) => (a.items[0]?.timestamp || "").localeCompare(b.items[0]?.timestamp || ""));
+}
+
 // --- Section header configs ---
-// S1 Decisions: red/amber tinted header (uses section accent, not card tint)
 const SECTION_STYLES = {
   decisions: {
     headerClass: "bg-red-500/[0.02] hover:bg-red-500/[0.05]",
@@ -212,6 +247,14 @@ const SECTION_STYLES = {
   },
 };
 
+/** Right-side time display — contextual per item type */
+function timeDisplay(item) {
+  if (item.days_blocked != null && item.days_blocked >= 1) return `${item.days_blocked}d`;
+  if (item.days_overdue) return `${item.days_overdue}d late`;
+  if (item.daysStale) return `${item.daysStale}d idle`;
+  return shortTime(item.timestamp);
+}
+
 export default function Briefing({ navigate }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -229,24 +272,28 @@ export default function Briefing({ navigate }) {
     refresh();
   }, []);
 
-  // Group items by section
+  // Group items by section, then by project within each section
   const grouped = useMemo(() => {
     if (!data?.items) return {};
     const result = {};
     for (const section of SECTIONS) {
-      result[section.key] = data.items.filter(section.filter);
+      const sectionItems = data.items.filter(section.filter);
+      result[section.key] = {
+        items: sectionItems,
+        byProject: groupByProject(sectionItems),
+      };
     }
     return result;
   }, [data]);
 
   // Actionable count = S1 (Decisions) + S2 (Risks)
   const actionableCount = useMemo(() => {
-    return (grouped.decisions?.length || 0) + (grouped.risks?.length || 0);
+    return (grouped.decisions?.items?.length || 0) + (grouped.risks?.items?.length || 0);
   }, [grouped]);
 
   // S1 has a critical budget item? → red accent, else amber
   const hasCritical = useMemo(() => {
-    return (grouped.decisions || []).some(
+    return (grouped.decisions?.items || []).some(
       (item) => item.type === "budget" && item.severity === "critical"
     );
   }, [grouped]);
@@ -293,7 +340,8 @@ export default function Briefing({ navigate }) {
       {/* Sections */}
       <div className="space-y-6 pb-12">
         {SECTIONS.map((section) => {
-          const items = grouped[section.key] || [];
+          const sectionData = grouped[section.key] || { items: [], byProject: [] };
+          const { items, byProject } = sectionData;
           if (items.length === 0 && !section.showEmpty) return null;
 
           const Icon = section.icon;
@@ -329,40 +377,59 @@ export default function Briefing({ navigate }) {
                   <span className="text-[12px] text-muted-foreground/60">System stable, agents running</span>
                 </div>
               ) : (
-                items.map((item, idx) => {
-                  const badge = getItemBadge(item);
-                  const RowIcon = getRowIcon(item);
-                  // S3 rows use muted text to reduce visual weight
-                  const titleClass = isMuted
-                    ? "text-[14px] text-muted-foreground flex-1 truncate"
-                    : "text-[14px] text-foreground flex-1 truncate";
-
-                  return (
-                    <div
-                      key={item.id || idx}
-                      className={`flex items-center gap-4 px-5 py-3 hover:bg-accent/40 cursor-pointer focus-within:bg-accent/40 transition-colors ${
-                        idx < items.length - 1 ? "border-b border-border/50" : ""
-                      }`}
-                      onClick={() => handleClick(item, navigate)}
-                    >
-                      <RowIcon className="text-muted-foreground w-[18px] h-[18px] flex-shrink-0" />
-                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-normal border ${badge.classes} flex-shrink-0`}>
-                        {badge.label}
+                /* Project-grouped items */
+                byProject.map((group, groupIdx) => (
+                  <div key={group.project}>
+                    {/* Project sub-header — lightweight grouping line */}
+                    <div className={`flex items-center justify-between px-5 py-2 ${groupIdx > 0 ? "border-t border-border/50" : ""}`}>
+                      <span className="text-[13px] font-mono uppercase tracking-[0.1em] text-muted-foreground">
+                        {group.project}
                       </span>
-                      <span className={titleClass}>{item.title}</span>
-                      <span className="text-[12px] text-muted-foreground flex-shrink-0 w-32 truncate hidden sm:block">
-                        {item.project && item.project !== "general" ? item.project : item.requester || ""}
-                      </span>
-                      <span className="text-[12px] font-mono text-muted-foreground/60 w-16 text-right flex-shrink-0">
-                        {item.days_overdue
-                          ? `${item.days_overdue}d late`
-                          : item.daysStale
-                            ? `${item.daysStale}d idle`
-                            : shortTime(item.timestamp)}
+                      <span className="text-[11px] font-mono text-muted-foreground/50">
+                        {group.items.length}
                       </span>
                     </div>
-                  );
-                })
+
+                    {/* Items within this project */}
+                    {group.items.map((item, idx) => {
+                      const badge = getItemBadge(item);
+                      const RowIcon = getRowIcon(item);
+                      const titleClass = isMuted
+                        ? "text-[14px] text-muted-foreground flex-1 truncate"
+                        : "text-[14px] text-foreground flex-1 truncate";
+
+                      return (
+                        <div
+                          key={item.id || `${groupIdx}-${idx}`}
+                          className={`flex items-center gap-4 px-5 py-3 hover:bg-accent/40 cursor-pointer focus-within:bg-accent/40 transition-colors ${
+                            idx < group.items.length - 1 ? "border-b border-border/30" : ""
+                          }`}
+                          onClick={() => handleClick(item, navigate)}
+                        >
+                          <RowIcon className="text-muted-foreground w-[18px] h-[18px] flex-shrink-0" />
+                          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-normal border ${badge.classes} flex-shrink-0`}>
+                            {badge.label}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <span className={titleClass}>{item.title}</span>
+                            {/* Blocker reason — visible inline beneath title */}
+                            {item.type === "blocked_on_operator" && item.blocked_reason && (
+                              <div className="text-[12px] text-muted-foreground/70 truncate mt-0.5">
+                                {item.blocked_reason}
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[12px] text-muted-foreground flex-shrink-0 w-28 truncate hidden sm:block text-right">
+                            {item.assignee || item.requester || ""}
+                          </span>
+                          <span className="text-[12px] font-mono text-muted-foreground/60 w-16 text-right flex-shrink-0">
+                            {timeDisplay(item)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))
               )}
             </div>
           );

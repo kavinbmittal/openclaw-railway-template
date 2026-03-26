@@ -2639,6 +2639,24 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
               });
             }
           }
+
+          // C3. Blocked on operator — agent is waiting for Kavin's input
+          if (issue.blocked_on === "operator" && !skipStatuses.includes(issue.status)) {
+            const blockedAt = issue.blocked_at || issue.updated || new Date().toISOString();
+            const elapsed = now - new Date(blockedAt).getTime();
+            const daysBlocked = Math.floor(elapsed / (24 * 60 * 60 * 1000));
+            items.push({
+              type: "blocked_on_operator",
+              project: proj.name,
+              id: issue.id || issueFile.replace(".json", ""),
+              title: issue.title || issueFile.replace(".json", ""),
+              blocked_reason: issue.blocked_reason || "Waiting on input",
+              blocked_at: blockedAt,
+              assignee: issue.assignee || null,
+              days_blocked: daysBlocked,
+              timestamp: blockedAt,
+            });
+          }
         } catch { /* skip */ }
       }
     }
@@ -2836,8 +2854,9 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
     updates: items.filter((i) => i.type === "experiment_update").length,
     overdue: items.filter((i) => i.type === "overdue_issue").length,
     paused: items.filter((i) => i.type === "paused_experiment").length,
+    blocked: items.filter((i) => i.type === "blocked_on_operator").length,
   };
-  counts.total = counts.approvals + counts.budget + counts.tasks + counts.standups + counts.proposed + counts.updates + counts.overdue + counts.paused;
+  counts.total = counts.approvals + counts.budget + counts.tasks + counts.standups + counts.proposed + counts.updates + counts.overdue + counts.paused + counts.blocked;
 
   return res.json({ items, counts });
 });

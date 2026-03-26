@@ -3,6 +3,8 @@
 ## 2026-03-26
 - **fix:** Only leads post standups — strengthened heartbeat message so agents skip projects they don't lead; deleted fake `standups` project directory; all project endpoints now require PROJECT.md to exist (stray directories ignored); cleaned up non-lead standup files from lia-first-100
 - **fix:** Heartbeat cron now explicitly tells agents only leads post standups; `_org-level` filtered from all project-listing endpoints (sidebar, costs, approvals, agents — not just inbox)
+- **feat:** Blocked-on-operator detection — agents can flag when they're waiting on you (`blocked_on: "operator"`); shows in Briefing Section 1 with orange badge, inline reason text, and agent name; API scans issues for blocker fields
+- **feat:** Project-grouped Briefing — all three sections now group items by project with lightweight sub-headers; projects sorted by urgency (oldest item first); items within a project sorted oldest-first
 - **feat:** Briefing page replaces Inbox — three priority-ordered sections (Decisions Waiting, Risks, What Happened) with decreasing visual weight; elevated card with red/amber accent for decisions, standard card for risks, muted rows for context; new overdue issue and paused experiment detection in API; sidebar badge counts only actionable items (Sections 1+2); `#/inbox` aliases to `#/briefing`
 
 ## 2026-03-25

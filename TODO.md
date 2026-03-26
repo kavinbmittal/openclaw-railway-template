@@ -173,6 +173,20 @@
 - [ ] Teach agents to read `shared/model-routing.json` and use model/thinking fields at spawn time — effort M
 - [ ] Teach agents to write `budget_status` + budget approval JSON when cap is hit — effort S
 
+## 2026-03-26-blocked-on-operator
+
+### Backend
+- [x] Add `blocked_on_operator` scan to inbox issues loop
+- [x] Add `blocked` to counts object + sidebar badge
+
+### Frontend
+- [x] Project grouping across all three Briefing sections
+- [x] Blocker row rendering with inline reason
+- [x] Build dist
+
+### Follow-up (separate oc-sync)
+- [ ] Protocol update: teach agents to set/clear blocker fields
+
 ## 2026-03-26-dashboard-briefing
 
 ### Backend
