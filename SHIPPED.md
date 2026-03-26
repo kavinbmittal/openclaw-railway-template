@@ -1,6 +1,7 @@
 # SHIPPED.md
 
 ## 2026-03-26
+- **fix:** Only leads post standups — strengthened heartbeat message so agents skip projects they don't lead; deleted fake `standups` project directory; all project endpoints now require PROJECT.md to exist (stray directories ignored); cleaned up non-lead standup files from lia-first-100
 - **fix:** Heartbeat cron now explicitly tells agents only leads post standups; `_org-level` filtered from all project-listing endpoints (sidebar, costs, approvals, agents — not just inbox)
 - **feat:** Briefing page replaces Inbox — three priority-ordered sections (Decisions Waiting, Risks, What Happened) with decreasing visual weight; elevated card with red/amber accent for decisions, standard card for risks, muted rows for context; new overdue issue and paused experiment detection in API; sidebar badge counts only actionable items (Sections 1+2); `#/inbox` aliases to `#/briefing`
 
