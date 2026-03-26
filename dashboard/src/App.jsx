@@ -7,7 +7,7 @@ import AgentDetail from"./pages/AgentDetail.jsx";
 import CreateProject from"./pages/CreateProject.jsx";
 import Approvals from"./pages/Approvals.jsx";
 import ApprovalDetail from"./pages/ApprovalDetail.jsx";
-import Inbox from"./pages/Inbox.jsx";
+import Briefing from"./pages/Briefing.jsx";
 import Activity from"./pages/Activity.jsx";
 import IssueDetail from"./pages/IssueDetail.jsx";
 import Costs from"./pages/Costs.jsx";
@@ -33,8 +33,9 @@ function parseHash(hash) {
   case"agents":
    if (parts[1]) return { page:"agent-detail", selectedAgent: parts[1] };
    return { page:"agents" };
+  case"briefing":
   case"inbox":
-   return { page:"inbox" };
+   return { page:"briefing" };
   case"activity":
    return { page:"activity" };
   case"costs":
@@ -120,8 +121,9 @@ function buildHash(target, data) {
   case"issue-detail":
    // data = { projectSlug, issueId }
    return `#/projects/${data.projectSlug}/issues/${data.issueId}`;
+  case"briefing":
   case"inbox":
-   return"#/inbox";
+   return"#/briefing";
   case"activity":
    return"#/activity";
   case"costs":
@@ -236,7 +238,7 @@ export default function App() {
        {page ==="overview" && <Overview navigate={navigate} />}
        {page ==="agents" && <AgentList navigate={navigate} />}
        {page ==="approvals" && <Approvals navigate={navigate} />}
-       {page ==="inbox" && <Inbox navigate={navigate} />}
+       {page ==="briefing" && <Briefing navigate={navigate} />}
        {page ==="activity" && <Activity navigate={navigate} />}
        {page ==="costs" && <Costs navigate={navigate} />}
        {page ==="org-chart" && <OrgChart navigate={navigate} />}

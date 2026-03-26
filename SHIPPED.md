@@ -1,5 +1,8 @@
 # SHIPPED.md
 
+## 2026-03-26
+- **feat:** Briefing page replaces Inbox — three priority-ordered sections (Decisions Waiting, Risks, What Happened) with decreasing visual weight; elevated card with red/amber accent for decisions, standard card for risks, muted rows for context; new overdue issue and paused experiment detection in API; sidebar badge counts only actionable items (Sections 1+2); `#/inbox` aliases to `#/briefing`
+
 ## 2026-03-25
 - **fix:** Only project leads post standups — protocol updated, non-lead agents skip standup writes; inbox groups standups by project+date (no more 24 duplicate rows); `_org-level` filtered from inbox
 - **feat:** Issue target dates — agents can propose a due date when creating issues, editable from the dashboard; issues list shows friendly relative text ("overdue" in red, "today"/"tomorrow" in amber, "in X days" in gray); issue detail shows target date in header metadata and sidebar; create and edit forms include a date picker field

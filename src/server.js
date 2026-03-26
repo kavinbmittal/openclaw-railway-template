@@ -2587,29 +2587,53 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
       } catch { /* skip */ }
     }
 
-    // C. Stale Tasks — issues in_progress > 3 days
+    // C. Stale Tasks + Overdue Issues — single pass over issues
     const issuesDir = path.join(projDir, "issues");
     if (fs.existsSync(issuesDir)) {
       const issueFiles = fs.readdirSync(issuesDir).filter((f) => f.endsWith(".json"));
       for (const issueFile of issueFiles) {
         try {
           const issue = JSON.parse(fs.readFileSync(path.join(issuesDir, issueFile), "utf8"));
-          if (issue.status !== "in_progress") continue;
-          const updated = issue.updated || issue.created || issue.started;
-          if (!updated) continue;
-          const elapsed = now - new Date(updated).getTime();
-          if (elapsed > threeDays) {
-            const daysStale = Math.floor(elapsed / (24 * 60 * 60 * 1000));
-            items.push({
-              type: "stale_task",
-              project: proj.name,
-              id: issue.id || issueFile,
-              title: issue.title || issueFile.replace(".json", ""),
-              subtitle: `Assigned to ${issue.assignee || "unassigned"} — in progress for ${daysStale} days`,
-              assignee: issue.assignee || null,
-              daysStale,
-              timestamp: updated,
-            });
+          const skipStatuses = ["done", "cancelled", "proposed"];
+
+          // C1. Stale tasks — in_progress > 3 days since last update
+          if (issue.status === "in_progress") {
+            const updated = issue.updated || issue.created || issue.started;
+            if (updated) {
+              const elapsed = now - new Date(updated).getTime();
+              if (elapsed > threeDays) {
+                const daysStale = Math.floor(elapsed / (24 * 60 * 60 * 1000));
+                items.push({
+                  type: "stale_task",
+                  project: proj.name,
+                  id: issue.id || issueFile,
+                  title: issue.title || issueFile.replace(".json", ""),
+                  subtitle: `Assigned to ${issue.assignee || "unassigned"} — in progress for ${daysStale} days`,
+                  assignee: issue.assignee || null,
+                  daysStale,
+                  timestamp: updated,
+                });
+              }
+            }
+          }
+
+          // C2. Overdue issues — target_date is before today, issue still active
+          if (issue.target_date && !skipStatuses.includes(issue.status)) {
+            const targetDate = new Date(issue.target_date + "T00:00:00Z");
+            const todayDate = new Date(today + "T00:00:00Z");
+            if (targetDate < todayDate) {
+              const daysOverdue = Math.floor((todayDate - targetDate) / (24 * 60 * 60 * 1000));
+              items.push({
+                type: "overdue_issue",
+                project: proj.name,
+                id: issue.id || issueFile.replace(".json", ""),
+                title: issue.title || issueFile.replace(".json", ""),
+                assignee: issue.assignee || null,
+                target_date: issue.target_date,
+                days_overdue: daysOverdue,
+                timestamp: issue.target_date + "T00:00:00Z",
+              });
+            }
           }
         } catch { /* skip */ }
       }
@@ -2738,6 +2762,64 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
     }
   }
 
+  // G. Paused Experiments — experiments with latest decision "pause"
+  for (const proj of projects) {
+    const expDir = path.join(projectsDir, proj.name, "experiments");
+    if (!fs.existsSync(expDir)) continue;
+    const expEntries = fs.readdirSync(expDir, { withFileTypes: true }).filter((e) => e.isDirectory());
+    for (const entry of expEntries) {
+      try {
+        const programPath = path.join(expDir, entry.name, "program.md");
+        const resultsPath = path.join(expDir, entry.name, "results.tsv");
+
+        // Parse experiment name from program.md
+        let expName = entry.name;
+        let mdStatus = "unknown";
+        if (fs.existsSync(programPath)) {
+          const programMd = fs.readFileSync(programPath, "utf8");
+          const titleMatch = programMd.match(/^#\s+(.+)/m);
+          if (titleMatch) expName = titleMatch[1];
+          const statusMatch = programMd.match(/## Status\s*\n\s*(\S+)/);
+          if (statusMatch) mdStatus = statusMatch[1];
+        }
+
+        // Parse results.tsv to derive status
+        const results = [];
+        if (fs.existsSync(resultsPath)) {
+          const raw = fs.readFileSync(resultsPath, "utf8");
+          const lines = raw.trim().split("\n");
+          if (lines.length > 1) {
+            const headers = lines[0].split("\t").map((h) => h.trim());
+            for (let i = 1; i < lines.length; i++) {
+              const cols = lines[i].split("\t").map((c) => c.trim());
+              const row = {};
+              for (let j = 0; j < headers.length; j++) {
+                row[headers[j]] = cols[j] || "";
+              }
+              results.push(row);
+            }
+          }
+        }
+
+        const status = deriveStatusFromResults(results, mdStatus);
+        if (status !== "paused") continue;
+
+        // Use the last result's date as timestamp, fall back to now
+        const lastResult = results[results.length - 1];
+        const ts = lastResult?.date || new Date().toISOString();
+
+        items.push({
+          type: "paused_experiment",
+          project: proj.name,
+          id: entry.name,
+          title: expName,
+          experiment_dir: entry.name,
+          timestamp: ts.includes("T") ? ts : ts + "T00:00:00Z",
+        });
+      } catch { /* skip */ }
+    }
+  }
+
   // Sort by recency
   items.sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""));
 
@@ -2748,8 +2830,10 @@ app.get("/mc/api/inbox", requireSetupAuth, (_req, res) => {
     standups: items.filter((i) => i.type === "standup").length,
     proposed: items.filter((i) => i.type === "proposed_issue").length,
     updates: items.filter((i) => i.type === "experiment_update").length,
+    overdue: items.filter((i) => i.type === "overdue_issue").length,
+    paused: items.filter((i) => i.type === "paused_experiment").length,
   };
-  counts.total = counts.approvals + counts.budget + counts.tasks + counts.standups + counts.proposed + counts.updates;
+  counts.total = counts.approvals + counts.budget + counts.tasks + counts.standups + counts.proposed + counts.updates + counts.overdue + counts.paused;
 
   return res.json({ items, counts });
 });

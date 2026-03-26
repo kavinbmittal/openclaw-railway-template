@@ -4,7 +4,7 @@ import {
  ShieldCheck,
  ChevronRight,
  Bot,
- Inbox,
+ Zap,
  Activity,
  CircleDot,
  DollarSign,
@@ -118,7 +118,8 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
    getInbox()
     .then((data) => {
      const c = data?.counts || {};
-     setInboxCount((c.approvals || 0) + (c.budget || 0) + (c.tasks || 0) + (c.proposed || 0) + (c.updates || 0));
+     // Badge = Sections 1+2 only (Decisions + Risks). Excludes standups and experiment updates.
+     setInboxCount((c.approvals || 0) + (c.proposed || 0) + (c.budget || 0) + (c.tasks || 0) + (c.overdue || 0) + (c.paused || 0));
     })
     .catch(() => {});
   load();
@@ -170,10 +171,10 @@ export default function Sidebar({ page, selectedProject, navigate, refreshKey })
       label="Dashboard"
      />
      <SidebarNavItem
-      active={page ==="inbox"}
-      onClick={() => navigate("inbox")}
-      icon={Inbox}
-      label="Inbox"
+      active={page ==="briefing"}
+      onClick={() => navigate("briefing")}
+      icon={Zap}
+      label="Briefing"
       badge={inboxCount}
       badgeTone="danger"
      />
